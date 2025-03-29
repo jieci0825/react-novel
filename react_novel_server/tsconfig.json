@@ -1,0 +1,25 @@
+{
+    // 编译选项
+    "compilerOptions": {
+        // 指定模块代码生成方式
+        "module": "ES2020",
+        // 指定 ECMAScript 目标版本
+        "target": "ES2020",
+        "outDir": "dist",
+        "rootDir": "src",
+        // 禁止隐式 any 类型
+        "noImplicitAny": true,
+        // 启用对 CommonJS 和 ES 模块的兼容性
+        "esModuleInterop": true,
+        // 跳过库文件的类型检查
+        "skipLibCheck": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["src/*"]
+        }
+    },
+    // 指定要包含的文件
+    "include": ["./src/**/*"],
+    // 指定要排除的文件
+    "exclude": ["node_modules"]
+}
