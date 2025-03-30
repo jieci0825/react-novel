@@ -4,7 +4,6 @@ import path from 'node:path'
 import fs from 'node:fs'
 import { DEVELOPMENT } from '@/constants'
 import Router from 'koa-router'
-const requireDirectory = require('require-directory')
 
 // 解析参数
 function applyBodyParse(app: Koa) {
