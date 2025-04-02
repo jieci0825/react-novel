@@ -15,7 +15,7 @@ export class ErrorTypeImpl extends Error {
 }
 
 export class DataSuccess extends ErrorTypeImpl {
-    constructor(data = null, msg = 'ok', errorCode = '0') {
+    constructor(data: any, msg = 'ok', errorCode = '0') {
         super()
         this.statusCode = 200
         this.errorCode = errorCode

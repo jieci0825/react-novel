@@ -4,6 +4,7 @@ import path from 'node:path'
 import fs from 'node:fs'
 import { DEVELOPMENT } from '@/constants'
 import Router from 'koa-router'
+import { handleError } from './handle-error'
 
 // 解析参数
 function applyBodyParse(app: Koa) {
@@ -55,7 +56,27 @@ async function applyRouter(app: Koa) {
     }
 }
 
+async function createTableModels() {
+    const { db } = require('@/core/db')
+
+    const modelsPath = path.resolve(process.cwd(), 'src/app/models')
+    const files = fs.readdirSync(modelsPath)
+
+    for (const file of files) {
+        if (file.endsWith('.model.ts')) {
+            const { default: model } = await import(path.join(modelsPath, file))
+            db[model.name] = model
+        }
+    }
+
+    db.sync({ alter: true })
+        .then(() => console.log('同步完成'))
+        .catch(console.error)
+}
+
 export async function registerApp(app: Koa) {
+    app.use(handleError)
+    createTableModels()
     applyCors(app)
     await applyRouter(app)
     applyBodyParse(app)

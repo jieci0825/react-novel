@@ -3,7 +3,7 @@ import { Middleware } from '@/types'
 import { ErrorTypeImpl } from './error-type'
 
 // 异常处理
-const handleError: Middleware = async (ctx, next) => {
+export const handleError: Middleware = async (ctx, next) => {
     try {
         await next()
     } catch (error) {
@@ -37,5 +37,3 @@ const handleError: Middleware = async (ctx, next) => {
         }
     }
 }
-
-module.exports = { handleError }
