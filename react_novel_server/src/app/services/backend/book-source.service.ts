@@ -24,7 +24,8 @@ export async function addBookSourceService(data: AddBookSourceData) {
             {
                 book_source_name: data.bookSourceName,
                 book_source_url: data.url,
-                book_source_method: data.method
+                book_source_method: data.method,
+                book_source_effect: data.effect
             },
             { transaction: t }
         )

@@ -25,6 +25,11 @@ const BookSource = db.define('book_sources', {
         unique: true,
         allowNull: false,
         comment: '书源地址'
+    },
+    book_source_effect: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+        comment: '书源效果'
     }
 })
 
