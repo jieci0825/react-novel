@@ -1,4 +1,4 @@
-import { GetBookParams } from '@/app/types/boo-store.type'
+import { GetBookParams, SearchBookParams } from '@/app/types/boo-store.type'
 import axios from 'axios'
 
 export async function getBookStoreCategorysService() {
@@ -30,4 +30,15 @@ export async function getBooksByCategoryService(data: GetBookParams) {
     })
 
     return result.data.rows
+}
+
+export async function searchBooksService(data: SearchBookParams) {
+    const start = (data.page - 1) * data.pageSize
+    const end = data.page * data.pageSize
+
+    const result = await axios.get('https://newopensearch.reader.qq.com/wechat', {
+        params: { keyword: data.keyword, start, end }
+    })
+
+    return result.data.booklist
 }
