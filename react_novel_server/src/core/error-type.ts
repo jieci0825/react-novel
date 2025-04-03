@@ -70,7 +70,7 @@ export class Forbidden extends ErrorTypeImpl {
 }
 
 export class Collide extends ErrorTypeImpl {
-    constructor(msg: string, errorCode: string) {
+    constructor(msg: string, errorCode?: string) {
         super()
         this.statusCode = 409
         this.errorCode = errorCode || '10004'

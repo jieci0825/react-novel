@@ -15,15 +15,16 @@ const BookSource = db.define('book_sources', {
         allowNull: false,
         comment: '书源名称'
     },
-    createTime: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-        allowNull: false
+    book_source_method: {
+        type: DataTypes.STRING(10),
+        allowNull: false,
+        comment: '书源请求方式'
     },
-    updateTime: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-        allowNull: false
+    book_source_url: {
+        type: DataTypes.STRING(255),
+        unique: true,
+        allowNull: false,
+        comment: '书源地址'
     }
 })
 

@@ -8,7 +8,13 @@ import { handleError } from './handle-error'
 
 // 解析参数
 function applyBodyParse(app: Koa) {
-    app.use(koaBody())
+    // 支持解析 post
+    app.use(
+        koaBody({
+            json: true,
+            jsonLimit: '10mb'
+        })
+    )
 }
 
 // 处理 cors
@@ -69,7 +75,7 @@ async function createTableModels() {
         }
     }
 
-    db.sync({ alter: true })
+    db.sync()
         .then(() => console.log('同步完成'))
         .catch(console.error)
 }
@@ -78,6 +84,6 @@ export async function registerApp(app: Koa) {
     app.use(handleError)
     createTableModels()
     applyCors(app)
-    await applyRouter(app)
     applyBodyParse(app)
+    await applyRouter(app)
 }
