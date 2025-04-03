@@ -50,6 +50,7 @@ export interface AddBookSourceData {
 }
 
 export interface AddBookSourceRequest {
+    bookSourceId: number
     method: 'get' | 'put' | 'post' | 'delete' | 'patch'
     url: string
     effect: BookSourceEffect

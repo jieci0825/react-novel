@@ -8,7 +8,7 @@ const config = {
     database: process.env.DB_DATABASE
 } as any
 
-const db = new Sequelize(config.database, config.username, config.password, {
+export const db = new Sequelize(config.database, config.username, config.password, {
     dialect: 'mysql', // 选择链接数据库的类型, 需要安装 mysql2 这个驱动包
     host: config.host,
     port: config.port,
