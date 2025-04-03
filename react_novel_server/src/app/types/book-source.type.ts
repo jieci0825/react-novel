@@ -38,8 +38,18 @@ export enum BookSourceEffect {
     GET_BOOK_CHAPTER_CONTENT = 'getBookChapterContent'
 }
 
+export enum BookSourceStatus {
+    ENABLE = 100,
+    DISABLE = 200,
+    UNDONE = 300
+}
+
 export interface AddBookSourceData {
     bookSourceName: string
+    status: BookSourceStatus
+}
+
+export interface AddBookSourceRequest {
     method: 'get' | 'put' | 'post' | 'delete' | 'patch'
     url: string
     effect: BookSourceEffect

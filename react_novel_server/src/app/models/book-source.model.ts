@@ -15,21 +15,10 @@ const BookSource = db.define('book_sources', {
         allowNull: false,
         comment: '书源名称'
     },
-    book_source_method: {
-        type: DataTypes.STRING(10),
+    book_source_status: {
+        type: DataTypes.INTEGER,
         allowNull: false,
-        comment: '书源请求方式'
-    },
-    book_source_url: {
-        type: DataTypes.STRING(255),
-        unique: true,
-        allowNull: false,
-        comment: '书源地址'
-    },
-    book_source_effect: {
-        type: DataTypes.STRING(20),
-        allowNull: false,
-        comment: '书源效果'
+        comment: '书源状态'
     }
 })
 
