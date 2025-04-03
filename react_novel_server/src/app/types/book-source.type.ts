@@ -38,7 +38,7 @@ export enum BookSourceEffect {
     GET_BOOK_CHAPTER_CONTENT = 'getBookChapterContent'
 }
 
-export enum BookSourceStatus {
+export enum EBookSourceStatus {
     ENABLE = 100,
     DISABLE = 200,
     UNDONE = 300
@@ -46,7 +46,7 @@ export enum BookSourceStatus {
 
 export interface AddBookSourceData {
     bookSourceName: string
-    status: BookSourceStatus
+    status: EBookSourceStatus
 }
 
 export interface AddBookSourceRequest {

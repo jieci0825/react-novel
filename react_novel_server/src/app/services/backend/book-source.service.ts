@@ -1,6 +1,6 @@
 import BookSource from '@/app/models/book-source.model'
 import { Collide } from '@/core/error-type'
-import { AddBookSourceData, AddBookSourceRequest, BookSourceStatus } from '@/app/types/book-source.type'
+import { AddBookSourceData, AddBookSourceRequest, EBookSourceStatus } from '@/app/types/book-source.type'
 import { db } from '@/core/db'
 import { Transaction } from 'sequelize'
 import BookSourceRequst from '@/app/models/book-source-request.model'
@@ -20,7 +20,7 @@ export async function addBookSourceService(data: AddBookSourceData) {
 
     const result = await BookSource.create({
         book_source_name: data.bookSourceName,
-        book_source_status: BookSourceStatus.UNDONE
+        book_source_status: EBookSourceStatus.UNDONE
     })
 
     return result.id
