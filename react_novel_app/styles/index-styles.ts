@@ -98,3 +98,7 @@ export const bookGridStyles = (theme: Theme) => {
     },
   });
 };
+
+export const bookListStyles = (theme: Theme) => {
+  return StyleSheet.create({});
+};

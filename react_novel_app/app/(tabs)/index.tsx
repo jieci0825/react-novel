@@ -99,18 +99,38 @@ interface BookItem {
   title: string;
 }
 interface BookLayoutProps {
-  bookList: BookItem[][];
+  bookList: BookItem[];
 }
-interface BookGridLayoutProps extends BookLayoutProps {
-  columns: number;
-}
-function BookGridLayout(props: BookGridLayoutProps) {
+function BookGridLayout(props: BookLayoutProps) {
   const { theme } = useTheme();
 
   const styles = bookGridStyles(theme);
 
   // 动态计算宽度，保证间隔是 20
   const [itemWidth, setItemWidth] = useState<number | string>("30%");
+
+  // 监听屏幕宽度
+  const { width: screenWidth } = useWindowDimensions();
+
+  // 屏幕宽度超出 500 时候，每多100距离，就多一列
+  const baseColumns = 3;
+  const baseWidth = 500;
+  // 计算列数
+  const columns =
+    screenWidth < baseWidth
+      ? baseColumns
+      : Math.floor((screenWidth - baseWidth) / 100) + baseColumns;
+
+  // 因为不支持 grid 布局，所以需要手动分配成一个二维数组，每一项排列三个
+  function chunkArray(array: BookItem[], chunkSize: number = columns) {
+    const result = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+      result.push(array.slice(i, i + chunkSize));
+    }
+    return result;
+  }
+
+  const bookList = chunkArray(props.bookList);
 
   return (
     <>
@@ -120,11 +140,11 @@ function BookGridLayout(props: BookGridLayoutProps) {
           const { width } = e.nativeEvent.layout;
           // 减去间隔，书籍之间的两个 20
           // 然后剩余的宽度根据列数评分，即列数 - 1
-          const iw = (width - 20 * (props.columns - 1)) / props.columns;
+          const iw = (width - 20 * (columns - 1)) / columns;
           setItemWidth(iw);
         }}
       >
-        {props.bookList.map((item, index) => {
+        {bookList.map((item, index) => {
           return (
             <View style={[styles.bookRow]} key={index}>
               {item.map((book) => {
@@ -169,18 +189,6 @@ function HomeContent(props: HomeContentProps) {
 
   const styles = homeContentStyles(theme);
 
-  // 监听屏幕宽度
-  const { width: windowWidth } = useWindowDimensions();
-
-  // 屏幕宽度超出 500 时候，每多100距离，就多一列
-  const baseColumns = 3;
-  const baseWidth = 500;
-  // 计算列数
-  const columns =
-    windowWidth < baseWidth
-      ? baseColumns
-      : Math.floor((windowWidth - baseWidth) / 100) + baseColumns;
-
   const originBookList: BookItem[] = [
     { id: 1, title: "JavaScript高级程序设计" },
     { id: 2, title: "深入理解TypeScript" },
@@ -194,20 +202,9 @@ function HomeContent(props: HomeContentProps) {
     { id: 10, title: "计算机网络：自顶向下方法" },
   ];
 
-  // 因为不支持 grid 布局，所以需要手动分配成一个二维数组，每一项排列三个
-  function chunkArray(array: BookItem[], chunkSize: number = columns) {
-    const result = [];
-    for (let i = 0; i < array.length; i += chunkSize) {
-      result.push(array.slice(i, i + chunkSize));
-    }
-    return result;
-  }
-
-  const bookList = chunkArray(originBookList);
-
   const layoutComp: Record<BookLayout, React.ReactNode> = {
-    [BookLayout.Grid]: BookGridLayout({ bookList, columns }),
-    [BookLayout.List]: BookListLayout({ bookList }),
+    [BookLayout.Grid]: BookGridLayout({ bookList: originBookList }),
+    [BookLayout.List]: BookListLayout({ bookList: originBookList }),
   };
 
   return (
