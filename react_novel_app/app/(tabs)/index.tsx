@@ -12,6 +12,7 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useTheme } from "@/hooks/useTheme";
 import {
   bookGridStyles,
+  bookListStyles,
   homeContentStyles,
   homeHeaderStyles,
   homeStyles,
@@ -96,7 +97,9 @@ function HomeHeader(props: HomeHeaderProps) {
 
 interface BookItem {
   id: number;
+  author: string;
   title: string;
+  process: string;
 }
 interface BookLayoutProps {
   bookList: BookItem[];
@@ -174,9 +177,24 @@ function BookGridLayout(props: BookLayoutProps) {
 }
 
 function BookListLayout(props: BookLayoutProps) {
+  const { theme } = useTheme();
+
+  const styles = bookListStyles(theme);
+
   return (
     <>
-      <View></View>
+      {props.bookList.map((book) => {
+        return (
+          <View style={styles.bookItem} key={book.id}>
+            <View style={styles.bookCover}></View>
+            <View style={styles.bookInfo}>
+              <Text style={styles.bookTitle}>{book.title}</Text>
+              <Text style={styles.bookAuthor}>{book.author}</Text>
+              <Text style={styles.bookProcess}>{book.process}</Text>
+            </View>
+          </View>
+        );
+      })}
     </>
   );
 }
@@ -189,18 +207,35 @@ function HomeContent(props: HomeContentProps) {
 
   const styles = homeContentStyles(theme);
 
-  const originBookList: BookItem[] = [
-    { id: 1, title: "JavaScript高级程序设计" },
-    { id: 2, title: "深入理解TypeScript" },
-    { id: 3, title: "React设计原理与实战" },
-    { id: 4, title: "Node.js企业级应用开发" },
-    { id: 5, title: "Python机器学习手册" },
-    { id: 6, title: "数据结构与算法分析" },
-    { id: 7, title: "现代前端技术解析" },
-    { id: 8, title: "数据库系统概念" },
-    { id: 9, title: "计算机组成与设计" },
-    { id: 10, title: "计算机网络：自顶向下方法" },
-  ];
+  // const originBookList: BookItem[] = [
+  //   {
+  //     id: 1,
+  //     title: "JavaScript高级程序设计",
+  //     author: "佚名",
+  //     process: "1/1000",
+  //   },
+  //   { id: 2, title: "深入理解TypeScript", author: "佚名", process: "1/1000" },
+  //   { id: 3, title: "React设计原理与实战", author: "佚名", process: "1/1000" },
+  //   {
+  //     id: 4,
+  //     title: "Node.js企业级应用开发",
+  //     author: "佚名",
+  //     process: "1/1000",
+  //   },
+  //   { id: 5, title: "Python机器学习手册", author: "佚名", process: "1/1000" },
+  //   { id: 6, title: "数据结构与算法分析", author: "佚名", process: "1/1000" },
+  //   { id: 7, title: "现代前端技术解析", author: "佚名", process: "1/1000" },
+  //   { id: 8, title: "数据库系统概念", author: "佚名", process: "1/1000" },
+  //   { id: 9, title: "计算机组成与设计", author: "佚名", process: "1/1000" },
+  //   {
+  //     id: 10,
+  //     title: "计算机网络：自顶向下方法",
+  //     author: "佚名",
+  //     process: "1/1000",
+  //   },
+  // ];
+
+  const originBookList: BookItem[] = [];
 
   const layoutComp: Record<BookLayout, React.ReactNode> = {
     [BookLayout.Grid]: BookGridLayout({ bookList: originBookList }),
@@ -211,7 +246,13 @@ function HomeContent(props: HomeContentProps) {
     <>
       <SafeAreaView style={styles.homeContent}>
         <ScrollView style={styles.homeContentInner}>
-          {layoutComp[props.bookLayout]}
+          {originBookList.length ? (
+            layoutComp[props.bookLayout]
+          ) : (
+            <View style={styles.emptyTips}>
+              <Text style={styles.emptyTipsText}>快去挑选你的书籍吧~</Text>
+            </View>
+          )}
         </ScrollView>
       </SafeAreaView>
     </>

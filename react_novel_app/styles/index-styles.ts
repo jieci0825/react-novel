@@ -1,6 +1,7 @@
 import { Theme } from "@/hooks/useTheme";
 import { StyleSheet } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import { adaptiveSize } from "@/utils";
 
 export const homeStyles = (theme: Theme) => {
   return StyleSheet.create({
@@ -68,6 +69,15 @@ export const homeContentStyles = (theme: Theme) => {
     homeContentInner: {
       padding: 20,
     },
+    emptyTips: {
+      width: "100%",
+    },
+    emptyTipsText: {
+      marginHorizontal: "auto",
+      marginTop: adaptiveSize(50),
+      color: theme.textTertiaryColor,
+      fontSize: RFValue(18),
+    },
   });
 };
 
@@ -100,5 +110,39 @@ export const bookGridStyles = (theme: Theme) => {
 };
 
 export const bookListStyles = (theme: Theme) => {
-  return StyleSheet.create({});
+  return StyleSheet.create({
+    bookItem: {
+      width: "100%",
+      display: "flex",
+      flexDirection: "row",
+      marginBottom: 20,
+    },
+    bookCover: {
+      width: adaptiveSize(65),
+      height: adaptiveSize(80),
+      backgroundColor: theme.bgSecondaryColor,
+      borderRadius: 4,
+    },
+    bookInfo: {
+      flex: 1,
+      marginLeft: 10,
+      display: "flex",
+    },
+    bookTitle: {
+      marginTop: 5,
+      fontWeight: "500",
+      color: theme.textPrimaryColor,
+      fontSize: RFValue(14),
+    },
+    bookAuthor: {
+      marginTop: "auto",
+      fontSize: RFValue(12),
+      color: theme.textSecondaryColor,
+    },
+    bookProcess: {
+      marginTop: 5,
+      fontSize: RFValue(12),
+      color: theme.textSecondaryColor,
+    },
+  });
 };
