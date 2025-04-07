@@ -43,7 +43,7 @@ export class ParamsError extends ErrorTypeImpl {
 }
 
 export class NotFound extends ErrorTypeImpl {
-    constructor(msg: string, errorCode: string) {
+    constructor(msg?: string, errorCode?: string) {
         super()
         this.statusCode = 404
         this.errorCode = errorCode || '10001'

@@ -7,6 +7,7 @@ export const homeStyles = (theme: Theme) => {
   return StyleSheet.create({
     container: {
       flex: 1,
+      backgroundColor: theme.bgColor,
     },
   });
 };
@@ -19,13 +20,9 @@ export const homeHeaderStyles = (theme: Theme) => {
       justifyContent: "space-between",
       alignItems: "center",
       width: "100%",
-      height: 60,
+      height: adaptiveSize(60),
       borderBottomWidth: 1,
       borderBottomColor: theme.borderColor,
-      backgroundColor: theme.bgColor,
-    },
-    homeHeaderLeft: {
-      marginRight: "auto",
     },
     headerAct: {
       display: "flex",
@@ -34,8 +31,8 @@ export const homeHeaderStyles = (theme: Theme) => {
       alignItems: "center",
       minWidth: 100,
       height: "100%",
-      gap: 10,
-      padding: 10,
+      gap: adaptiveSize(10),
+      padding: adaptiveSize(10),
     },
     homeCenter: {
       display: "flex",
@@ -63,7 +60,6 @@ export const homeContentStyles = (theme: Theme) => {
   return StyleSheet.create({
     homeContent: {
       width: "100%",
-      backgroundColor: theme.bgColor,
       flex: 1,
     },
     homeContentInner: {

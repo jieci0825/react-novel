@@ -6,21 +6,5 @@ export interface GetBookParams extends Page {
 
 export interface SearchBookParams extends Page {
     keyword: string
-    source: number
-}
-
-export interface SearchBookItem {
-    bookId: number
-    title: string
-    author: string
-    description: string
-    cover: string
-    status: string
-    wordCount: number
     _source: number
-}
-
-export interface SearchBookResult {
-    total: number
-    list: SearchBookItem[]
 }
