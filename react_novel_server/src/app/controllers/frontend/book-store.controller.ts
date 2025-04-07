@@ -3,7 +3,7 @@ import {
     getBookStoreCategorysService,
     searchBooksService
 } from '@/app/services/frontend/book-store.service'
-import { GetBookParams, SearchBookParams } from '@/app/types/boo-store.type'
+import { GetBookParams, SearchBookParams } from '@/app/types/book-store.type'
 import { DataSuccess } from '@/core/error-type'
 import { Context } from 'koa'
 
