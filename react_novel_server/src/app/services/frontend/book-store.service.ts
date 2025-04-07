@@ -6,12 +6,12 @@ export async function getBookStoreCategorysService() {
     return [
         { id: 1501, categoryName: '玄幻' },
         { id: 1503, categoryName: '武侠' },
-        { id: 20006, categoryName: '系统' },
-        { id: 20083, categoryName: '都市' },
-        { id: 1506, categoryName: '历史' },
-        { id: 1509, categoryName: '科幻' },
+        { id: 20349, categoryName: '种田' },
         { id: 1523, categoryName: '言情' },
-        { id: 20349, categoryName: '种田' }
+        { id: 1509, categoryName: '科幻' },
+        { id: 20006, categoryName: '系统' },
+        { id: 1506, categoryName: '历史' },
+        { id: 20083, categoryName: '都市' }
     ]
 }
 
