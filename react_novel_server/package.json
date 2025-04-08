@@ -13,6 +13,7 @@
     "license": "ISC",
     "packageManager": "pnpm@10.6.5",
     "devDependencies": {
+        "@types/crypto-js": "^4.2.2",
         "@types/koa": "^2.15.0",
         "@types/koa-router": "^7.4.8",
         "@types/node": "^22.13.14",
@@ -24,6 +25,7 @@
     },
     "dependencies": {
         "axios": "^1.8.4",
+        "crypto-js": "^4.2.0",
         "dotenv-flow": "^4.1.0",
         "koa": "^2.16.0",
         "koa-body": "^6.0.1",

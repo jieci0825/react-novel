@@ -1,6 +1,7 @@
 import { GetBookParams, SearchBookParams } from '@/app/types/book-store.type'
 import axios from 'axios'
 
+// 获取书籍分类
 export async function getBookStoreCategorysService() {
     // 由于数据并不来源本站，所以分类固定，无法更改
     return [
@@ -15,6 +16,7 @@ export async function getBookStoreCategorysService() {
     ]
 }
 
+// 根据分类获取书籍
 export async function getBooksByCategoryService(data: GetBookParams) {
     const result = await axios.get('https://bookshelf.html5.qq.com/qbread/api/rank/list', {
         params: {

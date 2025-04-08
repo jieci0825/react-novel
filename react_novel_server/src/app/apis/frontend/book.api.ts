@@ -2,7 +2,7 @@ import { viewBookDetailController, viewBookChapterController } from '@/app/contr
 import Router from 'koa-router'
 const router = new Router({ prefix: '/book' })
 
-// 获取小说详情
+// 获取书籍详情
 router.post('/detail', viewBookDetailController)
 
 // 获取小说章节列表

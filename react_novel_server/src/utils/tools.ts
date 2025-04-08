@@ -1,3 +1,4 @@
+// 检测是否是一个合法的链接
 export function isValidUrl(url: string): boolean {
     const pattern = /^(https?:\/\/)([\w-]+\.)+[a-zA-Z]{2,6}(\/[\w./?%&=-]*)?$/
     return pattern.test(url) && !!url.trim() // 必须包含协议且非空字符串

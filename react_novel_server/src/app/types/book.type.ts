@@ -1,4 +1,4 @@
 export interface ViewBookDetailParams {
-    bookId: number
+    bookId: number | string
     _source: number
 }
