@@ -30,8 +30,13 @@ export interface BookSourceSearchResult {
     list: SearchBookItem[]
 }
 
+export interface ContentResult {
+    content: string
+}
+
 export type BookSourceImpl = {
     search: (data: SearchBookParams) => Promise<BookSourceSearchResult>
     detail: (bookId: SearchBookItem['bookId']) => Promise<BookDetailResult>
     chapter: (bookId: SearchBookItem['bookId']) => Promise<ChapterItem[]>
+    content?: (bookId: SearchBookItem['bookId'], chapterId: ChapterItem['chapterId']) => Promise<ContentResult>
 }

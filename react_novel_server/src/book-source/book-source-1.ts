@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { SearchBookParams } from '@/app/types/book-store.type'
-import { BookDetailResult, BookSourceSearchResult, ChapterItem, SearchBookItem } from '@/types'
+import { BookDetailResult, BookSourceSearchResult, ChapterItem, ContentResult, SearchBookItem } from '@/types'
 import { formatToTenThousand, getBookCoverUrl } from '@/utils'
 
 export async function search(data: SearchBookParams): Promise<BookSourceSearchResult> {
@@ -80,4 +80,29 @@ export async function chapter(bookId: SearchBookItem['bookId']): Promise<any> {
     })
 
     return chapters
+}
+
+export async function content(
+    bookId: SearchBookItem['bookId'],
+    chapterId: ChapterItem['chapterId']
+): Promise<ContentResult> {
+    const resp = await axios.post('https://novel.html5.qq.com/be-api/content/ads-read', {
+        Scene: 'chapter',
+        ContentAnchorBatch: [
+            {
+                BookID: bookId,
+                ChapterSeqNo: [chapterId]
+            }
+        ]
+    })
+
+    const result = resp.data.content[0]
+    if (!result)
+        return {
+            content: '请求失败~~'
+        } as ContentResult
+
+    return {
+        content: result.Content
+    }
 }
