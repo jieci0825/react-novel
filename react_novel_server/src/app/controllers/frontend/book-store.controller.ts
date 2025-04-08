@@ -20,9 +20,6 @@ export async function getBooksByCategoryController(ctx: Context) {
 // 根据关键词搜索书籍
 export async function searchBooksController(ctx: Context) {
     const data: SearchBookParams = ctx.request.body
-    if (!BookSourceMap[data._source]) {
-        throw new NotFound('不存在的书源')
-    }
     const result = await BookSourceMap[data._source].search(data)
     throw new DataSuccess(result)
 }

@@ -40,3 +40,5 @@ export type BookSourceImpl = {
     chapter: (bookId: SearchBookItem['bookId']) => Promise<ChapterItem[]>
     content?: (bookId: SearchBookItem['bookId'], chapterId: ChapterItem['chapterId']) => Promise<ContentResult>
 }
+
+export type BookSourceImplKey = keyof BookSourceImpl

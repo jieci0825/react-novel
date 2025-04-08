@@ -34,7 +34,7 @@ export class Success extends ErrorTypeImpl {
 }
 
 export class ParamsError extends ErrorTypeImpl {
-    constructor(msg: string, errorCode: string) {
+    constructor(msg?: string, errorCode?: string) {
         super()
         this.statusCode = 400
         this.errorCode = errorCode || '10000'

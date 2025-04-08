@@ -3,6 +3,7 @@ import {
     getBookStoreCategorysController,
     searchBooksController
 } from '@/app/controllers/frontend/book-store.controller'
+import { verifyBookSource } from '@/middlewares/verifyBookSource'
 import Router from 'koa-router'
 const router = new Router({ prefix: '/book-store' })
 
@@ -13,6 +14,6 @@ router.post('/categorys', getBookStoreCategorysController)
 router.post('/books-by-category', getBooksByCategoryController)
 
 // 搜索小说
-router.post('/search', searchBooksController)
+router.post('/search', verifyBookSource(), searchBooksController)
 
 export default router

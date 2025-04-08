@@ -7,4 +7,6 @@ const BookSourceMap: { [key: number]: BookSourceImpl } = {
     2: BS_2
 }
 
+export const BookSourceKeys = Object.keys(BookSourceMap).map(key => +key) as unknown as number[]
+
 export default BookSourceMap
