@@ -86,21 +86,28 @@ export async function content(
     bookId: SearchBookItem['bookId'],
     chapterId: ChapterItem['chapterId']
 ): Promise<ContentResult> {
-    const resp = await axios.post('https://novel.html5.qq.com/be-api/content/ads-read', {
+    const data = {
         Scene: 'chapter',
         ContentAnchorBatch: [
             {
-                BookID: bookId,
+                BookID: String(bookId),
                 ChapterSeqNo: [chapterId]
             }
         ]
-    })
+    }
 
-    const result = resp.data.content[0]
-    if (!result)
-        return {
-            content: '请求失败~~'
-        } as ContentResult
+    const resp = await axios({
+        method: 'post',
+        url: 'https://novel.html5.qq.com/be-api/content/ads-read',
+        data,
+        headers: {
+            'Q-GUID': '4aa27c7cf2d9aca3359656ea186488cb'
+        }
+    })
+    const result = resp.data.data.Content[0]
+    if (!result) {
+        return { content: '请求失败~~' }
+    }
 
     return {
         content: result.Content
