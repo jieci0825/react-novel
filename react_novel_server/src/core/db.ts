@@ -1,3 +1,4 @@
+import { toCamelCaseForObj } from '@/utils'
 const Sequelize = require('sequelize')
 
 const config = {
@@ -19,5 +20,11 @@ export const db = new Sequelize(config.database, config.username, config.passwor
         paranoid: true // 可以生成记录删除时间的字段,  delete (软删除-硬删除)
     }
 })
+
+// 使用 JSON 序列化移除字段
+Sequelize.Model.prototype.toJSON = function () {
+    const data = { ...toCamelCaseForObj(this.dataValues) }
+    return data
+}
 
 module.exports = { db }

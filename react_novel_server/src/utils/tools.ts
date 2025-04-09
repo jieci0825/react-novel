@@ -37,3 +37,29 @@ export function formatToTenThousand(value: number, decimalPlaces: number = 2): s
 
     return `${formattedValue}万`
 }
+
+// 转为驼峰命名法
+export function toCamelCase(key: string): string {
+    const splits = key.split('_')
+    if (splits.length === 1) {
+        return key
+    }
+    return splits
+        .map((word, index) =>
+            index === 0 ? word.toLowerCase() : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join('')
+}
+
+// 给一个对象里面的所有属性名转为驼峰命名法
+export function toCamelCaseForObj(obj: Record<string, any>): Record<string, any> {
+    for (const key in obj) {
+        const oldKey = key
+        const newKey = toCamelCase(key)
+        if (oldKey !== newKey) {
+            obj[newKey] = obj[key]
+            delete obj[key]
+        }
+    }
+    return obj
+}
