@@ -75,11 +75,14 @@ export const bookGridStyles = (theme: Theme) => {
 
 export const bookListStyles = (theme: Theme) => {
     return StyleSheet.create({
+        bookListWrap: {
+            display: 'flex',
+            gap: adaptiveSize(20)
+        },
         bookItem: {
             width: '100%',
             display: 'flex',
-            flexDirection: 'row',
-            marginBottom: 20
+            flexDirection: 'row'
         },
         bookCover: {
             width: adaptiveSize(65),
