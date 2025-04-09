@@ -108,3 +108,35 @@ export const discoverBookHotRankStyles = (theme: Theme) => {
         }
     })
 }
+
+export const discoverMainRecommendStyles = (theme: Theme) => {
+    return StyleSheet.create({
+        recommendWrap: {
+            marginTop: 20
+        },
+        recommendContent: {
+            marginTop: 15
+        },
+        recommendItemWrap: {
+            display: 'flex',
+            flexDirection: 'row',
+            gap: adaptiveSize(15)
+        },
+        recommendItem: {
+            display: 'flex',
+            width: adaptiveSize(90),
+            height: adaptiveSize(140)
+        },
+        cover: {
+            flex: 1,
+            borderRadius: 4,
+            borderWidth: 1,
+            borderColor: theme.borderColor
+        },
+        title: {
+            marginTop: 5,
+            color: theme.secondaryColor,
+            textAlign: 'center'
+        }
+    })
+}

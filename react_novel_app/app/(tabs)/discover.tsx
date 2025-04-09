@@ -1,9 +1,14 @@
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
-import { discoverBookHotRankStyles, discoverCategoryStyles, discoverStyles } from '@/styles/discover-styles'
+import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import {
+    discoverBookHotRankStyles,
+    discoverCategoryStyles,
+    discoverMainRecommendStyles,
+    discoverStyles
+} from '@/styles/discover-styles'
 import { useTheme } from '@/hooks/useTheme'
 import Feather from '@expo/vector-icons/Feather'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { bookStoreApi } from '@/api'
+import { bookRecommendApi, bookStoreApi } from '@/api'
 import React, { useEffect, useState } from 'react'
 import { BookCategoryItem, HotRankingItem } from '@/api/modules/book-store/type'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
@@ -12,6 +17,7 @@ import AntDesign from '@expo/vector-icons/AntDesign'
 import PageHeader from '@/components/page-header/page-header'
 import PageSection from '@/components/page-section/page-section'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
+import { BookRecommendItem } from '@/api/modules/book-recommend/type'
 
 // 头部
 function DiscoverHeader() {
@@ -216,8 +222,53 @@ function DiscoverHotRank() {
 }
 
 // 站主推荐
-function UpRecommend() {}
+function MainRecommend() {
+    const { theme } = useTheme()
 
+    const styles = discoverMainRecommendStyles(theme)
+
+    // 站主推荐书籍
+    const [mainRecommendList, setMainRecommendList] = useState<BookRecommendItem[]>([])
+
+    useEffect(() => {
+        bookRecommendApi.reqGetMainBookRecommendList().then(res => {
+            setMainRecommendList(res.data)
+        })
+    }, [])
+
+    return (
+        <>
+            <View style={styles.recommendWrap}>
+                <PageSection title='站主推荐' />
+                <View style={styles.recommendContent}>
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                    >
+                        <View style={styles.recommendItemWrap}>
+                            {mainRecommendList.map(item => {
+                                return (
+                                    <View
+                                        key={item.id}
+                                        style={styles.recommendItem}
+                                    >
+                                        <Image
+                                            source={{ uri: item.bookCover }}
+                                            style={styles.cover}
+                                        />
+                                        <Text style={styles.title}>{item.bookName}</Text>
+                                    </View>
+                                )
+                            })}
+                        </View>
+                    </ScrollView>
+                </View>
+            </View>
+        </>
+    )
+}
+
+// 容器
 export default function Discover() {
     const { theme } = useTheme()
 
@@ -230,6 +281,7 @@ export default function Discover() {
                 <View style={styles.content}>
                     <DiscoverCategory />
                     <DiscoverHotRank />
+                    <MainRecommend />
                 </View>
             </View>
         </>
