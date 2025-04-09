@@ -134,9 +134,7 @@ export const discoverMainRecommendStyles = (theme: Theme) => {
             borderColor: theme.borderColor
         },
         title: {
-            marginTop: 5,
-            color: theme.secondaryColor,
-            textAlign: 'center'
+            marginTop: 5
         }
     })
 }

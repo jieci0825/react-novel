@@ -18,6 +18,7 @@ import PageHeader from '@/components/page-header/page-header'
 import PageSection from '@/components/page-section/page-section'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { BookRecommendItem } from '@/api/modules/book-recommend/type'
+import TextOverflowHidden from '@/components/text-overflow-hidden/text-overflow-hidden'
 
 // 头部
 function DiscoverHeader() {
@@ -256,7 +257,16 @@ function MainRecommend() {
                                             source={{ uri: item.bookCover }}
                                             style={styles.cover}
                                         />
-                                        <Text style={styles.title}>{item.bookName}</Text>
+                                        <TextOverflowHidden
+                                            fontStyle={{
+                                                fontSize: RFValue(13),
+                                                color: theme.tertiaryColor,
+                                                textAlign: 'center'
+                                            }}
+                                            style={styles.title}
+                                        >
+                                            {item.bookName}
+                                        </TextOverflowHidden>
                                     </View>
                                 )
                             })}
