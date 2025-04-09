@@ -15,3 +15,5 @@ export enum BookRecommendType {
     POST_COMMENT = 'post_comment',
     MAIN = 'main'
 }
+
+export const REMOVE_ATTRIBUTES = ['createdAt', 'updatedAt', 'deletedAt']

@@ -1,5 +1,6 @@
 import BookAccessModel from '@/app/models/book-access.model'
 import { GetBookParams, SearchBookParams } from '@/app/types/backend/book-store.type'
+import { REMOVE_ATTRIBUTES } from '@/app/types/common.type'
 import axios from 'axios'
 
 // 获取书籍分类
@@ -39,7 +40,7 @@ export async function getBooksByCategoryService(data: GetBookParams) {
 export async function getBooksByHotService() {
     const topThreeRecords = await BookAccessModel.findAll({
         attributes: {
-            exclude: ['createdAt', 'deletedAt', 'updatedAt']
+            exclude: REMOVE_ATTRIBUTES
         },
         order: [['access_count', 'DESC']],
         limit: 3
