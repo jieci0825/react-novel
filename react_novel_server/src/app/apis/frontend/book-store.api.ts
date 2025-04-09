@@ -1,7 +1,8 @@
 import {
     getBooksByCategoryController,
     getBookStoreCategorysController,
-    searchBooksController
+    searchBooksController,
+    getBooksByHotController
 } from '@/app/controllers/frontend/book-store.controller'
 import { verifyBookSource } from '@/middlewares/verifyBookSource'
 import Router from 'koa-router'
@@ -15,5 +16,8 @@ router.post('/books-by-category', getBooksByCategoryController)
 
 // 搜索小说
 router.post('/search', verifyBookSource(), searchBooksController)
+
+// 获取热度榜
+router.post('/hot', getBooksByHotController)
 
 export default router

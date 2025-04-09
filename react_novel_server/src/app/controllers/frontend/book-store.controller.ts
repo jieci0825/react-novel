@@ -1,4 +1,8 @@
-import { getBooksByCategoryService, getBookStoreCategorysService } from '@/app/services/frontend/book-store.service'
+import {
+    getBooksByCategoryService,
+    getBooksByHotService,
+    getBookStoreCategorysService
+} from '@/app/services/frontend/book-store.service'
 import { GetBookParams, SearchBookParams } from '@/app/types/book-store.type'
 import BookSourceMap from '@/book-source'
 import { DataSuccess, NotFound } from '@/core/error-type'
@@ -21,5 +25,11 @@ export async function getBooksByCategoryController(ctx: Context) {
 export async function searchBooksController(ctx: Context) {
     const data: SearchBookParams = ctx.request.body
     const result = await BookSourceMap[data._source].search(data)
+    throw new DataSuccess(result)
+}
+
+// 获取热度榜
+export async function getBooksByHotController(ctx: Context) {
+    const result = await getBooksByHotService()
     throw new DataSuccess(result)
 }
