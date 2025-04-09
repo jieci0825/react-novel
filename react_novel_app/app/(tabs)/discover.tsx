@@ -1,10 +1,5 @@
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
-import {
-    discoverBookRankStyles,
-    discoverCategoryStyles,
-    discoverStyles,
-    discoverTitlteStyles
-} from '@/styles/discover-styles'
+import { discoverBookHotRankStyles, discoverCategoryStyles, discoverStyles } from '@/styles/discover-styles'
 import { useTheme } from '@/hooks/useTheme'
 import Feather from '@expo/vector-icons/Feather'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -18,6 +13,7 @@ import PageHeader from '@/components/page-header/page-header'
 import PageSection from '@/components/page-section/page-section'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 
+// 头部
 function DiscoverHeader() {
     const { theme } = useTheme()
 
@@ -51,6 +47,7 @@ function DiscoverHeader() {
 interface CategoryIconProps {
     name: string
 }
+// 分类icon
 function CategoryIcon(props: CategoryIconProps) {
     const { theme } = useTheme()
 
@@ -132,6 +129,7 @@ function CategoryIcon(props: CategoryIconProps) {
     }
 }
 
+// 分类列表
 function DiscoverCategory() {
     const { theme } = useTheme()
 
@@ -170,10 +168,11 @@ function DiscoverCategory() {
     )
 }
 
+// 热榜
 function DiscoverHotRank() {
     const { theme } = useTheme()
 
-    const styles = discoverTitlteStyles(theme)
+    const styles = discoverBookHotRankStyles(theme)
 
     // 热度榜单
     const [hotList, setHotList] = useState<HotRankingItem[]>([])
@@ -185,7 +184,7 @@ function DiscoverHotRank() {
     }, [])
 
     return (
-        <View>
+        <View style={styles.bookRankWrap}>
             <PageSection title='本站热榜' />
             {/* rank list */}
             <View style={styles.rankWrap}>
@@ -216,19 +215,8 @@ function DiscoverHotRank() {
     )
 }
 
-function BookRank() {
-    const { theme } = useTheme()
-
-    const styles = discoverBookRankStyles(theme)
-
-    return (
-        <>
-            <View style={styles.bookRankWrap}>
-                <DiscoverHotRank />
-            </View>
-        </>
-    )
-}
+// 站主推荐
+function UpRecommend() {}
 
 export default function Discover() {
     const { theme } = useTheme()
@@ -241,7 +229,7 @@ export default function Discover() {
                 <DiscoverHeader />
                 <View style={styles.content}>
                     <DiscoverCategory />
-                    <BookRank />
+                    <DiscoverHotRank />
                 </View>
             </View>
         </>

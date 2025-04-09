@@ -49,9 +49,13 @@ export const discoverCategoryStyles = (theme: Theme) => {
     })
 }
 
-export const discoverTitlteStyles = (theme: Theme) => {
+export const discoverBookHotRankStyles = (theme: Theme) => {
     const size = adaptiveSize(25)
     return StyleSheet.create({
+        bookRankWrap: {
+            marginTop: 20,
+            width: '100%'
+        },
         rankWrap: {
             marginTop: 15,
             display: 'flex',
@@ -102,15 +106,5 @@ export const discoverTitlteStyles = (theme: Theme) => {
             color: theme.tertiaryColor,
             fontSize: RFValue(14)
         }
-    })
-}
-
-export const discoverBookRankStyles = (theme: Theme) => {
-    return StyleSheet.create({
-        bookRankWrap: {
-            marginTop: 20,
-            width: '100%'
-        },
-        bookRankItem: {}
     })
 }
