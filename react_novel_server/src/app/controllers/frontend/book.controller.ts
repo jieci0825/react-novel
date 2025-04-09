@@ -1,4 +1,4 @@
-import { addBookAccessCountService } from '@/app/services/frontend/boos-access.service'
+import { addBookAccessCountService } from '@/app/services/frontend/book-access.service'
 import { GetContentParams, ViewBookDetailParams } from '@/app/types/book.type'
 import BookSourceMap from '@/book-source'
 import { DataSuccess } from '@/core/error-type'

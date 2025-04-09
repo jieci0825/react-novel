@@ -10,6 +10,6 @@ export async function addBookAccessCountService({ bookName, bookAuthor }: AddBoo
         return
     } else {
         // 如果存在，则自增
-        await record.increment('count', { by: 1 })
+        await record.increment('access_count', { by: 1 })
     }
 }
