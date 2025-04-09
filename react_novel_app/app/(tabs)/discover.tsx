@@ -2,7 +2,6 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import {
     discoverBookRankStyles,
     discoverCategoryStyles,
-    discoverHeaderStyles,
     discoverStyles,
     discoverTitlteStyles
 } from '@/styles/discover-styles'
@@ -11,29 +10,29 @@ import Feather from '@expo/vector-icons/Feather'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { bookStoreApi } from '@/api'
 import React, { useEffect, useState } from 'react'
-import { BookCategoryItem } from '@/api/modules/book-store/type'
+import { BookCategoryItem, HotRankingItem } from '@/api/modules/book-store/type'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import PageHeader from '@/components/page-header/page-header'
 import PageSection from '@/components/page-section/page-section'
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 
 function DiscoverHeader() {
     const { theme } = useTheme()
-    const styles = discoverHeaderStyles(theme)
 
     const slots = {
         left: () => (
             <Feather
                 name='search'
-                size={RFValue(26)}
+                size={RFValue(22)}
                 color={theme.tertiaryColor}
             />
         ),
         right: () => (
             <FontAwesome6
                 name='filter'
-                size={RFValue(22)}
+                size={RFValue(18)}
                 color={theme.tertiaryColor}
             />
         )
@@ -138,6 +137,7 @@ function DiscoverCategory() {
 
     const styles = discoverCategoryStyles(theme)
 
+    // 分类列表
     const [categoryList, setCategoryList] = useState<BookCategoryItem[]>([])
 
     useEffect(() => {
@@ -170,37 +170,49 @@ function DiscoverCategory() {
     )
 }
 
-function DiscoverTitle(props: { title: string; viewMore?: Function }) {
+function DiscoverHotRank() {
     const { theme } = useTheme()
 
     const styles = discoverTitlteStyles(theme)
 
-    const handleMore = () => {
-        props.viewMore && props.viewMore()
-    }
+    // 热度榜单
+    const [hotList, setHotList] = useState<HotRankingItem[]>([])
 
-    const slots = {
-        right: () => (
-            <>
-                <TouchableOpacity onPress={handleMore}>
-                    <View style={styles.viewMoreWrap}>
-                        <Text style={styles.viewMoreText}>查看更多</Text>
-                        <AntDesign
-                            name='right'
-                            size={RFValue(13)}
-                            color={theme.tertiaryColor}
-                        />
-                    </View>
-                </TouchableOpacity>
-            </>
-        )
-    }
+    useEffect(() => {
+        bookStoreApi.reqGetBookHotList().then(res => {
+            setHotList(res.data)
+        })
+    }, [])
 
     return (
-        <PageSection
-            title='本站热榜'
-            slots={slots}
-        />
+        <View>
+            <PageSection title='本站热榜' />
+            {/* rank list */}
+            <View style={styles.rankWrap}>
+                {hotList.map((hot, index) => {
+                    return (
+                        <View
+                            style={styles.rankItem}
+                            key={index}
+                        >
+                            <Text style={styles.rankSN}>{index + 1}</Text>
+                            <View style={styles.rankInfo}>
+                                <Text style={styles.rankInfoTitle}>{hot.bookName}</Text>
+                                <Text style={styles.rankInfoAuthor}>{hot.bookAuthor}</Text>
+                            </View>
+                            <View style={styles.rankRight}>
+                                <MaterialCommunityIcons
+                                    name='fire'
+                                    size={RFValue(20)}
+                                    color={theme.tertiaryColor}
+                                />
+                                <Text style={styles.rankInfoCount}>{hot.accessCount}</Text>
+                            </View>
+                        </View>
+                    )
+                })}
+            </View>
+        </View>
     )
 }
 
@@ -212,7 +224,7 @@ function BookRank() {
     return (
         <>
             <View style={styles.bookRankWrap}>
-                <DiscoverTitle title='本站热门' />
+                <DiscoverHotRank />
             </View>
         </>
     )

@@ -92,6 +92,15 @@ export const discoverTitlteStyles = (theme: Theme) => {
         rankInfoAuthor: {
             color: theme.tertiaryColor,
             fontSize: RFValue(12)
+        },
+        rankRight: {
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center'
+        },
+        rankInfoCount: {
+            color: theme.tertiaryColor,
+            fontSize: RFValue(14)
         }
     })
 }
