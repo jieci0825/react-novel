@@ -37,6 +37,11 @@ const BookRecommendModel = db.define('book_recommend', {
         type: DataTypes.ENUM('post', 'post-comment', 'main'),
         allowNull: false,
         comment: '推荐类型'
+    },
+    order: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        comment: '排序'
     }
 })
 
