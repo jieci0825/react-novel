@@ -15,30 +15,36 @@ import { BookCategoryItem } from '@/api/modules/book-store/type'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 import AntDesign from '@expo/vector-icons/AntDesign'
+import PageHeader from '@/components/page-header/page-header'
+import PageSection from '@/components/page-section/page-section'
 
 function DiscoverHeader() {
     const { theme } = useTheme()
     const styles = discoverHeaderStyles(theme)
 
+    const slots = {
+        left: () => (
+            <Feather
+                name='search'
+                size={RFValue(26)}
+                color={theme.tertiaryColor}
+            />
+        ),
+        right: () => (
+            <FontAwesome6
+                name='filter'
+                size={RFValue(22)}
+                color={theme.tertiaryColor}
+            />
+        )
+    }
+
     return (
         <>
-            <View style={styles.discoverHeader}>
-                <View style={styles.headerAct}>
-                    <Feather
-                        name='search'
-                        size={RFValue(26)}
-                        color={theme.tertiaryColor}
-                    />
-                </View>
-                <Text style={styles.homeCenterText}>发现书籍</Text>
-                <View style={styles.headerAct}>
-                    <FontAwesome6
-                        name='filter'
-                        size={RFValue(22)}
-                        color={theme.tertiaryColor}
-                    />
-                </View>
-            </View>
+            <PageHeader
+                title='发现书籍'
+                slots={slots}
+            />
         </>
     )
 }
@@ -173,23 +179,28 @@ function DiscoverTitle(props: { title: string; viewMore?: Function }) {
         props.viewMore && props.viewMore()
     }
 
+    const slots = {
+        right: () => (
+            <>
+                <TouchableOpacity onPress={handleMore}>
+                    <View style={styles.viewMoreWrap}>
+                        <Text style={styles.viewMoreText}>查看更多</Text>
+                        <AntDesign
+                            name='right'
+                            size={RFValue(13)}
+                            color={theme.tertiaryColor}
+                        />
+                    </View>
+                </TouchableOpacity>
+            </>
+        )
+    }
+
     return (
-        <View style={styles.titleWrap}>
-            <View style={styles.titleLeft}>
-                <View style={styles.titleBar}></View>
-                <Text style={styles.titleText}>{props.title}</Text>
-            </View>
-            <TouchableOpacity onPress={handleMore}>
-                <View style={styles.viewMoreWrap}>
-                    <Text style={styles.viewMoreText}>查看更多</Text>
-                    <AntDesign
-                        name='right'
-                        size={RFValue(13)}
-                        color={theme.tertiaryColor}
-                    />
-                </View>
-            </TouchableOpacity>
-        </View>
+        <PageSection
+            title='本站热榜'
+            slots={slots}
+        />
     )
 }
 
