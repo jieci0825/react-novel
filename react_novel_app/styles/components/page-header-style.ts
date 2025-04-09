@@ -22,7 +22,7 @@ export const pageHeaderStyles = (theme: Theme) => {
             alignItems: 'center',
             height: '100%',
             gap: adaptiveSize(10),
-            padding: adaptiveSize(10)
+            padding: adaptiveSize(20)
         },
         pageCenter: {
             display: 'flex',
@@ -32,7 +32,6 @@ export const pageHeaderStyles = (theme: Theme) => {
             alignItems: 'center'
         },
         pageCenterText: {
-            fontWeight: 600,
             color: theme.primaryColor,
             fontSize: RFValue(18)
         }

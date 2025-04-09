@@ -50,20 +50,48 @@ export const discoverCategoryStyles = (theme: Theme) => {
 }
 
 export const discoverTitlteStyles = (theme: Theme) => {
+    const size = adaptiveSize(25)
     return StyleSheet.create({
-        titleText: {
-            color: theme.primaryColor,
-            fontSize: RFValue(16)
+        rankWrap: {
+            marginTop: 15,
+            display: 'flex',
+            gap: adaptiveSize(10)
         },
-        viewMoreWrap: {
+        rankItem: {
+            height: adaptiveSize(58),
             display: 'flex',
             flexDirection: 'row',
-            alignItems: 'center'
+            alignItems: 'center',
+            padding: adaptiveSize(10),
+            backgroundColor: theme.bgSecondaryColor,
+            borderRadius: adaptiveSize(4)
         },
-        viewMoreText: {
+        rankSN: {
+            flexShrink: 0,
+            backgroundColor: theme.primaryColor,
+            width: size,
+            height: size,
+            borderRadius: '50%',
+            marginRight: 10,
+            color: theme.bgColor,
+            textAlign: 'center',
+            lineHeight: size,
+            fontSize: RFValue(14)
+        },
+        rankInfo: {
+            flex: 1,
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'space-between'
+        },
+        rankInfoTitle: {
+            color: theme.primaryColor,
+            fontSize: RFValue(14),
+            fontWeight: 'bold'
+        },
+        rankInfoAuthor: {
             color: theme.tertiaryColor,
-            fontSize: RFValue(12),
-            marginLeft: adaptiveSize(5)
+            fontSize: RFValue(12)
         }
     })
 }

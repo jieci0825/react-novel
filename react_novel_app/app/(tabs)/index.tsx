@@ -154,21 +154,23 @@ function BookListLayout(props: BookLayoutProps) {
 
     return (
         <>
-            {props.bookList.map(book => {
-                return (
-                    <View
-                        style={styles.bookItem}
-                        key={book.id}
-                    >
-                        <View style={styles.bookCover}></View>
-                        <View style={styles.bookInfo}>
-                            <Text style={styles.bookTitle}>{book.title}</Text>
-                            <Text style={styles.bookAuthor}>{book.author}</Text>
-                            <Text style={styles.bookProcess}>{book.process}</Text>
+            <View style={styles.bookListWrap}>
+                {props.bookList.map(book => {
+                    return (
+                        <View
+                            style={styles.bookItem}
+                            key={book.id}
+                        >
+                            <View style={styles.bookCover}></View>
+                            <View style={styles.bookInfo}>
+                                <Text style={styles.bookTitle}>{book.title}</Text>
+                                <Text style={styles.bookAuthor}>{book.author}</Text>
+                                <Text style={styles.bookProcess}>{book.process}</Text>
+                            </View>
                         </View>
-                    </View>
-                )
-            })}
+                    )
+                })}
+            </View>
         </>
     )
 }

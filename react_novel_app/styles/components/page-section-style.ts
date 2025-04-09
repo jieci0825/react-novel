@@ -26,7 +26,7 @@ export const pageSectionStyles = (theme: Theme) => {
         },
         titleText: {
             color: theme.primaryColor,
-            fontSize: RFValue(16)
+            fontSize: RFValue(15)
         },
         rightWrap: {
             marginLeft: 20
