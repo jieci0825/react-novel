@@ -1,4 +1,4 @@
-import { SearchBookParams } from '@/app/types/book-store.type'
+import { SearchBookParams } from '@/app/types/backend/book-store.type'
 
 export interface SearchBookItem {
     bookId: number | string

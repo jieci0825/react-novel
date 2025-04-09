@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { SearchBookParams } from '@/app/types/book-store.type'
+import { SearchBookParams } from '@/app/types/backend/book-store.type'
 import { BookDetailResult, BookSourceSearchResult, ChapterItem, ContentResult, SearchBookItem } from '@/types'
 import { formatToTenThousand, getBookCoverUrl } from '@/utils'
 

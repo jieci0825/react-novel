@@ -1,5 +1,5 @@
 import BookAccessModel from '@/app/models/book-access.model'
-import { GetBookParams, SearchBookParams } from '@/app/types/book-store.type'
+import { GetBookParams, SearchBookParams } from '@/app/types/backend/book-store.type'
 import axios from 'axios'
 
 // 获取书籍分类

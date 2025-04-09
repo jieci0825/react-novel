@@ -1,6 +1,6 @@
 import CryptoJS from 'crypto-js'
 import axios from 'axios'
-import { SearchBookParams } from '@/app/types/book-store.type'
+import { SearchBookParams } from '@/app/types/backend/book-store.type'
 import { BookDetailResult, BookSourceSearchResult, ChapterItem, SearchBookItem } from '@/types'
 
 // 配置密钥和IV（需与后端一致）

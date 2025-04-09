@@ -3,7 +3,7 @@ import {
     getBooksByHotService,
     getBookStoreCategorysService
 } from '@/app/services/frontend/book-store.service'
-import { GetBookParams, SearchBookParams } from '@/app/types/book-store.type'
+import { GetBookParams, SearchBookParams } from '@/app/types/backend/book-store.type'
 import BookSourceMap from '@/book-source'
 import { DataSuccess, NotFound } from '@/core/error-type'
 import { Context } from 'koa'

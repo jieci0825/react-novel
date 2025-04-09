@@ -1,5 +1,5 @@
 import BookAccessModel from '@/app/models/book-access.model'
-import { AddBookAccessCountParams } from '@/app/types/book-access.type'
+import { AddBookAccessCountParams } from '@/app/types/backend/book-access.type'
 
 export async function addBookAccessCountService({ bookName, bookAuthor }: AddBookAccessCountParams) {
     // 先查询到记录
