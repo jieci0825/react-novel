@@ -17,31 +17,6 @@ export const discoverStyles = (theme: Theme) => {
 
 export const discoverHeaderStyles = (theme: Theme) => {
     return StyleSheet.create({
-        discoverHeader: {
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            height: adaptiveSize(60),
-            borderBottomWidth: 1,
-            borderBottomColor: theme.borderColor
-        },
-        headerAct: {
-            width: 50,
-            padding: adaptiveSize(10)
-        },
-        homeCenter: {
-            display: 'flex',
-            flexDirection: 'row',
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center'
-        },
-        homeCenterText: {
-            fontWeight: 600,
-            color: theme.primaryColor,
-            fontSize: RFValue(18)
-        },
         homeIconBox: {
             padding: 4,
             borderRadius: 4

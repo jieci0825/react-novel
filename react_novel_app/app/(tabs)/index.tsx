@@ -6,6 +6,7 @@ import { useTheme } from '@/hooks/useTheme'
 import { bookGridStyles, bookListStyles, homeContentStyles, homeHeaderStyles, homeStyles } from '@/styles/index-styles'
 import React, { useState } from 'react'
 import { RFValue } from 'react-native-responsive-fontsize'
+import PageHeader from '@/components/page-header/page-header'
 
 enum BookLayout {
     Grid = 1,
@@ -21,51 +22,47 @@ function HomeHeader(props: HomeHeaderProps) {
 
     const styles = homeHeaderStyles(theme)
 
+    const slots = {
+        left: () => (
+            <Entypo
+                name='menu'
+                size={RFValue(30)}
+                color={theme.tertiaryColor}
+            />
+        ),
+        right: () => (
+            <>
+                <TouchableOpacity onPress={() => props.setBookLayout(BookLayout.Grid)}>
+                    <View
+                        style={[styles.homeIconBox, props.bookLayout === BookLayout.Grid && styles.homeIconBoxActive]}
+                    >
+                        <MaterialCommunityIcons
+                            name='grid-large'
+                            size={RFValue(24)}
+                            color={props.bookLayout === BookLayout.Grid ? theme.primaryColor : theme.tertiaryColor}
+                        />
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => props.setBookLayout(BookLayout.List)}>
+                    <View
+                        style={[styles.homeIconBox, props.bookLayout === BookLayout.List && styles.homeIconBoxActive]}
+                    >
+                        <FontAwesome5
+                            name='list-ul'
+                            size={RFValue(24)}
+                            color={props.bookLayout === BookLayout.List ? theme.primaryColor : theme.tertiaryColor}
+                        />
+                    </View>
+                </TouchableOpacity>
+            </>
+        )
+    }
+
     return (
-        <>
-            <View style={[styles.homeHeader]}>
-                <View style={[styles.headerAct]}>
-                    <Entypo
-                        name='menu'
-                        size={RFValue(30)}
-                        color={theme.tertiaryColor}
-                    />
-                </View>
-                <View style={styles.homeCenter}>
-                    <Text style={styles.homeCenterText}>我的书架</Text>
-                </View>
-                <View style={[styles.headerAct]}>
-                    <TouchableOpacity onPress={() => props.setBookLayout(BookLayout.Grid)}>
-                        <View
-                            style={[
-                                styles.homeIconBox,
-                                props.bookLayout === BookLayout.Grid && styles.homeIconBoxActive
-                            ]}
-                        >
-                            <MaterialCommunityIcons
-                                name='grid-large'
-                                size={RFValue(24)}
-                                color={props.bookLayout === BookLayout.Grid ? theme.primaryColor : theme.tertiaryColor}
-                            />
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => props.setBookLayout(BookLayout.List)}>
-                        <View
-                            style={[
-                                styles.homeIconBox,
-                                props.bookLayout === BookLayout.List && styles.homeIconBoxActive
-                            ]}
-                        >
-                            <FontAwesome5
-                                name='list-ul'
-                                size={RFValue(24)}
-                                color={props.bookLayout === BookLayout.List ? theme.primaryColor : theme.tertiaryColor}
-                            />
-                        </View>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </>
+        <PageHeader
+            title='我的书架'
+            slots={slots}
+        />
     )
 }
 
@@ -184,35 +181,33 @@ function HomeContent(props: HomeContentProps) {
 
     const styles = homeContentStyles(theme)
 
-    // const originBookList: BookItem[] = [
-    //   {
-    //     id: 1,
-    //     title: "JavaScript高级程序设计",
-    //     author: "佚名",
-    //     process: "1/1000",
-    //   },
-    //   { id: 2, title: "深入理解TypeScript", author: "佚名", process: "1/1000" },
-    //   { id: 3, title: "React设计原理与实战", author: "佚名", process: "1/1000" },
-    //   {
-    //     id: 4,
-    //     title: "Node.js企业级应用开发",
-    //     author: "佚名",
-    //     process: "1/1000",
-    //   },
-    //   { id: 5, title: "Python机器学习手册", author: "佚名", process: "1/1000" },
-    //   { id: 6, title: "数据结构与算法分析", author: "佚名", process: "1/1000" },
-    //   { id: 7, title: "现代前端技术解析", author: "佚名", process: "1/1000" },
-    //   { id: 8, title: "数据库系统概念", author: "佚名", process: "1/1000" },
-    //   { id: 9, title: "计算机组成与设计", author: "佚名", process: "1/1000" },
-    //   {
-    //     id: 10,
-    //     title: "计算机网络：自顶向下方法",
-    //     author: "佚名",
-    //     process: "1/1000",
-    //   },
-    // ];
-
-    const originBookList: BookItem[] = []
+    const originBookList: BookItem[] = [
+        {
+            id: 1,
+            title: 'JavaScript高级程序设计',
+            author: '佚名',
+            process: '1/1000'
+        },
+        { id: 2, title: '深入理解TypeScript', author: '佚名', process: '1/1000' },
+        { id: 3, title: 'React设计原理与实战', author: '佚名', process: '1/1000' },
+        {
+            id: 4,
+            title: 'Node.js企业级应用开发',
+            author: '佚名',
+            process: '1/1000'
+        },
+        { id: 5, title: 'Python机器学习手册', author: '佚名', process: '1/1000' },
+        { id: 6, title: '数据结构与算法分析', author: '佚名', process: '1/1000' },
+        { id: 7, title: '现代前端技术解析', author: '佚名', process: '1/1000' },
+        { id: 8, title: '数据库系统概念', author: '佚名', process: '1/1000' },
+        { id: 9, title: '计算机组成与设计', author: '佚名', process: '1/1000' },
+        {
+            id: 10,
+            title: '计算机网络：自顶向下方法',
+            author: '佚名',
+            process: '1/1000'
+        }
+    ]
 
     const layoutComp: Record<BookLayout, React.ReactNode> = {
         [BookLayout.Grid]: BookGridLayout({ bookList: originBookList }),
