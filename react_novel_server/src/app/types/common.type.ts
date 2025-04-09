@@ -9,3 +9,9 @@ export interface BookBase {
     bookAuthor: string
     bookCover: string
 }
+
+export enum BookRecommendType {
+    POST = 'post',
+    POST_COMMENT = 'post_comment',
+    MAIN = 'main'
+}
