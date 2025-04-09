@@ -13,7 +13,8 @@ export const pageHeaderStyles = (theme: Theme) => {
             width: '100%',
             height: adaptiveSize(60),
             borderBottomWidth: 1,
-            borderBottomColor: theme.borderColor
+            borderBottomColor: theme.borderColor,
+            position: 'relative'
         },
         headerAct: {
             display: 'flex',
@@ -33,7 +34,11 @@ export const pageHeaderStyles = (theme: Theme) => {
         },
         pageCenterText: {
             color: theme.primaryColor,
-            fontSize: RFValue(18)
+            fontSize: RFValue(18),
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: [{ translateX: '-50%' }, { translateY: '-50%' }]
         }
     })
 }

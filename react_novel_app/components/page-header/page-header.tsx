@@ -32,9 +32,8 @@ function PageHeader(props: PageHeaderProps) {
         <>
             <View style={[styles.pageHeader]}>
                 <View style={[styles.headerAct]}>{leftComp()}</View>
-                <View style={styles.pageCenter}>
-                    <Text style={styles.pageCenterText}>{props.title}</Text>
-                </View>
+                <View style={styles.pageCenter}></View>
+                <Text style={styles.pageCenterText}>{props.title}</Text>
                 <View style={[styles.headerAct]}>{rightComp()}</View>
             </View>
         </>
