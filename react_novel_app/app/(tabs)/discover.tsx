@@ -4,7 +4,7 @@ import {
     discoverCategoryStyles,
     discoverMainRecommendStyles,
     discoverStyles
-} from '@/styles/discover-styles'
+} from '@/styles/tabs/discover-styles'
 import { useTheme } from '@/hooks/useTheme'
 import Feather from '@expo/vector-icons/Feather'
 import { RFValue } from 'react-native-responsive-fontsize'

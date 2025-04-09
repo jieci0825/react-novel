@@ -3,7 +3,13 @@ import Entypo from '@expo/vector-icons/Entypo'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 import { useTheme } from '@/hooks/useTheme'
-import { bookGridStyles, bookListStyles, homeContentStyles, homeHeaderStyles, homeStyles } from '@/styles/index-styles'
+import {
+    bookGridStyles,
+    bookListStyles,
+    homeContentStyles,
+    homeHeaderStyles,
+    homeStyles
+} from '@/styles/tabs/index-styles'
 import React, { useState } from 'react'
 import { RFValue } from 'react-native-responsive-fontsize'
 import PageHeader from '@/components/page-header/page-header'

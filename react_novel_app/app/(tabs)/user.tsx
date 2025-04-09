@@ -1,10 +1,19 @@
+import PageHeader from '@/components/page-header/page-header'
 import { Text, View } from 'react-native'
 
-export default function Index() {
+function UserHeader() {
+    return (
+        <>
+            <PageHeader title='个人中心' />
+        </>
+    )
+}
+
+export default function User() {
     return (
         <>
             <View>
-                <Text>用户设置</Text>
+                <UserHeader />
             </View>
         </>
     )
