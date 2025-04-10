@@ -1,7 +1,8 @@
 import {
     getBooksByCategoryService,
     getBooksByHotService,
-    getBookStoreCategorysService
+    getBookStoreCategorysService,
+    getBookStoreFaqService
 } from '@/app/services/frontend/book-store.service'
 import { GetBookParams, SearchBookParams } from '@/app/types/backend/book-store.type'
 import BookSourceMap from '@/book-source'
@@ -31,5 +32,11 @@ export async function searchBooksController(ctx: Context) {
 // 获取热度榜
 export async function getBooksByHotController(ctx: Context) {
     const result = await getBooksByHotService()
+    throw new DataSuccess(result)
+}
+
+// 获取常见问题
+export async function getBookStoreFaqController(ctx: Context) {
+    const result = await getBookStoreFaqService()
     throw new DataSuccess(result)
 }

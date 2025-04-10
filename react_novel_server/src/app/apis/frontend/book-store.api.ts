@@ -2,7 +2,8 @@ import {
     getBooksByCategoryController,
     getBookStoreCategorysController,
     searchBooksController,
-    getBooksByHotController
+    getBooksByHotController,
+    getBookStoreFaqController
 } from '@/app/controllers/frontend/book-store.controller'
 import { verifyBookSource } from '@/middlewares/verifyBookSource'
 import Router from 'koa-router'
@@ -19,5 +20,8 @@ router.post('/search', verifyBookSource(), searchBooksController)
 
 // 获取热度榜
 router.post('/hot', getBooksByHotController)
+
+// 获取常见问题
+router.post('/faq', getBookStoreFaqController)
 
 export default router

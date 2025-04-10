@@ -1,4 +1,5 @@
 import BookAccessModel from '@/app/models/book-access.model'
+import FaqModel from '@/app/models/faq.model'
 import { GetBookParams, SearchBookParams } from '@/app/types/backend/book-store.type'
 import { REMOVE_ATTRIBUTES } from '@/app/types/common.type'
 import axios from 'axios'
@@ -46,4 +47,15 @@ export async function getBooksByHotService() {
         limit: 3
     })
     return topThreeRecords
+}
+
+// 获取常见问题
+export async function getBookStoreFaqService() {
+    const result = await FaqModel.findAll({
+        order: [['sn', 'ASC']],
+        attributes: {
+            exclude: REMOVE_ATTRIBUTES
+        }
+    })
+    return result
 }
