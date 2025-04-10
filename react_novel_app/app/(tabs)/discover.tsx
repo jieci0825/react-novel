@@ -2,6 +2,7 @@ import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import {
     discoverBookHotRankStyles,
     discoverCategoryStyles,
+    discoverFAQStyles,
     discoverMainRecommendStyles,
     discoverStyles
 } from '@/styles/tabs/discover-styles'
@@ -10,7 +11,7 @@ import Feather from '@expo/vector-icons/Feather'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { bookRecommendApi, bookStoreApi } from '@/api'
 import React, { useEffect, useState } from 'react'
-import { BookCategoryItem, HotRankingItem } from '@/api/modules/book-store/type'
+import { BookCategoryItem, FAQItem, HotRankingItem } from '@/api/modules/book-store/type'
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 import AntDesign from '@expo/vector-icons/AntDesign'
@@ -278,6 +279,37 @@ function MainRecommend() {
     )
 }
 
+// 常见问题
+function DiscoverFAQ() {
+    const { theme } = useTheme()
+
+    const styles = discoverFAQStyles(theme)
+
+    const [faqList, setFaqList] = useState<FAQItem[]>([])
+
+    useEffect(() => {
+        bookStoreApi.reqGetBookFAQ().then(res => {
+            setFaqList(res.data)
+        })
+    })
+
+    return (
+        <View style={styles.faqWrap}>
+            <PageSection title='常见问题' />
+            <View style={styles.fagContent}>
+                {faqList.map(faq => {
+                    return (
+                        <View key={faq.id}>
+                            <Text style={styles.fagTitle}>{faq.question}</Text>
+                            <Text style={styles.fagText}>{faq.answer}</Text>
+                        </View>
+                    )
+                })}
+            </View>
+        </View>
+    )
+}
+
 // 容器
 export default function Discover() {
     const { theme } = useTheme()
@@ -288,11 +320,12 @@ export default function Discover() {
         <>
             <View style={styles.container}>
                 <DiscoverHeader />
-                <View style={styles.content}>
+                <ScrollView style={styles.content}>
                     <DiscoverCategory />
                     <DiscoverHotRank />
                     <MainRecommend />
-                </View>
+                    <DiscoverFAQ />
+                </ScrollView>
             </View>
         </>
     )

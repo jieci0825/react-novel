@@ -9,3 +9,10 @@ export interface HotRankingItem {
     bookAuthor: string
     accessCount: number
 }
+
+export interface FAQItem {
+    id: number
+    sn: number
+    question: string
+    answer: string
+}

@@ -10,7 +10,8 @@ export const discoverStyles = (theme: Theme) => {
             flex: 1
         },
         content: {
-            paddingHorizontal: 20
+            paddingHorizontal: 20,
+            paddingBottom: 10
         }
     })
 }
@@ -57,7 +58,7 @@ export const discoverBookHotRankStyles = (theme: Theme) => {
             width: '100%'
         },
         rankWrap: {
-            marginTop: 15,
+            marginTop: 10,
             display: 'flex',
             gap: adaptiveSize(10)
         },
@@ -115,7 +116,7 @@ export const discoverMainRecommendStyles = (theme: Theme) => {
             marginTop: 20
         },
         recommendContent: {
-            marginTop: 15
+            marginTop: 10
         },
         recommendItemWrap: {
             display: 'flex',
@@ -135,6 +136,34 @@ export const discoverMainRecommendStyles = (theme: Theme) => {
         },
         title: {
             marginTop: 5
+        }
+    })
+}
+
+export const discoverFAQStyles = (theme: Theme) => {
+    return StyleSheet.create({
+        faqWrap: {
+            marginTop: 20
+        },
+        fagContent: {
+            marginTop: 10,
+            padding: adaptiveSize(10),
+            borderRadius: adaptiveSize(4),
+            backgroundColor: theme.bgSecondaryColor,
+            maxHeight: adaptiveSize(200),
+            overflowY: 'auto',
+            display: 'flex',
+            gap: adaptiveSize(10)
+        },
+        fagTitle: {
+            fontWeight: '600',
+            fontSize: RFValue(14),
+            color: theme.secondaryColor,
+            marginBottom: 5
+        },
+        fagText: {
+            fontSize: RFValue(12),
+            color: theme.tertiaryColor
         }
     })
 }
