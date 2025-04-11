@@ -55,3 +55,65 @@ export const userContentStyles = (theme: Theme) => {
         }
     })
 }
+
+export const userDataStyles = (theme: Theme) => {
+    return StyleSheet.create({
+        userDataWrap: {
+            padding: adaptiveSize(15),
+            marginBottom: adaptiveSize(10),
+            display: 'flex',
+            flexDirection: 'row',
+            gap: adaptiveSize(10),
+            justifyContent: 'space-between'
+        },
+        userDataItem: {
+            flex: 1,
+            height: adaptiveSize(45)
+        },
+        dataValue: {
+            textAlign: 'center',
+            fontSize: RFValue(18),
+            color: theme.primaryColor,
+            fontWeight: '600'
+        },
+        dataLabel: {
+            textAlign: 'center',
+            marginTop: 'auto',
+            fontSize: RFValue(12),
+            color: theme.secondaryColor
+        }
+    })
+}
+
+export const menuListStyles = (theme: Theme) => {
+    return StyleSheet.create({
+        menuWrap: {
+            display: 'flex',
+            gap: adaptiveSize(10)
+        },
+        menuGroup: {},
+        menuItem: {
+            paddingVertical: adaptiveSize(15),
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            borderBottomWidth: 1,
+            borderBottomColor: theme.borderColor
+        },
+        menuIcon: {
+            marginRight: adaptiveSize(10),
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: adaptiveSize(30)
+        },
+        menuText: {
+            fontSize: RFValue(14),
+            color: theme.secondaryColor,
+            flex: 1
+        },
+        menuAct: {
+            marginLeft: adaptiveSize(10)
+        }
+    })
+}

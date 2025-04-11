@@ -8,7 +8,17 @@ export const LightTheme = {
     textPrimaryColor: '#171717',
     textSecondaryColor: '#525252',
     textTertiaryColor: '#ced6e0',
-    borderColor: '#eee'
+    borderColor: '#eee',
+    switch: {
+        track: {
+            trueColor: '#6B7280',
+            falseColor: '#D1D5DB'
+        },
+        thumb: {
+            color: '#F9FAFB',
+            activeColor: '#F9FAFB'
+        }
+    }
 }
 
 export const DarkTheme = {

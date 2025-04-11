@@ -113,7 +113,7 @@ export const discoverBookHotRankStyles = (theme: Theme) => {
 export const discoverMainRecommendStyles = (theme: Theme) => {
     return StyleSheet.create({
         recommendWrap: {
-            marginTop: 20
+            marginTop: 30
         },
         recommendContent: {
             marginTop: 10
@@ -143,7 +143,7 @@ export const discoverMainRecommendStyles = (theme: Theme) => {
 export const discoverFAQStyles = (theme: Theme) => {
     return StyleSheet.create({
         faqWrap: {
-            marginTop: 20
+            marginTop: 30
         },
         fagContent: {
             marginTop: 10,

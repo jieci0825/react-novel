@@ -259,10 +259,6 @@ function MainRecommend() {
                                             src={item.bookCover}
                                             style={styles.cover}
                                         />
-                                        {/* <Image
-                                            source={{ uri: item.bookCover }}
-                                            style={styles.cover}
-                                        /> */}
                                         <TextOverflowHidden
                                             fontStyle={{
                                                 fontSize: RFValue(13),
