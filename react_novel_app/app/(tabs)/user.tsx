@@ -1,5 +1,5 @@
 import PageHeader from '@/components/page-header/page-header'
-import { useTheme } from '@/hooks/useTheme'
+import { Theme, useTheme } from '@/hooks/useTheme'
 import { menuListStyles, userContentStyles, userDataStyles, userStyles } from '@/styles/tabs/user-style'
 import { Text, TouchableOpacity, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -9,10 +9,10 @@ import TextOverflowHidden from '@/components/text-overflow-hidden/text-overflow-
 import Ionicons from '@expo/vector-icons/Ionicons'
 import Entypo from '@expo/vector-icons/Entypo'
 import React from 'react'
-import MaterialIcons from '@expo/vector-icons/MaterialIcons'
-import AntDesign from '@expo/vector-icons/AntDesign'
 import { isFunction } from '@/utils'
 import { Switch } from '@/components/ui/switch'
+import { useToast, Toast, ToastTitle, ToastDescription } from '@/components/ui/toast'
+import PageToast from '@/components/page-toast/page-toast'
 
 // 用户头部
 function UserHeader() {
@@ -104,6 +104,7 @@ interface MenuListProps {
     list: MenuItem[][]
 }
 
+// 菜单列表
 function MenuList(props: MenuListProps) {
     const { theme } = useTheme()
 
@@ -150,11 +151,8 @@ function MenuList(props: MenuListProps) {
     )
 }
 
-export default function User() {
-    const { theme } = useTheme()
-
-    const styles = userStyles(theme)
-
+// 生成菜单列表
+function generateMenuListData(theme: Theme): MenuItem[][] {
     const menuList: MenuItem[][] = [
         [
             {
@@ -215,9 +213,19 @@ export default function User() {
                     />
                 ),
                 title: '字体设置',
-                click: () => {
-                    console.log('字体设置')
-                }
+                right: (
+                    <PageToast
+                        options={{
+                            message: '字体设置功能开发中，敬请期待...'
+                        }}
+                    >
+                        <Entypo
+                            name='chevron-thin-right'
+                            size={RFValue(16)}
+                            color={theme.tertiaryColor}
+                        />
+                    </PageToast>
+                )
             }
         ],
         [
@@ -243,12 +251,31 @@ export default function User() {
                     />
                 ),
                 title: '检查更新',
-                click: () => {
-                    console.log('检查更新')
-                }
+                right: (
+                    <PageToast
+                        options={{
+                            message: '检查更新功能开发中，敬请期待...'
+                        }}
+                    >
+                        <Entypo
+                            name='chevron-thin-right'
+                            size={RFValue(16)}
+                            color={theme.tertiaryColor}
+                        />
+                    </PageToast>
+                )
             }
         ]
     ]
+    return menuList
+}
+
+export default function User() {
+    const { theme } = useTheme()
+
+    const styles = userStyles(theme)
+
+    const menuList = generateMenuListData(theme)
 
     return (
         <View style={styles.container}>
