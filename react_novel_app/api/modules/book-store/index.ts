@@ -1,6 +1,6 @@
 import request from '@/api/request'
 import { IBaseType } from '@/api/modules/types'
-import { BookCategoryItem, FAQItem, HotRankingItem } from './type'
+import { BookCategoryItem, FAQItem, HotRankingItem, SearchBookData, SearchByKeywordParams } from './type'
 
 /**
  * 获取书籍分类列表
@@ -26,5 +26,15 @@ export function reqGetBookHotList() {
 export function reqGetBookFAQ() {
     return request.post<IBaseType<FAQItem[]>>({
         url: '/book-store/faq'
+    })
+}
+
+/**
+ * 根据关键词搜索书籍
+ */
+export function reqSearchBookByKeyword(data: SearchByKeywordParams) {
+    return request.post<IBaseType<SearchBookData>>({
+        url: '/book-store/search',
+        data
     })
 }

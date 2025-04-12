@@ -21,18 +21,25 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { BookRecommendItem } from '@/api/modules/book-recommend/type'
 import TextOverflowHidden from '@/components/text-overflow-hidden/text-overflow-hidden'
 import ImgPlus from '@/components/img-plus/img-plus'
+import { RelativePathString, router } from 'expo-router'
 
 // 头部
 function DiscoverHeader() {
     const { theme } = useTheme()
 
+    const goToSearch = () => {
+        router.push({ pathname: '/search' as RelativePathString })
+    }
+
     const slots = {
         left: () => (
-            <Feather
-                name='search'
-                size={RFValue(22)}
-                color={theme.tertiaryColor}
-            />
+            <TouchableOpacity onPress={goToSearch}>
+                <Feather
+                    name='search'
+                    size={RFValue(22)}
+                    color={theme.tertiaryColor}
+                />
+            </TouchableOpacity>
         ),
         right: () => (
             <FontAwesome6

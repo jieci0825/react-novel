@@ -28,7 +28,7 @@ export default function TextOverflowHidden({
             <Text
                 numberOfLines={line}
                 ellipsizeMode='tail'
-                style={[fontStyle, { color: color || theme.secondaryColor, fontSize: fontSize || RFValue(14) }]}
+                style={[{ color: color || theme.secondaryColor, fontSize: fontSize || RFValue(14) }, fontStyle]}
             >
                 {children}
             </Text>
