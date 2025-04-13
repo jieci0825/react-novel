@@ -1,128 +1,18 @@
 import { View, Text } from 'react-native'
-import { searchBarStyles, SearchHistoryPanelStyles, searchStyles } from '@/styles/pages/search-style'
+import { searchStyles } from '@/styles/pages/search-style'
 import { useTheme } from '@/hooks/useTheme'
-import AntDesign from '@expo/vector-icons/AntDesign'
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
-import { Input, InputField, InputSlot, InputIcon } from '@/components/ui/input'
-import { RFValue } from 'react-native-responsive-fontsize'
-import { CloseIcon, SearchIcon } from '@/components/ui/icon'
-import { useState } from 'react'
-import { Button, ButtonText } from '@/components/ui/button'
+import { useEffect, useState } from 'react'
 import { bookStoreApi } from '@/api'
 import { SearchBookItem } from '@/api/modules/book-store/type'
-import { NovelStorage, storage } from '@/utils'
+import { LocalCache } from '@/utils'
 import { SEARCH_HISTORY } from '@/constants'
 import SearchBookList from '@/components/search-book-list/search-book-list'
-
-interface SearchPageProps {
-    onSearch: (keyword: string) => void
-    onFocus: () => void
-}
-// 搜索栏
-function SearchBar(props: SearchPageProps) {
-    const { theme } = useTheme()
-    const styles = searchBarStyles(theme)
-
-    const [keyword, setKeyword] = useState('')
-
-    return (
-        <View style={styles.searchBarWrap}>
-            <View style={styles.searchBarLeft}>
-                <AntDesign
-                    name='arrowleft'
-                    size={RFValue(24)}
-                    color={theme.primaryColor}
-                />
-            </View>
-            <View style={styles.searchBarCenter}>
-                <Input
-                    className='w-full'
-                    variant='rounded'
-                    size='sm'
-                    isDisabled={false}
-                    isInvalid={false}
-                    isReadOnly={false}
-                >
-                    <InputSlot className='pr-2 pl-2'>
-                        <InputIcon as={SearchIcon} />
-                    </InputSlot>
-                    <InputField
-                        className='p-0 flex-1'
-                        value={keyword}
-                        onSubmitEditing={e => props.onSearch(keyword)}
-                        onChangeText={v => setKeyword(v)}
-                        onFocus={() => props.onFocus()}
-                        placeholder='输入关键词查询'
-                    />
-                    <InputSlot
-                        onPress={() => setKeyword('')}
-                        className='pr-2 pl-2'
-                    >
-                        {!!keyword && <InputIcon as={CloseIcon} />}
-                    </InputSlot>
-                </Input>
-            </View>
-            <View style={styles.searchBarRight}>
-                <FontAwesome5
-                    name='random'
-                    size={RFValue(22)}
-                    color={theme.primaryColor}
-                />
-                <Button
-                    size='xs'
-                    variant='solid'
-                    action='primary'
-                    onPress={() => props.onSearch(keyword)}
-                >
-                    <ButtonText>搜索</ButtonText>
-                </Button>
-            </View>
-        </View>
-    )
-}
-
-interface SearchHistoryPanelProps {
-    historys: string[]
-    // 选中历史搜索词
-    onSelect: (keyword: string) => void
-    // 删除历史搜索词
-    onDelete: (index: number) => void
-    // 清空历史搜索词
-    onClear: () => void
-}
-// 搜索历史面板
-function SearchHistoryPanel(props: SearchHistoryPanelProps) {
-    const { theme } = useTheme()
-
-    const styles = SearchHistoryPanelStyles(theme)
-
-    return (
-        <>
-            <View style={styles.searchHistoryPanel}>
-                <View style={styles.head}>
-                    <Text style={styles.headLeft}>搜索历史</Text>
-                    <Text style={styles.headRight}>清空</Text>
-                </View>
-                <View style={styles.content}>
-                    {props.historys.map((item, index) => {
-                        return (
-                            <Text
-                                style={styles.item}
-                                key={index}
-                            >
-                                {item}
-                            </Text>
-                        )
-                    })}
-                </View>
-            </View>
-        </>
-    )
-}
+import SearchBar from './search-bar'
+import SearchHistoryPanel from './search-hostory-panel'
 
 // 添加搜索历史
-function addHistoryKeyword(keyword: string) {
-    const historys = NovelStorage.getItem(SEARCH_HISTORY) || []
+async function addHistoryKeyword(keyword: string) {
+    const historys = (await LocalCache.getData(SEARCH_HISTORY)) || []
     // 如果已经存在，则删除
     const index = historys.indexOf(keyword)
     if (index > -1) {
@@ -135,7 +25,7 @@ function addHistoryKeyword(keyword: string) {
     historys.unshift(keyword)
 
     // 保存
-    NovelStorage.setItem(SEARCH_HISTORY, historys)
+    LocalCache.storeData(SEARCH_HISTORY, historys)
 
     return historys
 }
@@ -148,7 +38,7 @@ export default function SearchPage() {
     // 是否还有更多
     const [isMore, setIsMore] = useState(true)
     // 搜索历史
-    const [historys, setHistorys] = useState<string[]>(NovelStorage.getItem(SEARCH_HISTORY) || [])
+    const [historys, setHistorys] = useState<string[]>([])
     // 搜索结果
     const [searchResult, setSearchResult] = useState<SearchBookItem[]>([])
     // 是否显示历史记录面板
@@ -156,11 +46,18 @@ export default function SearchPage() {
     // page
     const [page, setPage] = useState(1)
 
+    useEffect(() => {
+        LocalCache.getData(SEARCH_HISTORY).then(h => {
+            setHistorys(h || [])
+        })
+    }, [])
+
     const onSearch = async (keyword: string) => {
         if (!keyword || !isMore) return
 
         // 每次搜索前需要添加历史记录、关闭历史记录面板、重置数据
-        setHistorys(addHistoryKeyword(keyword))
+        const h = await addHistoryKeyword(keyword)
+        setHistorys(h)
         setShowHistoryPanel(false)
         reset()
 
@@ -187,7 +84,7 @@ export default function SearchPage() {
     }
 
     function onClear() {
-        NovelStorage.removeItem(SEARCH_HISTORY)
+        // TODO 删除本地缓存
         setHistorys([])
     }
 
