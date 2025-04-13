@@ -37,6 +37,7 @@ export async function getBooksByHotController(ctx: Context) {
 
 // 获取常见问题
 export async function getBookStoreFaqController(ctx: Context) {
+    console.log('getBookStoreFaqController')
     const result = await getBookStoreFaqService()
     throw new DataSuccess(result)
 }

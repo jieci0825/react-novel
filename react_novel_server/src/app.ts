@@ -9,7 +9,8 @@ dotenvFlow.config()
 async function run() {
     await registerApp(app)
 
-    app.listen(process.env.PORT, () => {
+    // @ts-ignore
+    app.listen(process.env.PORT, '0.0.0.0', () => {
         console.log(`server is running at http://localhost:${process.env.PORT}`)
     })
 }

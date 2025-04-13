@@ -23,7 +23,7 @@ export const pageHeaderStyles = (theme: Theme) => {
             alignItems: 'center',
             height: '100%',
             gap: adaptiveSize(10),
-            padding: adaptiveSize(20)
+            paddingHorizontal: adaptiveSize(20)
         },
         pageCenter: {
             display: 'flex',

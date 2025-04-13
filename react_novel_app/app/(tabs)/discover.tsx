@@ -21,6 +21,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { BookRecommendItem } from '@/api/modules/book-recommend/type'
 import TextOverflowHidden from '@/components/text-overflow-hidden/text-overflow-hidden'
 import ImgPlus from '@/components/img-plus/img-plus'
+// @ts-ignore
 import { RelativePathString, router } from 'expo-router'
 
 // 头部
@@ -210,7 +211,9 @@ function DiscoverHotRank() {
                             style={styles.rankItem}
                             key={index}
                         >
-                            <Text style={styles.rankSN}>{index + 1}</Text>
+                            <View style={styles.rankSN}>
+                                <Text style={styles.rankSNText}>{index + 1}</Text>
+                            </View>
                             <View style={styles.rankInfo}>
                                 <Text style={styles.rankInfoTitle}>{hot.bookName}</Text>
                                 <Text style={styles.rankInfoAuthor}>{hot.bookAuthor}</Text>
@@ -299,7 +302,7 @@ function DiscoverFAQ() {
         bookStoreApi.reqGetBookFAQ().then(res => {
             setFaqList(res.data)
         })
-    })
+    }, [])
 
     return (
         <View style={styles.faqWrap}>
