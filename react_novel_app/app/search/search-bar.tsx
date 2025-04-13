@@ -2,12 +2,12 @@ import { Button, ButtonText } from '@/components/ui/button'
 import { CloseIcon, SearchIcon } from '@/components/ui/icon'
 import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input'
 import { useTheme } from '@/hooks/useTheme'
-import { searchBarStyles } from './search.style'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 import { useState } from 'react'
 import { View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
+import { searchBarStyles } from '@/styles/pages/search.style'
 
 interface SearchPageProps {
     onSearch: (keyword: string) => void

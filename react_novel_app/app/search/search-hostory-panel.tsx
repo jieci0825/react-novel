@@ -1,5 +1,5 @@
 import { useTheme } from '@/hooks/useTheme'
-import { SearchHistoryPanelStyles } from './search.style'
+import { SearchHistoryPanelStyles } from '@/styles/pages/search.style'
 import { Text, View } from 'react-native'
 
 interface SearchHistoryPanelProps {
