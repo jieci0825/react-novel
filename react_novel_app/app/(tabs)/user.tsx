@@ -100,7 +100,7 @@ interface MenuItem {
 }
 
 interface MenuListProps {
-    list: MenuItem[][]
+    list: MenuItem[]
 }
 
 // 菜单列表
@@ -111,38 +111,28 @@ function MenuList(props: MenuListProps) {
 
     return (
         <View style={styles.menuWrap}>
-            {props.list.map((item, index) => {
+            {props.list.map((menu, index) => {
                 return (
-                    <View
-                        key={index}
-                        style={styles.menuGroup}
-                    >
-                        {item.map((menu, index) => {
-                            return (
-                                <View
-                                    key={index}
-                                    style={styles.menuItem}
-                                >
-                                    <View style={styles.menuIcon}>{menu.icon}</View>
-                                    <Text style={styles.menuText}>{menu.title}</Text>
-                                    <View style={styles.menuAct}>
-                                        {menu.right || (
-                                            <TouchableOpacity
-                                                onPress={() => {
-                                                    isFunction(menu.click) && menu.click()
-                                                }}
-                                            >
-                                                <Entypo
-                                                    name='chevron-thin-right'
-                                                    size={RFValue(16)}
-                                                    color={theme.tertiaryColor}
-                                                />
-                                            </TouchableOpacity>
-                                        )}
-                                    </View>
-                                </View>
-                            )
-                        })}
+                    <View key={index}>
+                        <View style={styles.menuItem}>
+                            <View style={styles.menuIcon}>{menu.icon}</View>
+                            <Text style={styles.menuText}>{menu.title}</Text>
+                            <View style={styles.menuAct}>
+                                {menu.right || (
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            isFunction(menu.click) && menu.click()
+                                        }}
+                                    >
+                                        <Entypo
+                                            name='chevron-thin-right'
+                                            size={RFValue(16)}
+                                            color={theme.tertiaryColor}
+                                        />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                        </View>
                     </View>
                 )
             })}
@@ -151,120 +141,114 @@ function MenuList(props: MenuListProps) {
 }
 
 // 生成菜单列表
-function generateMenuListData(theme: Theme): MenuItem[][] {
-    const menuList: MenuItem[][] = [
-        [
-            {
-                icon: (
-                    <FontAwesome5
-                        name='history'
-                        size={RFValue(15)}
-                        color={theme.tertiaryColor}
-                    />
-                ),
-                title: '阅读历史',
-                click: () => {
-                    console.log('阅读历史')
-                }
-            },
-            {
-                icon: (
-                    <Ionicons
-                        name='bookmark'
-                        size={RFValue(18)}
-                        color={theme.tertiaryColor}
-                    />
-                ),
-                title: '我的书签',
-                click: () => {
-                    console.log('我的书签')
-                }
+function generateMenuListData(theme: Theme): MenuItem[] {
+    const menuList: MenuItem[] = [
+        {
+            icon: (
+                <FontAwesome5
+                    name='history'
+                    size={RFValue(15)}
+                    color={theme.tertiaryColor}
+                />
+            ),
+            title: '阅读历史',
+            click: () => {
+                console.log('阅读历史')
             }
-        ],
-        [
-            {
-                icon: (
-                    <Ionicons
-                        name='moon'
-                        size={RFValue(18)}
-                        color={theme.tertiaryColor}
-                    />
-                ),
-                title: '夜间模式',
-                right: (
-                    <>
-                        <Switch
-                            size='sm'
-                            trackColor={{ false: theme.switch.track.falseColor, true: theme.switch.track.trueColor }}
-                            thumbColor={theme.switch.thumb.color}
-                            /* @ts-ignore */
-                            activeThumbColor={theme.switch.thumb.color}
-                        />
-                    </>
-                )
-            },
-            {
-                icon: (
-                    <FontAwesome5
-                        name='font'
-                        size={RFValue(18)}
-                        color={theme.tertiaryColor}
-                    />
-                ),
-                title: '字体设置',
-                right: (
-                    <PageToast
-                        options={{
-                            message: '字体设置功能开发中，敬请期待...'
-                        }}
-                    >
-                        <Entypo
-                            name='chevron-thin-right'
-                            size={RFValue(16)}
-                            color={theme.tertiaryColor}
-                        />
-                    </PageToast>
-                )
+        },
+        {
+            icon: (
+                <Ionicons
+                    name='bookmark'
+                    size={RFValue(18)}
+                    color={theme.tertiaryColor}
+                />
+            ),
+            title: '我的书签',
+            click: () => {
+                console.log('我的书签')
             }
-        ],
-        [
-            {
-                icon: (
+        },
+        {
+            icon: (
+                <Ionicons
+                    name='moon'
+                    size={RFValue(18)}
+                    color={theme.tertiaryColor}
+                />
+            ),
+            title: '夜间模式',
+            right: (
+                <>
+                    <Switch
+                        size='sm'
+                        trackColor={{ false: theme.switch.track.falseColor, true: theme.switch.track.trueColor }}
+                        thumbColor={theme.switch.thumb.color}
+                        /* @ts-ignore */
+                        activeThumbColor={theme.switch.thumb.color}
+                    />
+                </>
+            )
+        },
+        {
+            icon: (
+                <FontAwesome5
+                    name='font'
+                    size={RFValue(18)}
+                    color={theme.tertiaryColor}
+                />
+            ),
+            title: '字体设置',
+            right: (
+                <PageToast
+                    options={{
+                        message: '字体设置功能开发中，敬请期待...'
+                    }}
+                >
                     <Entypo
-                        name='info-with-circle'
-                        size={RFValue(18)}
+                        name='chevron-thin-right'
+                        size={RFValue(16)}
                         color={theme.tertiaryColor}
                     />
-                ),
-                title: '关于我们',
-                click: () => {
-                    console.log('关于我们')
-                }
-            },
-            {
-                icon: (
-                    <Entypo
-                        name='download'
-                        size={RFValue(20)}
-                        color={theme.tertiaryColor}
-                    />
-                ),
-                title: '检查更新',
-                right: (
-                    <PageToast
-                        options={{
-                            message: '检查更新功能开发中，敬请期待...'
-                        }}
-                    >
-                        <Entypo
-                            name='chevron-thin-right'
-                            size={RFValue(16)}
-                            color={theme.tertiaryColor}
-                        />
-                    </PageToast>
-                )
+                </PageToast>
+            )
+        },
+        {
+            icon: (
+                <Entypo
+                    name='info-with-circle'
+                    size={RFValue(18)}
+                    color={theme.tertiaryColor}
+                />
+            ),
+            title: '关于我们',
+            click: () => {
+                console.log('关于我们')
             }
-        ]
+        },
+        {
+            icon: (
+                <Entypo
+                    name='download'
+                    size={RFValue(20)}
+                    color={theme.tertiaryColor}
+                />
+            ),
+            title: '检查更新',
+            right: (
+                <PageToast
+                    options={{
+                        message: '检查更新功能开发中，敬请期待...'
+                    }}
+                >
+                    <Entypo
+                        name='chevron-thin-right'
+                        size={RFValue(16)}
+                        color={theme.tertiaryColor}
+                    />
+                </PageToast>
+            )
+        }
     ]
     return menuList
 }

@@ -88,13 +88,12 @@ export const userDataStyles = (theme: Theme) => {
 export const menuListStyles = (theme: Theme) => {
     return StyleSheet.create({
         menuWrap: {
-            display: 'flex',
-            gap: adaptiveSize(10)
+            display: 'flex'
         },
-        menuGroup: {},
         menuItem: {
-            paddingVertical: adaptiveSize(15),
+            width: '100%',
             display: 'flex',
+            height: adaptiveSize(50),
             flexDirection: 'row',
             alignItems: 'center',
             borderBottomWidth: 1,
