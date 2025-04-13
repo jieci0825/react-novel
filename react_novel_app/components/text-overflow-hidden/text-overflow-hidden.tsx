@@ -1,6 +1,6 @@
 import { useTheme } from '@/hooks/useTheme'
-import { textOverflowHiddenStyles } from '@/styles/components/text-overflow-hidden-style'
-import { StyleProp, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native'
+import { textOverflowHiddenStyles } from './text-overflow-hidden.style'
+import { StyleProp, Text, TextStyle, View, ViewStyle } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 
 interface TextOverflowHiddenProps {

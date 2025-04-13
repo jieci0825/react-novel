@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { isString } from './check-type'
 
 // 存储数据
 export const storeData = async (key: string, value: any) => {

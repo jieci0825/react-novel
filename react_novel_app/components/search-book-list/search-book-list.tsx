@@ -1,6 +1,6 @@
 import { SearchBookItem } from '@/api/modules/book-store/type'
 import { useTheme } from '@/hooks/useTheme'
-import { searchBookListStyles } from '@/styles/components/search-book-list.style'
+import { searchBookListStyles } from './search-book-list.style'
 import { View, Text } from 'react-native'
 import ImgPlus from '../img-plus/img-plus'
 import TextOverflowHidden from '../text-overflow-hidden/text-overflow-hidden'

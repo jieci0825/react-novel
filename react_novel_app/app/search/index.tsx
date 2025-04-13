@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native'
-import { searchStyles } from '@/styles/pages/search-style'
+import { searchStyles } from './search.style'
 import { useTheme } from '@/hooks/useTheme'
 import { useEffect, useState } from 'react'
 import { bookStoreApi } from '@/api'

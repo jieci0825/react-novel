@@ -9,7 +9,7 @@ import {
     homeContentStyles,
     homeHeaderStyles,
     homeStyles
-} from '@/styles/tabs/index-styles'
+} from '@/styles/tabs/index.style'
 import React, { useState } from 'react'
 import { RFValue } from 'react-native-responsive-fontsize'
 import PageHeader from '@/components/page-header/page-header'

@@ -1,5 +1,5 @@
 import { useTheme } from '@/hooks/useTheme'
-import { pageSectionStyles } from '@/styles/components/page-section-style'
+import { pageSectionStyles } from './page-section.style'
 import { Text, View } from 'react-native'
 
 interface PageSectionSlots {

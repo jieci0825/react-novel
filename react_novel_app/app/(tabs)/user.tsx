@@ -1,6 +1,6 @@
 import PageHeader from '@/components/page-header/page-header'
 import { Theme, useTheme } from '@/hooks/useTheme'
-import { menuListStyles, userContentStyles, userDataStyles, userStyles } from '@/styles/tabs/user-style'
+import { menuListStyles, userContentStyles, userDataStyles, userStyles } from '@/styles/tabs/user.style'
 import { Text, TouchableOpacity, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Feather from '@expo/vector-icons/Feather'
@@ -11,7 +11,6 @@ import Entypo from '@expo/vector-icons/Entypo'
 import React from 'react'
 import { isFunction } from '@/utils'
 import { Switch } from '@/components/ui/switch'
-import { useToast, Toast, ToastTitle, ToastDescription } from '@/components/ui/toast'
 import PageToast from '@/components/page-toast/page-toast'
 
 // 用户头部

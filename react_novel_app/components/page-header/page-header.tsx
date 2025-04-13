@@ -1,4 +1,4 @@
-import { pageHeaderStyles } from '@/styles/components/page-header-style'
+import { pageHeaderStyles } from './page-header.style'
 import { useTheme } from '@/hooks/useTheme'
 import React from 'react'
 import { Text, View } from 'react-native'
