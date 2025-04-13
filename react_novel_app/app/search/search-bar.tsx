@@ -10,15 +10,15 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { searchBarStyles } from '@/styles/pages/search.style'
 
 interface SearchPageProps {
-    onSearch: (keyword: string) => void
+    onSearch: () => void
     onFocus: () => void
+    setKeyword: (keyword: string) => void
+    keyword: string
 }
 // 搜索栏
 export default function SearchBar(props: SearchPageProps) {
     const { theme } = useTheme()
     const styles = searchBarStyles(theme)
-
-    const [keyword, setKeyword] = useState('')
 
     return (
         <View style={styles.searchBarWrap}>
@@ -43,17 +43,17 @@ export default function SearchBar(props: SearchPageProps) {
                     </InputSlot>
                     <InputField
                         className='p-0 flex-1'
-                        value={keyword}
-                        onSubmitEditing={e => props.onSearch(keyword)}
-                        onChangeText={v => setKeyword(v)}
+                        value={props.keyword}
+                        onSubmitEditing={e => props.onSearch()}
+                        onChangeText={v => props.setKeyword(v)}
                         onFocus={() => props.onFocus()}
                         placeholder='输入关键词查询'
                     />
                     <InputSlot
-                        onPress={() => setKeyword('')}
+                        onPress={() => props.setKeyword('')}
                         className='pr-2 pl-2'
                     >
-                        {!!keyword && <InputIcon as={CloseIcon} />}
+                        {!!props.keyword && <InputIcon as={CloseIcon} />}
                     </InputSlot>
                 </Input>
             </View>
@@ -67,7 +67,7 @@ export default function SearchBar(props: SearchPageProps) {
                     size='xs'
                     variant='solid'
                     action='primary'
-                    onPress={() => props.onSearch(keyword)}
+                    onPress={() => props.onSearch()}
                 >
                     <ButtonText>搜索</ButtonText>
                 </Button>

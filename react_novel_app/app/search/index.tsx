@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
 import { useTheme } from '@/hooks/useTheme'
 import { useEffect, useState } from 'react'
 import { bookStoreApi } from '@/api'
@@ -10,9 +10,14 @@ import SearchBar from './search-bar'
 import SearchHistoryPanel from './search-hostory-panel'
 import { searchStyles } from '@/styles/pages/search.style'
 
+// 获取搜索历史
+async function getSearchHistory() {
+    const h = await LocalCache.getData(SEARCH_HISTORY)
+    return h || []
+}
 // 添加搜索历史
 async function addHistoryKeyword(keyword: string) {
-    const historys = (await LocalCache.getData(SEARCH_HISTORY)) || []
+    const historys = await getSearchHistory()
     // 如果已经存在，则删除
     const index = historys.indexOf(keyword)
     if (index > -1) {
@@ -29,7 +34,20 @@ async function addHistoryKeyword(keyword: string) {
 
     return historys
 }
+// 删除搜索历史
+async function deleteHistoryKeyword(index: number) {
+    const historys = await getSearchHistory()
+    historys.splice(index, 1)
+    LocalCache.storeData(SEARCH_HISTORY, historys)
+    return historys
+}
+// 清空搜索历史
+async function clearAllHistoryKeyword() {
+    await LocalCache.removeData(SEARCH_HISTORY)
+    return []
+}
 
+// 搜索页面
 export default function SearchPage() {
     const { theme } = useTheme()
 
@@ -43,8 +61,10 @@ export default function SearchPage() {
     const [searchResult, setSearchResult] = useState<SearchBookItem[]>([])
     // 是否显示历史记录面板
     const [showHistoryPanel, setShowHistoryPanel] = useState(true)
-    // page
+    // 页码值
     const [page, setPage] = useState(1)
+    // 搜索关键词
+    const [keyword, setKeyword] = useState<string>('')
 
     useEffect(() => {
         LocalCache.getData(SEARCH_HISTORY).then(h => {
@@ -52,16 +72,24 @@ export default function SearchPage() {
         })
     }, [])
 
-    const onSearch = async (keyword: string) => {
-        if (!keyword || !isMore) return
+    // 监听 keyword 变化。当其变为空时，打开历史记录面板
+    useEffect(() => {
+        if (!keyword) {
+            setShowHistoryPanel(true)
+        }
+    }, [keyword])
+
+    const onSearch = async (v?: string) => {
+        const k = v || keyword
+        if (!k || !isMore) return
 
         // 每次搜索前需要添加历史记录、关闭历史记录面板、重置数据
-        const h = await addHistoryKeyword(keyword)
+        const h = await addHistoryKeyword(k)
         setHistorys(h)
         setShowHistoryPanel(false)
         reset()
 
-        fetchData(keyword)
+        fetchData(k)
     }
 
     async function fetchData(keyword: string) {
@@ -83,17 +111,24 @@ export default function SearchPage() {
         setPage(1)
     }
 
-    function onClear() {
-        // TODO 删除本地缓存
+    // 清除历史记录
+    async function onClear() {
+        await clearAllHistoryKeyword()
         setHistorys([])
     }
 
-    function onDelete() {
-        // TODO
+    // 删除历史记录
+    async function onDelete(index: number) {
+        const h = await deleteHistoryKeyword(index)
+        setHistorys(h)
     }
 
+    // 选择历史记录
     function onSelect(keyword: string) {
-        onSearch(keyword)
+        setKeyword(() => {
+            onSearch(keyword)
+            return keyword
+        })
     }
 
     function onFocus() {
@@ -107,6 +142,8 @@ export default function SearchPage() {
             <SearchBar
                 onSearch={onSearch}
                 onFocus={onFocus}
+                keyword={keyword}
+                setKeyword={setKeyword}
             />
             <View style={styles.main}>
                 {showHistoryPanel ? (

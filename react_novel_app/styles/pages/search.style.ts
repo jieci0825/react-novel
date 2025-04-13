@@ -64,9 +64,15 @@ export const SearchHistoryPanelStyles = (theme: Theme) => {
             fontSize: RFValue(14)
         },
         headRight: {
+            marginLeft: 'auto',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 5
+        },
+        headRightText: {
             color: theme.textSecondaryColor,
-            fontSize: RFValue(14),
-            marginLeft: 'auto'
+            fontSize: RFValue(12)
         },
         content: {
             width: '100%',
@@ -76,12 +82,19 @@ export const SearchHistoryPanelStyles = (theme: Theme) => {
             gap: 10
         },
         item: {
-            color: theme.textSecondaryColor,
-            fontSize: RFValue(12),
             paddingVertical: 4,
             paddingHorizontal: 12,
             borderRadius: 20,
-            backgroundColor: theme.bgSecondaryColor
+            backgroundColor: theme.bgSecondaryColor,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 4
+        },
+        itemText: {
+            color: theme.textSecondaryColor,
+            fontSize: RFValue(12)
         }
     })
 }
