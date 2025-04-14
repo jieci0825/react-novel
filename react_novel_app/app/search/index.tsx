@@ -1,8 +1,8 @@
-import { View } from 'react-native'
+import { Text, View } from 'react-native'
 import { useTheme } from '@/hooks/useTheme'
 import { useEffect, useState } from 'react'
 import { bookStoreApi } from '@/api'
-import { SearchBookItem } from '@/api/modules/book-store/type'
+import { SearchBookItem, SearchByKeywordParams } from '@/api/modules/book-store/type'
 import { LocalCache } from '@/utils'
 import { SEARCH_HISTORY } from '@/constants'
 import SearchBookList from '@/components/search-book-list/search-book-list'
@@ -79,6 +79,7 @@ export default function SearchPage() {
         }
     }, [keyword])
 
+    // 搜索，每次搜索都应该是从第一页开始
     const onSearch = async (v?: string) => {
         const k = v || keyword
         if (!k || !isMore) return
@@ -89,20 +90,29 @@ export default function SearchPage() {
         setShowHistoryPanel(false)
         reset()
 
-        fetchData(k)
+        fetchData({ keyword: k, _source: 1, page: 1 })
     }
 
-    async function fetchData(keyword: string) {
-        const resp = await bookStoreApi.reqSearchBookByKeyword({ keyword, _source: 1, page })
+    // 获取数据
+    async function fetchData(condition: SearchByKeywordParams) {
+        const resp = await bookStoreApi.reqSearchBookByKeyword(condition)
 
-        setPage(page + 1)
-
-        const list = [...resp.data.list, ...searchResult]
-        setSearchResult(list)
+        setSearchResult(prevData => [...prevData, ...resp.data.list])
 
         if (resp.data.list.length < resp.data.limit) {
             setIsMore(false)
         }
+    }
+
+    // 加载更多
+    async function loadMore() {
+        // 如果没有更多则不执行
+        if (!isMore) return
+        setPage(prev => {
+            const newPage = prev + 1
+            fetchData({ keyword, _source: 1, page: newPage })
+            return newPage
+        })
     }
 
     function reset() {
@@ -154,7 +164,11 @@ export default function SearchPage() {
                         onSelect={onSelect}
                     />
                 ) : (
-                    <SearchBookList list={searchResult} />
+                    <SearchBookList
+                        list={searchResult}
+                        loadData={loadMore}
+                        isMore={isMore}
+                    />
                 )}
             </View>
         </View>

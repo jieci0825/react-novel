@@ -8,15 +8,15 @@ export const searchBookListStyles = (theme: Theme) => {
         searchResultWrap: {
             width: '100%',
             padding: adaptiveSize(10),
-            display: 'flex',
-            gap: 10
+            paddingBottom: 0
         },
         searchResultItem: {
             width: '100%',
             height: adaptiveSize(120),
             display: 'flex',
             flexDirection: 'row',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            marginBottom: 10
         },
         cover: {
             width: adaptiveSize(90),
@@ -60,6 +60,23 @@ export const searchBookListStyles = (theme: Theme) => {
         desc: {
             color: theme.textSecondaryColor,
             fontSize: RFValue(12)
+        }
+    })
+}
+
+export const searchEmptyStyles = (theme: Theme) => {
+    return StyleSheet.create({
+        searchEmpty: {
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+        },
+        searchEmptyText: {
+            marginTop: adaptiveSize(50),
+            color: theme.textTertiaryColor,
+            fontSize: RFValue(18)
         }
     })
 }
