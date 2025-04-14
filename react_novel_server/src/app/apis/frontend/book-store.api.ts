@@ -24,7 +24,4 @@ router.post('/hot', getBooksByHotController)
 // 获取常见问题
 router.post('/faq', getBookStoreFaqController)
 
-// !test
-router.get('/faq', getBookStoreFaqController)
-
 export default router
