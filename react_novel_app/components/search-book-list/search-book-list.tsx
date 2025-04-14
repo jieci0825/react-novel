@@ -90,7 +90,21 @@ export default function SearchBookList(props: SearchBookResultProps) {
             extraData={selectedId}
             onEndReached={handleEndReached}
             onEndReachedThreshold={0.3}
-            ListFooterComponent={props.isMore ? <ActivityIndicator size='small' /> : <Text>没有更多数据了</Text>}
+            ListFooterComponent={
+                props.isMore ? (
+                    <ActivityIndicator size='small' />
+                ) : (
+                    <Text
+                        style={{
+                            color: theme.textTertiaryColor,
+                            marginTop: 10,
+                            textAlign: 'center'
+                        }}
+                    >
+                        没有更多数据了
+                    </Text>
+                )
+            }
             ListEmptyComponent={SearchEmpty}
         />
     )
