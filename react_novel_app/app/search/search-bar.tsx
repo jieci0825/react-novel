@@ -4,10 +4,10 @@ import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input'
 import { useTheme } from '@/hooks/useTheme'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
-import { useState } from 'react'
-import { View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { searchBarStyles } from '@/styles/pages/search.style'
+import { useRouter } from 'expo-router'
 
 interface SearchPageProps {
     onSearch: () => void
@@ -20,15 +20,30 @@ export default function SearchBar(props: SearchPageProps) {
     const { theme } = useTheme()
     const styles = searchBarStyles(theme)
 
+    const router = useRouter()
+
+    const toBack = () => {
+        const canGoBack = router.canGoBack()
+        // 检测是否存在可以返回的页面，不存在则返回发现页
+        if (!canGoBack) {
+            router.navigate('/discover')
+        } else {
+            router.back()
+        }
+    }
+
     return (
         <View style={styles.searchBarWrap}>
-            <View style={styles.searchBarLeft}>
+            <TouchableOpacity
+                onPress={toBack}
+                style={styles.searchBarLeft}
+            >
                 <AntDesign
                     name='arrowleft'
                     size={RFValue(24)}
                     color={theme.primaryColor}
                 />
-            </View>
+            </TouchableOpacity>
             <View style={styles.searchBarCenter}>
                 <Input
                     className='w-full'

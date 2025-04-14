@@ -28,13 +28,13 @@ import { RelativePathString, router } from 'expo-router'
 function DiscoverHeader() {
     const { theme } = useTheme()
 
-    const goToSearch = () => {
+    const toSearch = () => {
         router.push({ pathname: '/search' as RelativePathString })
     }
 
     const slots = {
         left: () => (
-            <TouchableOpacity onPress={goToSearch}>
+            <TouchableOpacity onPress={toSearch}>
                 <Feather
                     name='search'
                     size={RFValue(22)}
