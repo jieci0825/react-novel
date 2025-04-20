@@ -21,7 +21,6 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import { BookRecommendItem } from '@/api/modules/book-recommend/type'
 import TextOverflowHidden from '@/components/text-overflow-hidden/text-overflow-hidden'
 import ImgPlus from '@/components/img-plus/img-plus'
-// @ts-ignore
 import { RelativePathString, router } from 'expo-router'
 
 // 头部

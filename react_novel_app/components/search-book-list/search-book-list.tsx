@@ -7,6 +7,7 @@ import TextOverflowHidden from '../text-overflow-hidden/text-overflow-hidden'
 import { useEffect, useRef, useState } from 'react'
 import SearchEmpty from './search-empty'
 import { debounce, DebouncedFunction } from '@/utils'
+import { RelativePathString, router } from 'expo-router'
 
 // 搜索结果
 interface SearchBookResultProps {
@@ -34,9 +35,12 @@ export default function SearchBookList(props: SearchBookResultProps) {
 
     const styles = searchBookListStyles(theme)
 
-    const handleSelectBookItem = (bookId: string | number) => {
+    const handleSelectBookItem = (bookId: string | number, source: number) => {
         setSelectedId(bookId)
-        console.log('选中书籍', bookId)
+        router.push({
+            pathname: '/details' as RelativePathString,
+            params: { bid: bookId, source }
+        })
     }
 
     // 搜索结果列表项
@@ -44,7 +48,7 @@ export default function SearchBookList(props: SearchBookResultProps) {
         return (
             <TouchableOpacity
                 key={item.bookId}
-                onPress={() => handleSelectBookItem(item.bookId)}
+                onPress={() => handleSelectBookItem(item.bookId, item._source)}
             >
                 <View style={styles.searchResultItem}>
                     <ImgPlus

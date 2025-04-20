@@ -7,7 +7,7 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 import { TouchableOpacity, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { searchBarStyles } from '@/styles/pages/search.style'
-import { useRouter } from 'expo-router'
+import { router } from 'expo-router'
 
 interface SearchPageProps {
     onSearch: () => void
@@ -19,8 +19,6 @@ interface SearchPageProps {
 export default function SearchBar(props: SearchPageProps) {
     const { theme } = useTheme()
     const styles = searchBarStyles(theme)
-
-    const router = useRouter()
 
     const toBack = () => {
         const canGoBack = router.canGoBack()
