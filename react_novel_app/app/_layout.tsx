@@ -16,6 +16,10 @@ export default function Layout() {
                         name='search'
                         options={{ headerShown: false }}
                     />
+                    <Stack.Screen
+                        name='details'
+                        options={{ headerShown: false }}
+                    />
                 </Stack>
             </ThemeProvider>
         </GluestackUIProvider>

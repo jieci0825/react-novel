@@ -46,7 +46,6 @@ async function clearAllHistoryKeyword() {
     await LocalCache.removeData(SEARCH_HISTORY)
     return []
 }
-
 // 搜索页面
 export default function SearchPage() {
     const { theme } = useTheme()

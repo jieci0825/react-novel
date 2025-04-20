@@ -28,18 +28,23 @@ export default function SearchBookList(props: SearchBookResultProps) {
     }, [])
 
     // 选中的书籍id
-    const [selectedId, setSelectedId] = useState<string>()
+    const [selectedId, setSelectedId] = useState<string | number>()
 
     const { theme } = useTheme()
 
     const styles = searchBookListStyles(theme)
+
+    const handleSelectBookItem = (bookId: string | number) => {
+        setSelectedId(bookId)
+        console.log('选中书籍', bookId)
+    }
 
     // 搜索结果列表项
     const renderItem = ({ item, index }: { item: SearchBookItem; index: number }) => {
         return (
             <TouchableOpacity
                 key={item.bookId}
-                onPress={() => setSelectedId(item.bookId as string)}
+                onPress={() => handleSelectBookItem(item.bookId)}
             >
                 <View style={styles.searchResultItem}>
                     <ImgPlus
