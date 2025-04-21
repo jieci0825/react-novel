@@ -1,7 +1,7 @@
 import PageHeader from '@/components/page-header/page-header'
 import { useTheme } from '@/hooks/useTheme'
 import { detailsStyles } from '@/styles/pages/details.style'
-import { router, useLocalSearchParams } from 'expo-router'
+import { RelativePathString, router, useLocalSearchParams } from 'expo-router'
 import { Text, TouchableOpacity, View } from 'react-native'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -54,6 +54,20 @@ export default function DetailsPage() {
         )
     }
 
+    const toRead = () => {
+        router.push({
+            pathname: '/read' as RelativePathString,
+            params: {
+                bid: params.bid,
+                source: params.source
+            }
+        })
+    }
+
+    const addBookShelf = () => {
+        console.log('加入书架')
+    }
+
     return (
         <>
             <View style={styles.container}>
@@ -65,7 +79,10 @@ export default function DetailsPage() {
                     {details && <BookInfo item={details} />}
                     {details && <BookChapter item={details} />}
                 </View>
-                <DetailsFooter />
+                <DetailsFooter
+                    toRead={toRead}
+                    addBookShelf={addBookShelf}
+                />
             </View>
         </>
     )

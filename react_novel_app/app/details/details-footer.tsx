@@ -2,7 +2,12 @@ import { useTheme } from '@/hooks/useTheme'
 import { detailsFooterStyles } from '@/styles/pages/details.style'
 import { Text, View } from 'react-native'
 
-export default function DetailsFooter() {
+interface DetailsFooterProps {
+    addBookShelf: Function
+    toRead: Function
+}
+
+export default function DetailsFooter(props: DetailsFooterProps) {
     const { theme } = useTheme()
     const styles = detailsFooterStyles(theme)
 
