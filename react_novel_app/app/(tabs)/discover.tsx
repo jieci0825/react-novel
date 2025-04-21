@@ -248,6 +248,13 @@ function MainRecommend() {
         })
     }, [])
 
+    const toDetails = (item: BookRecommendItem) => {
+        router.push({
+            pathname: '/details',
+            params: { bid: item.bookId, source: item.bookSource }
+        })
+    }
+
     return (
         <>
             <View style={styles.recommendWrap}>
@@ -260,25 +267,27 @@ function MainRecommend() {
                         <View style={styles.recommendItemWrap}>
                             {mainRecommendList.map(item => {
                                 return (
-                                    <View
+                                    <TouchableOpacity
                                         key={item.id}
-                                        style={styles.recommendItem}
+                                        onPress={() => toDetails(item)}
                                     >
-                                        <ImgPlus
-                                            src={item.bookCover}
-                                            style={styles.cover}
-                                        />
-                                        <TextOverflowHidden
-                                            fontStyle={{
-                                                fontSize: RFValue(13),
-                                                color: theme.tertiaryColor,
-                                                textAlign: 'center'
-                                            }}
-                                            style={styles.title}
-                                        >
-                                            {item.bookName}
-                                        </TextOverflowHidden>
-                                    </View>
+                                        <View style={styles.recommendItem}>
+                                            <ImgPlus
+                                                src={item.bookCover}
+                                                style={styles.cover}
+                                            />
+                                            <TextOverflowHidden
+                                                fontStyle={{
+                                                    fontSize: RFValue(13),
+                                                    color: theme.tertiaryColor,
+                                                    textAlign: 'center'
+                                                }}
+                                                style={styles.title}
+                                            >
+                                                {item.bookName}
+                                            </TextOverflowHidden>
+                                        </View>
+                                    </TouchableOpacity>
                                 )
                             })}
                         </View>

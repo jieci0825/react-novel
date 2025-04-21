@@ -5,5 +5,5 @@ export interface BookRecommendItem {
     bookCover: string
     bookAuthor: string
     bookId: number | string
-    _source: number
+    bookSource: number
 }

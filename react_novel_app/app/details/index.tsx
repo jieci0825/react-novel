@@ -29,6 +29,7 @@ export default function DetailsPage() {
             .then(res => {
                 setDetails(res.data)
             })
+            .catch(err => {})
     }, [])
 
     const toBack = () => {
