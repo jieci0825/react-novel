@@ -199,6 +199,15 @@ function DiscoverHotRank() {
         })
     }, [])
 
+    const toSearch = (item: HotRankingItem) => {
+        router.push({
+            pathname: '/search',
+            params: {
+                bookName: item.bookName
+            }
+        })
+    }
+
     return (
         <View style={styles.bookRankWrap}>
             <PageSection title='本站热榜' />
@@ -206,26 +215,28 @@ function DiscoverHotRank() {
             <View style={styles.rankWrap}>
                 {hotList.map((hot, index) => {
                     return (
-                        <View
-                            style={styles.rankItem}
+                        <TouchableOpacity
                             key={index}
+                            onPress={() => toSearch(hot)}
                         >
-                            <View style={styles.rankSN}>
-                                <Text style={styles.rankSNText}>{index + 1}</Text>
+                            <View style={styles.rankItem}>
+                                <View style={styles.rankSN}>
+                                    <Text style={styles.rankSNText}>{index + 1}</Text>
+                                </View>
+                                <View style={styles.rankInfo}>
+                                    <Text style={styles.rankInfoTitle}>{hot.bookName}</Text>
+                                    <Text style={styles.rankInfoAuthor}>{hot.bookAuthor}</Text>
+                                </View>
+                                <View style={styles.rankRight}>
+                                    <MaterialCommunityIcons
+                                        name='fire'
+                                        size={RFValue(20)}
+                                        color={theme.tertiaryColor}
+                                    />
+                                    <Text style={styles.rankInfoCount}>{hot.accessCount}</Text>
+                                </View>
                             </View>
-                            <View style={styles.rankInfo}>
-                                <Text style={styles.rankInfoTitle}>{hot.bookName}</Text>
-                                <Text style={styles.rankInfoAuthor}>{hot.bookAuthor}</Text>
-                            </View>
-                            <View style={styles.rankRight}>
-                                <MaterialCommunityIcons
-                                    name='fire'
-                                    size={RFValue(20)}
-                                    color={theme.tertiaryColor}
-                                />
-                                <Text style={styles.rankInfoCount}>{hot.accessCount}</Text>
-                            </View>
-                        </View>
+                        </TouchableOpacity>
                     )
                 })}
             </View>

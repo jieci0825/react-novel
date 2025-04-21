@@ -3,12 +3,13 @@ import { useTheme } from '@/hooks/useTheme'
 import { useEffect, useState } from 'react'
 import { bookStoreApi } from '@/api'
 import { SearchBookItem, SearchByKeywordParams } from '@/api/modules/book-store/type'
-import { LocalCache } from '@/utils'
+import { isString, LocalCache } from '@/utils'
 import { SEARCH_HISTORY } from '@/constants'
 import SearchBookList from '@/components/search-book-list/search-book-list'
 import SearchBar from './search-bar'
 import SearchHistoryPanel from './search-hostory-panel'
 import { searchStyles } from '@/styles/pages/search.style'
+import { useLocalSearchParams } from 'expo-router'
 
 // 获取搜索历史
 async function getSearchHistory() {
@@ -65,10 +66,18 @@ export default function SearchPage() {
     // 搜索关键词
     const [keyword, setKeyword] = useState<string>('')
 
+    // 获取路由参数
+    const params = useLocalSearchParams()
+
     useEffect(() => {
         LocalCache.getData(SEARCH_HISTORY).then(h => {
             setHistorys(h || [])
         })
+
+        if (params.bookName && isString(params.bookName)) {
+            setKeyword(params.bookName)
+            onSearch(params.bookName)
+        }
     }, [])
 
     // 监听 keyword 变化。当其变为空时，打开历史记录面板
