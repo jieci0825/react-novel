@@ -1,6 +1,6 @@
 import { useTheme } from '@/hooks/useTheme'
 import { detailsFooterStyles } from '@/styles/pages/details.style'
-import { Text, View } from 'react-native'
+import { Text, TouchableOpacity, View } from 'react-native'
 
 interface DetailsFooterProps {
     addBookShelf: Function
@@ -13,12 +13,20 @@ export default function DetailsFooter(props: DetailsFooterProps) {
 
     return (
         <View style={styles.detailsFooterWrap}>
-            <View style={[styles.detailsFooterBtn]}>
+            <TouchableOpacity
+                activeOpacity={0.5}
+                onPress={() => props.addBookShelf()}
+                style={[styles.detailsFooterBtn]}
+            >
                 <Text style={styles.leftText}>放入书架</Text>
-            </View>
-            <View style={[styles.detailsFooterBtn, styles.right]}>
+            </TouchableOpacity>
+            <TouchableOpacity
+                activeOpacity={0.5}
+                style={[styles.detailsFooterBtn, styles.right]}
+                onPress={() => props.toRead()}
+            >
                 <Text style={styles.rightText}>开始阅读</Text>
-            </View>
+            </TouchableOpacity>
         </View>
     )
 }

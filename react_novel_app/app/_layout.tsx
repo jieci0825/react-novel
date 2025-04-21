@@ -20,6 +20,10 @@ export default function Layout() {
                         name='details'
                         options={{ headerShown: false }}
                     />
+                    <Stack.Screen
+                        name='read'
+                        options={{ headerShown: false }}
+                    />
                 </Stack>
             </ThemeProvider>
         </GluestackUIProvider>
