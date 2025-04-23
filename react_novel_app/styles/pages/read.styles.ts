@@ -1,0 +1,110 @@
+import { Theme } from '@/hooks/useTheme'
+import { adaptiveSize } from '@/utils'
+import { StyleSheet } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
+
+export const readStyles = (theme: Theme) => {
+    return StyleSheet.create({
+        container: {
+            width: '100%',
+            height: '100%',
+            backgroundColor: theme.bgColor,
+            display: 'flex',
+            flexDirection: 'column',
+            position: 'relative',
+            overflow: 'hidden'
+        },
+        main: {
+            flex: 1
+        }
+    })
+}
+
+export const readHeaderStyles = (theme: Theme) => {
+    return StyleSheet.create({
+        readHeaderWrap: {
+            width: '100%',
+            height: adaptiveSize(60),
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            backgroundColor: theme.bgColor,
+            borderBottomWidth: 1,
+            borderBottomColor: theme.borderColor,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: 20
+        },
+        backBtn: {
+            marginRight: 20
+        },
+        bookName: {
+            fontSize: RFValue(14),
+            color: theme.textPrimaryColor,
+            fontWeight: '600'
+        },
+        chapterName: {
+            marginTop: 2,
+            fontSize: RFValue(12),
+            color: theme.textSecondaryColor
+        },
+        readHeaderRight: {
+            marginLeft: 'auto',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 20
+        }
+    })
+}
+
+export const readFooterStyles = (theme: Theme) => {
+    return StyleSheet.create({
+        readFooterWrap: {
+            width: '100%',
+            height: adaptiveSize(100),
+            position: 'absolute',
+            left: 0,
+            bottom: 0,
+            backgroundColor: theme.bgColor,
+            borderTopWidth: 1,
+            borderTopColor: theme.borderColor,
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            gap: adaptiveSize(10),
+            justifyContent: 'space-between'
+        },
+        footerTop: {
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            width: '100%',
+            justifyContent: 'space-between',
+            gap: adaptiveSize(20)
+        },
+        footerTopText: {
+            fontSize: RFValue(14),
+            color: theme.textPrimaryColor
+        },
+        footerTopCenter: {
+            flex: 1
+        },
+        footerBottom: {
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'flex-end',
+            justifyContent: 'space-between',
+            width: '100%'
+        },
+        footerBottomBtn: {
+            alignItems: 'center'
+        },
+        footerBottomBtnText: {
+            color: theme.textPrimaryColor,
+            fontSize: RFValue(12),
+            marginTop: 2
+        }
+    })
+}
