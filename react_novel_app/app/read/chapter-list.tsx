@@ -10,6 +10,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 interface ChapterListProps {
     isVisible: boolean
     chaperList: ChapterItem[]
+    closeChapterList: () => void
 }
 
 export default function ChapterList(props: ChapterListProps) {
@@ -68,7 +69,7 @@ export default function ChapterList(props: ChapterListProps) {
             ]}
         >
             <View style={styles.header}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={props.closeChapterList}>
                     <AntDesign
                         name='arrowleft'
                         size={RFValue(24)}

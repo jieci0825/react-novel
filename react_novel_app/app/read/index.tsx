@@ -64,6 +64,7 @@ export default function ReadPage() {
                 <ChapterList
                     isVisible={isChapterListVisible}
                     chaperList={chapterList}
+                    closeChapterList={() => setIsChapterListVisible(false)}
                 />
             </View>
         </>
