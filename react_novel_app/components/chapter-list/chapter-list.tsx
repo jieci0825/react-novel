@@ -1,11 +1,11 @@
 import { ChapterItem } from '@/api/modules/book/type'
 import { useTheme } from '@/hooks/useTheme'
-import { readChapterListStyles } from '@/styles/pages/read.styles'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import Feather from '@expo/vector-icons/Feather'
 import { useEffect, useRef, useState } from 'react'
 import { Animated, FlatList, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
+import { chapterListStyles } from './chapter-list.style'
 
 interface ChapterListProps {
     isVisible: boolean
@@ -15,7 +15,7 @@ interface ChapterListProps {
 
 export default function ChapterList(props: ChapterListProps) {
     const { theme } = useTheme()
-    const styles = readChapterListStyles(theme)
+    const styles = chapterListStyles(theme)
 
     const screenWidth = useWindowDimensions().width
 

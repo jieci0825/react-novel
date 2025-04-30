@@ -1,13 +1,13 @@
 import { useTheme } from '@/hooks/useTheme'
 import { readStyles } from '@/styles/pages/read.styles'
-import { Animated, Button, Text, View } from 'react-native'
+import { Button, View } from 'react-native'
 import ReadHeader from './read-header'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import ReadFooter from './read-footer'
 import { bookApi } from '@/api'
 import { useLocalSearchParams } from 'expo-router'
-import ChapterList from './chapter-list'
 import { ChapterItem } from '@/api/modules/book/type'
+import ChapterList from '@/components/chapter-list/chapter-list'
 
 export default function ReadPage() {
     const { theme } = useTheme()
