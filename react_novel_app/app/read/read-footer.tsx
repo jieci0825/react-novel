@@ -13,6 +13,7 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 
 interface ReadFooterProps {
     isVisible: boolean
+    showChapterList: () => void
 }
 
 export default function ReadFooter(props: ReadFooterProps) {
@@ -57,7 +58,10 @@ export default function ReadFooter(props: ReadFooterProps) {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.footerBottom}>
-                    <TouchableOpacity style={styles.footerBottomBtn}>
+                    <TouchableOpacity
+                        onPress={props.showChapterList}
+                        style={styles.footerBottomBtn}
+                    >
                         <FontAwesome5
                             name='list'
                             size={RFValue(16)}

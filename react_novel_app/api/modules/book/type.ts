@@ -5,7 +5,7 @@ export interface GetBookDetailsParams {
 
 export interface ChapterItem {
     contentUrl: string
-    chapterName: number | null
+    chapterName: string
     chapterId: string | number
     _source: number
 }
