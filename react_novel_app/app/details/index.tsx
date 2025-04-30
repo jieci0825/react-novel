@@ -11,6 +11,7 @@ import { bookApi } from '@/api'
 import { GetBookDetailsData } from '@/api/modules/book/type'
 import BookChapter from './book-chapter'
 import DetailsFooter from './details-footer'
+import ChapterList from '@/components/chapter-list/chapter-list'
 
 export default function DetailsPage() {
     const { theme } = useTheme()
@@ -59,13 +60,20 @@ export default function DetailsPage() {
             pathname: '/read' as RelativePathString,
             params: {
                 bid: params.bid,
-                source: params.source
+                source: params.source,
+                c_sn: '1'
             }
         })
     }
 
     const addBookShelf = () => {
         console.log('加入书架')
+    }
+
+    // 目录的显示与隐藏
+    const [isChapterListVisible, setIsChapterListVisible] = useState(false)
+    const onMoreChapter = () => {
+        setIsChapterListVisible(true)
     }
 
     return (
@@ -77,11 +85,21 @@ export default function DetailsPage() {
                 />
                 <View style={styles.main}>
                     {details && <BookInfo item={details} />}
-                    {details && <BookChapter item={details} />}
+                    {details && (
+                        <BookChapter
+                            onMoreChapter={onMoreChapter}
+                            item={details}
+                        />
+                    )}
                 </View>
                 <DetailsFooter
                     toRead={toRead}
                     addBookShelf={addBookShelf}
+                />
+                <ChapterList
+                    isVisible={isChapterListVisible}
+                    chaperList={details?.chapters || []}
+                    closeChapterList={() => setIsChapterListVisible(false)}
                 />
             </View>
         </>

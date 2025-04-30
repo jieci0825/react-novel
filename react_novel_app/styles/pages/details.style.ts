@@ -11,7 +11,8 @@ export const detailsStyles = (theme: Theme) => {
             backgroundColor: theme.bgColor,
             display: 'flex',
             flexDirection: 'column',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            position: 'relative'
         },
         main: {
             flex: 1,
