@@ -9,6 +9,7 @@ interface ImageProps {
     src: string
     defaultImg?: string | React.ReactNode
     style?: StyleProp<ImageStyle | ViewStyle>
+    fit?: 'cover' | 'contain' | 'fill' | 'scale-down'
 }
 
 /**
@@ -27,7 +28,9 @@ export default function ImgPlus(props: ImageProps) {
                     size={RFValue(32)}
                     color={theme.tertiaryColor}
                 />
-            )
+            ),
+            style: {},
+            fit: 'cover'
         },
         props
     )
@@ -35,7 +38,10 @@ export default function ImgPlus(props: ImageProps) {
     // 图片加载失败
     const [hasError, setHasError] = React.useState(false)
 
-    const imageStyles: ImageStyle[] = [{ width: '100%', height: '100%' }, config.style as ImageStyle]
+    const imageStyles: ImageStyle[] = [
+        { width: '100%', height: '100%', objectFit: config.fit! },
+        config.style as ImageStyle
+    ]
 
     const ErrorComp = () => {
         // 如果 props.defaultImg 是字符串，则渲染图片，否则渲染组件
