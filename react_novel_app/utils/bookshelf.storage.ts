@@ -44,6 +44,7 @@ async function getBookshelfList(): Promise<BookShelfItem[]> {
 const bookshelfStorage = {
     addToBookshelf,
     isInBookshelf,
+    getBookshelfList,
     genKey
 }
 
