@@ -1,7 +1,7 @@
 import PageHeader from '@/components/page-header/page-header'
 import { Theme, useTheme } from '@/hooks/useTheme'
 import { menuListStyles, userContentStyles, userDataStyles, userStyles } from '@/styles/tabs/user.style'
-import { Text, TouchableOpacity, View } from 'react-native'
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Feather from '@expo/vector-icons/Feather'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
@@ -12,6 +12,7 @@ import React from 'react'
 import { isFunction } from '@/utils'
 import { Switch } from '@/components/ui/switch'
 import PageToast from '@/components/page-toast/page-toast'
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 
 // 用户头部
 function UserHeader() {
@@ -110,10 +111,15 @@ function MenuList(props: MenuListProps) {
     const styles = menuListStyles(theme)
 
     return (
-        <View style={styles.menuWrap}>
+        <ScrollView style={styles.menuWrap}>
             {props.list.map((menu, index) => {
                 return (
-                    <View key={index}>
+                    <TouchableOpacity
+                        key={index}
+                        onPress={() => {
+                            isFunction(menu.click) && menu.click()
+                        }}
+                    >
                         <View style={styles.menuItem}>
                             <View style={styles.menuIcon}>{menu.icon}</View>
                             <Text style={styles.menuText}>{menu.title}</Text>
@@ -133,10 +139,10 @@ function MenuList(props: MenuListProps) {
                                 )}
                             </View>
                         </View>
-                    </View>
+                    </TouchableOpacity>
                 )
             })}
-        </View>
+        </ScrollView>
     )
 }
 
@@ -154,6 +160,19 @@ function generateMenuListData(theme: Theme): MenuItem[] {
             title: '阅读历史',
             click: () => {
                 console.log('阅读历史')
+            }
+        },
+        {
+            icon: (
+                <MaterialCommunityIcons
+                    name='cloud-refresh'
+                    size={RFValue(18)}
+                    color={theme.tertiaryColor}
+                />
+            ),
+            title: '数据同步',
+            click: () => {
+                console.log('数据同步')
             }
         },
         {
