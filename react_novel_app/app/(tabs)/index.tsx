@@ -13,7 +13,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import { RFValue } from 'react-native-responsive-fontsize'
 import PageHeader from '@/components/page-header/page-header'
-import { BookShelfItem } from '@/types'
+import { BookshelfItem } from '@/types'
 import bookshelfStorage from '@/utils/bookshelf.storage'
 import ImgPlus from '@/components/img-plus/img-plus'
 import { useNavigation } from 'expo-router'
@@ -32,6 +32,10 @@ function HomeHeader(props: HomeHeaderProps) {
 
     const styles = homeHeaderStyles(theme)
 
+    const switchBookLayout = (layout: BookLayout) => {
+        props.setBookLayout(layout)
+    }
+
     const slots = {
         left: () => (
             <Entypo
@@ -42,7 +46,11 @@ function HomeHeader(props: HomeHeaderProps) {
         ),
         right: () => (
             <>
-                <TouchableOpacity onPress={() => props.setBookLayout(BookLayout.Grid)}>
+                <TouchableOpacity
+                    onPress={() => {
+                        switchBookLayout(BookLayout.Grid)
+                    }}
+                >
                     <View
                         style={[styles.homeIconBox, props.bookLayout === BookLayout.Grid && styles.homeIconBoxActive]}
                     >
@@ -53,7 +61,11 @@ function HomeHeader(props: HomeHeaderProps) {
                         />
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => props.setBookLayout(BookLayout.List)}>
+                <TouchableOpacity
+                    onPress={() => {
+                        switchBookLayout(BookLayout.List)
+                    }}
+                >
                     <View
                         style={[styles.homeIconBox, props.bookLayout === BookLayout.List && styles.homeIconBoxActive]}
                     >
@@ -77,7 +89,7 @@ function HomeHeader(props: HomeHeaderProps) {
 }
 
 interface BookLayoutProps {
-    bookList: BookShelfItem[]
+    bookList: BookshelfItem[]
 }
 function BookGridLayout(props: BookLayoutProps) {
     const { theme } = useTheme()
@@ -98,7 +110,7 @@ function BookGridLayout(props: BookLayoutProps) {
     const columns = screenWidth < baseWidth ? baseColumns : Math.floor((screenWidth - baseWidth) / 100) + baseColumns
 
     // 因为不支持 grid 布局，所以需要手动分配成一个二维数组，每一项排列三个
-    function chunkArray(array: BookShelfItem[], chunkSize: number = columns) {
+    function chunkArray(array: BookshelfItem[], chunkSize: number = columns) {
         const result = []
         for (let i = 0; i < array.length; i += chunkSize) {
             result.push(array.slice(i, i + chunkSize))
@@ -133,7 +145,7 @@ function BookGridLayout(props: BookLayoutProps) {
                             return (
                                 <View
                                     // @ts-ignore
-                                    style={[styles.BookShelfItem, { width: itemWidth, height: itemHeight }]}
+                                    style={[styles.BookshelfItem, { width: itemWidth, height: itemHeight }]}
                                     key={book.bookId}
                                 >
                                     <View style={styles.bookCover}>
@@ -202,7 +214,7 @@ function HomeContent(props: HomeContentProps) {
 
     const styles = homeContentStyles(theme)
 
-    const [bookList, setBookList] = useState<BookShelfItem[]>([])
+    const [bookList, setBookList] = useState<BookshelfItem[]>([])
 
     async function init() {
         const resp = await bookshelfStorage.getBookshelfList()
