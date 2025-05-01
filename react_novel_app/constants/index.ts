@@ -12,3 +12,6 @@ export const NOVEL_READ_HISTORY = 'NOVEL_READ_HISTORY'
 
 // 我的书架key
 export const MY_BOOKSHELF = 'MY_BOOKSHELF'
+
+// 书架布局key
+export const BOOKSHELF_LAYOUT = 'BOOKSHELF_LAYOUT'

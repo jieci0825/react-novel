@@ -14,7 +14,7 @@ import DetailsFooter from './details-footer'
 import ChapterList from '@/components/chapter-list/chapter-list'
 import { LocalCache } from '@/utils'
 import { MY_BOOKSHELF } from '@/constants'
-import { BookShelfItem } from '@/types'
+import { BookshelfItem } from '@/types'
 import { jcShowToast } from '@/components/jc-toast/jc-toast'
 import bookshelfStorage from '@/utils/bookshelf.storage'
 
@@ -87,7 +87,7 @@ export default function DetailsPage() {
         const bookName = details?.title || '[未知]'
         const author = details?.author || '[未知]'
 
-        const data: BookShelfItem = {
+        const data: BookshelfItem = {
             bookId: params.bid as string,
             source: +params.source,
             bookName,

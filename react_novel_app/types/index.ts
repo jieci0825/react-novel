@@ -1,4 +1,4 @@
-export interface BookShelfItem {
+export interface BookshelfItem {
     bookId: number | string
     source: number
     cover: string

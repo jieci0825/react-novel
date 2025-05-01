@@ -1,9 +1,9 @@
-import { BookShelfItem } from '@/types'
+import { BookshelfItem } from '@/types'
 import { LocalCache } from '.'
 import { MY_BOOKSHELF } from '@/constants'
 import { jcShowToast } from '@/components/jc-toast/jc-toast'
 
-function getKey(data: BookShelfItem) {
+function getKey(data: BookshelfItem) {
     return `${data.bookId}-${data.source}-${data.bookName}-${data.author}`
 }
 
@@ -12,7 +12,7 @@ export function genKey(bookId: string | number, source: number, bookName: string
 }
 
 // 添加到书架
-async function addToBookshelf(data: BookShelfItem) {
+async function addToBookshelf(data: BookshelfItem) {
     const key = getKey(data)
     const isExist = await isInBookshelf(key)
     if (isExist) {
@@ -37,7 +37,7 @@ async function isInBookshelf(key: string) {
 }
 
 // 获取书架列表
-async function getBookshelfList(): Promise<BookShelfItem[]> {
+async function getBookshelfList(): Promise<BookshelfItem[]> {
     return (await LocalCache.getData(MY_BOOKSHELF)) || []
 }
 
