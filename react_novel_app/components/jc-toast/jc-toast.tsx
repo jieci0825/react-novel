@@ -95,7 +95,7 @@ export default function JcToast() {
         type: 'success',
         position: 'top',
         text: '这是一个 toast',
-        duration: 2000
+        duration: 1000
     })
 
     useEffect(() => {
