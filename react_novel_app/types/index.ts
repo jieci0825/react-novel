@@ -7,5 +7,4 @@ export interface BookShelfItem {
     lastReadChapter: number
     lastReadChapterProgress: number
     totalChapterCount: number
-    key: string
 }
