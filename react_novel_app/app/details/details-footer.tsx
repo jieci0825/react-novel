@@ -5,6 +5,7 @@ import { Text, TouchableOpacity, View } from 'react-native'
 interface DetailsFooterProps {
     addBookShelf: Function
     toRead: Function
+    isExist: boolean
 }
 
 export default function DetailsFooter(props: DetailsFooterProps) {
@@ -13,13 +14,16 @@ export default function DetailsFooter(props: DetailsFooterProps) {
 
     return (
         <View style={styles.detailsFooterWrap}>
-            <TouchableOpacity
-                activeOpacity={0.5}
-                onPress={() => props.addBookShelf()}
-                style={[styles.detailsFooterBtn]}
-            >
-                <Text style={styles.leftText}>放入书架</Text>
-            </TouchableOpacity>
+            {/* 不存在书架时才显示放入书架 */}
+            {!props.isExist && (
+                <TouchableOpacity
+                    activeOpacity={0.5}
+                    onPress={() => props.addBookShelf()}
+                    style={[styles.detailsFooterBtn]}
+                >
+                    <Text style={styles.leftText}>放入书架</Text>
+                </TouchableOpacity>
+            )}
             <TouchableOpacity
                 activeOpacity={0.5}
                 style={[styles.detailsFooterBtn, styles.right]}

@@ -31,5 +31,15 @@ export const DarkTheme = {
     textSecondaryColor: '#bbbbbb',
     textTertiaryColor: '#666666',
     borderColor: '#444444',
-    bgSecondaryColor: '#333333'
+    bgSecondaryColor: '#333333',
+    switch: {
+        track: {
+            trueColor: '#6B7280',
+            falseColor: '#D1D5DB'
+        },
+        thumb: {
+            color: '#F9FAFB',
+            activeColor: '#F9FAFB'
+        }
+    }
 }

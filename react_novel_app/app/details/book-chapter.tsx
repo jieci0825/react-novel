@@ -16,7 +16,7 @@ export default function BookChapter(props: BookChapterProps) {
 
     const details = props.item
 
-    const len = Math.min(details.chapters.length || 0, 10)
+    const len = Math.min(details.chapters.length || 0, 5)
     const chapters = details.chapters.slice(0, len)
 
     const slots = {

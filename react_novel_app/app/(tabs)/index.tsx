@@ -13,6 +13,7 @@ import {
 import React, { useState } from 'react'
 import { RFValue } from 'react-native-responsive-fontsize'
 import PageHeader from '@/components/page-header/page-header'
+import { BookShelfItem } from '@/types'
 
 enum BookLayout {
     Grid = 1,
@@ -72,14 +73,8 @@ function HomeHeader(props: HomeHeaderProps) {
     )
 }
 
-interface BookItem {
-    id: number
-    author: string
-    title: string
-    process: string
-}
 interface BookLayoutProps {
-    bookList: BookItem[]
+    bookList: BookShelfItem[]
 }
 function BookGridLayout(props: BookLayoutProps) {
     const { theme } = useTheme()
@@ -99,7 +94,7 @@ function BookGridLayout(props: BookLayoutProps) {
     const columns = screenWidth < baseWidth ? baseColumns : Math.floor((screenWidth - baseWidth) / 100) + baseColumns
 
     // 因为不支持 grid 布局，所以需要手动分配成一个二维数组，每一项排列三个
-    function chunkArray(array: BookItem[], chunkSize: number = columns) {
+    function chunkArray(array: BookShelfItem[], chunkSize: number = columns) {
         const result = []
         for (let i = 0; i < array.length; i += chunkSize) {
             result.push(array.slice(i, i + chunkSize))
@@ -131,8 +126,8 @@ function BookGridLayout(props: BookLayoutProps) {
                                 return (
                                     <View
                                         // @ts-ignore
-                                        style={[styles.bookItem, { width: itemWidth }]}
-                                        key={book.id}
+                                        style={[styles.BookShelfItem, { width: itemWidth }]}
+                                        key={book.bookId}
                                     >
                                         <View style={styles.bookCover}></View>
                                         <Text
@@ -140,7 +135,14 @@ function BookGridLayout(props: BookLayoutProps) {
                                             ellipsizeMode='tail'
                                             style={styles.bookTitle}
                                         >
-                                            {book.title}
+                                            {book.bookName}
+                                        </Text>
+                                        <Text
+                                            numberOfLines={1}
+                                            ellipsizeMode='tail'
+                                            style={styles.bookProgress}
+                                        >
+                                            第{book.lastReadChapter}章/第{book.totalChapterCount}章
                                         </Text>
                                     </View>
                                 )
@@ -165,13 +167,14 @@ function BookListLayout(props: BookLayoutProps) {
                     return (
                         <View
                             style={styles.bookItem}
-                            key={book.id}
+                            key={book.bookId}
                         >
                             <View style={styles.bookCover}></View>
                             <View style={styles.bookInfo}>
-                                <Text style={styles.bookTitle}>{book.title}</Text>
+                                <Text style={styles.bookTitle}>{book.bookName}</Text>
                                 <Text style={styles.bookAuthor}>{book.author}</Text>
-                                <Text style={styles.bookProcess}>{book.process}</Text>
+                                <Text style={styles.bookProgress}>第{book.lastReadChapter}章</Text>
+                                <Text style={styles.bookProgress}>第{book.totalChapterCount}章</Text>
                             </View>
                         </View>
                     )
@@ -189,33 +192,7 @@ function HomeContent(props: HomeContentProps) {
 
     const styles = homeContentStyles(theme)
 
-    const originBookList: BookItem[] = [
-        {
-            id: 1,
-            title: 'JavaScript高级程序设计',
-            author: '佚名',
-            process: '1/1000'
-        },
-        { id: 2, title: '深入理解TypeScript', author: '佚名', process: '1/1000' },
-        { id: 3, title: 'React设计原理与实战', author: '佚名', process: '1/1000' },
-        {
-            id: 4,
-            title: 'Node.js企业级应用开发',
-            author: '佚名',
-            process: '1/1000'
-        },
-        { id: 5, title: 'Python机器学习手册', author: '佚名', process: '1/1000' },
-        { id: 6, title: '数据结构与算法分析', author: '佚名', process: '1/1000' },
-        { id: 7, title: '现代前端技术解析', author: '佚名', process: '1/1000' },
-        { id: 8, title: '数据库系统概念', author: '佚名', process: '1/1000' },
-        { id: 9, title: '计算机组成与设计', author: '佚名', process: '1/1000' },
-        {
-            id: 10,
-            title: '计算机网络：自顶向下方法',
-            author: '佚名',
-            process: '1/1000'
-        }
-    ]
+    const originBookList: BookShelfItem[] = []
 
     const layoutComp: Record<BookLayout, React.ReactNode> = {
         [BookLayout.Grid]: BookGridLayout({ bookList: originBookList }),

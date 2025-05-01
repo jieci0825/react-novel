@@ -12,6 +12,10 @@ import { GetBookDetailsData } from '@/api/modules/book/type'
 import BookChapter from './book-chapter'
 import DetailsFooter from './details-footer'
 import ChapterList from '@/components/chapter-list/chapter-list'
+import { LocalCache } from '@/utils'
+import { MY_BOOKSHELF } from '@/constants'
+import { BookShelfItem } from '@/types'
+import { jcShowToast } from '@/components/jc-toast/jc-toast'
 
 export default function DetailsPage() {
     const { theme } = useTheme()
@@ -20,6 +24,9 @@ export default function DetailsPage() {
     const params = useLocalSearchParams()
     // 书籍详情
     const [details, setDetails] = useState<GetBookDetailsData | null>(null)
+
+    // 本书籍是否存在于书架中
+    const [isExistBookShelf, setIsExistBookShelf] = useState(false)
 
     useEffect(() => {
         bookApi
@@ -66,8 +73,26 @@ export default function DetailsPage() {
         })
     }
 
+    // 这里只会首次添加书籍到书架才会触发
     const addBookShelf = () => {
-        console.log('加入书架')
+        jcShowToast({ text: '已添加到书架', type: 'success' })
+
+        const bookName = details?.title || '[未知]'
+        const author = details?.author || '[未知]'
+
+        const data: BookShelfItem = {
+            bookId: params.bid as string,
+            source: +params.source,
+            bookName,
+            author,
+            cover: details?.cover || '',
+            lastReadChapter: 1,
+            lastReadChapterProgress: 0,
+            totalChapterCount: details?.chapters.length || 0,
+            key: `${params.bid}-${params.source}-${bookName}-${author}`
+        }
+
+        // LocalCache.storeData(MY_BOOKSHELF, data)
     }
 
     // 目录的显示与隐藏
@@ -95,6 +120,7 @@ export default function DetailsPage() {
                 <DetailsFooter
                     toRead={toRead}
                     addBookShelf={addBookShelf}
+                    isExist={false}
                 />
                 <ChapterList
                     isVisible={isChapterListVisible}

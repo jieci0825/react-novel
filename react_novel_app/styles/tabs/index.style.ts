@@ -66,9 +66,13 @@ export const bookGridStyles = (theme: Theme) => {
             overflow: 'hidden'
         },
         bookTitle: {
-            marginTop: 5,
-            fontSize: RFValue(13),
+            marginTop: 10,
+            fontSize: RFValue(14),
             color: theme.textSecondaryColor
+        },
+        bookProgress: {
+            marginTop: 5,
+            fontSize: RFValue(12)
         }
     })
 }
@@ -106,7 +110,7 @@ export const bookListStyles = (theme: Theme) => {
             fontSize: RFValue(12),
             color: theme.textSecondaryColor
         },
-        bookProcess: {
+        bookProgress: {
             marginTop: 5,
             fontSize: RFValue(12),
             color: theme.textSecondaryColor

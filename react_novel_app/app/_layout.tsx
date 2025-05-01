@@ -2,6 +2,7 @@ import { ThemeProvider } from '@/hooks/useTheme'
 import '@/global.css'
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider'
 import { Stack } from 'expo-router/stack'
+import JcToast from '@/components/jc-toast/jc-toast'
 
 export default function Layout() {
     return (
@@ -25,6 +26,7 @@ export default function Layout() {
                         options={{ headerShown: false }}
                     />
                 </Stack>
+                <JcToast />
             </ThemeProvider>
         </GluestackUIProvider>
     )
