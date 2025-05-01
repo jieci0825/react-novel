@@ -170,9 +170,12 @@ function generateMenuListData(theme: Theme): MenuItem[] {
                     color={theme.tertiaryColor}
                 />
             ),
-            title: '数据同步',
+            title: '数据备份',
             click: () => {
-                console.log('数据同步')
+                // 因为书源的不稳定性，所以并不会将用户的书架数据、阅读进度、书签等信息同步到云端
+                //  - 但是你可以在更换设备的时候，进行数据备份，此时系统会自动将书架数据、阅读进度、书签等信息备份到云端
+                //  - 当你使用新设备之后，可以通过数据恢复功能，将之前的数据恢复到新设备上
+                console.log('数据备份')
             }
         },
         {

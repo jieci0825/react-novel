@@ -41,10 +41,17 @@ async function getBookshelfList(): Promise<BookshelfItem[]> {
     return (await LocalCache.getData(MY_BOOKSHELF)) || []
 }
 
+// 根据 key 返回书架中的书籍
+async function getBookshelfItem(key: string): Promise<BookshelfItem | null> {
+    const bookshelfs = await getBookshelfList()
+    return bookshelfs.find(item => getKey(item) === key) || null
+}
+
 const bookshelfStorage = {
     addToBookshelf,
     isInBookshelf,
     getBookshelfList,
+    getBookshelfItem,
     genKey
 }
 

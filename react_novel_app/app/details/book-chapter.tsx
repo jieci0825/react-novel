@@ -8,6 +8,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 interface BookChapterProps {
     item: GetBookDetailsData
     onMoreChapter: () => void
+    onChapterClick: (index: number) => void
 }
 
 export default function BookChapter(props: BookChapterProps) {
@@ -44,14 +45,18 @@ export default function BookChapter(props: BookChapterProps) {
                     slots={slots}
                 />
                 <View style={styles.bookChapterListWrap}>
-                    {chapters.map(item => {
+                    {chapters.map((item, index) => {
                         return (
-                            <View
+                            <TouchableOpacity
                                 style={styles.bookChapterItem}
                                 key={item.chapterId}
+                                activeOpacity={0.8}
+                                onPress={() => {
+                                    props.onChapterClick(index)
+                                }}
                             >
                                 <Text style={styles.bookChapterItemTitle}>{item.chapterName}</Text>
-                            </View>
+                            </TouchableOpacity>
                         )
                     })}
                 </View>
