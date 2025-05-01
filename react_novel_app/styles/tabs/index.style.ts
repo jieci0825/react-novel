@@ -31,7 +31,8 @@ export const homeContentStyles = (theme: Theme) => {
             flex: 1
         },
         homeContentInner: {
-            padding: 20
+            padding: 20,
+            flex: 1
         },
         emptyTips: {
             width: '100%'
@@ -54,9 +55,7 @@ export const bookGridStyles = (theme: Theme) => {
             gap: 20
         },
         bookItem: {
-            display: 'flex',
-            width: '30%',
-            aspectRatio: 1 / 1.5
+            display: 'flex'
         },
         bookCover: {
             width: '100%',
@@ -89,10 +88,13 @@ export const bookListStyles = (theme: Theme) => {
             flexDirection: 'row'
         },
         bookCover: {
-            width: adaptiveSize(65),
-            height: adaptiveSize(80),
+            width: adaptiveSize(75),
+            height: adaptiveSize(110),
             backgroundColor: theme.bgSecondaryColor,
-            borderRadius: 4
+            borderRadius: 4,
+            overflow: 'hidden',
+            borderWidth: 1,
+            borderColor: theme.borderColor
         },
         bookInfo: {
             flex: 1,

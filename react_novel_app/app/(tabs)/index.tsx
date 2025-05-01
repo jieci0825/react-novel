@@ -10,10 +10,13 @@ import {
     homeHeaderStyles,
     homeStyles
 } from '@/styles/tabs/index.style'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RFValue } from 'react-native-responsive-fontsize'
 import PageHeader from '@/components/page-header/page-header'
 import { BookShelfItem } from '@/types'
+import bookshelfStorage from '@/utils/bookshelf.storage'
+import ImgPlus from '@/components/img-plus/img-plus'
+import { useNavigation } from 'expo-router'
 
 enum BookLayout {
     Grid = 1,
@@ -83,6 +86,7 @@ function BookGridLayout(props: BookLayoutProps) {
 
     // 动态计算宽度，保证间隔是 20
     const [itemWidth, setItemWidth] = useState<number | string>('30%')
+    const [itemHeight, setItemHeight] = useState<number | string>(0)
 
     // 监听屏幕宽度
     const { width: screenWidth } = useWindowDimensions()
@@ -104,54 +108,58 @@ function BookGridLayout(props: BookLayoutProps) {
 
     const bookList = chunkArray(props.bookList)
 
+    function calcWidthAndHeight() {
+        // 计算书籍间隔需要减去的宽度： (columns - 1) * 20 即展示的列数 - 1 * 每列间隔 20、因为间隔的数量比列数少 1
+        // 最后减去 40 表示容器的左右内边距
+        const iw = (screenWidth - 20 * (columns - 1) - 40) / columns
+        setItemWidth(iw)
+        const ih = iw * 2
+        setItemHeight(ih)
+    }
+
+    useEffect(() => {
+        calcWidthAndHeight()
+    }, [screenWidth])
+
     return (
-        <>
-            <View
-                onLayout={e => {
-                    // 宽度表示当前容器的宽度
-                    const { width } = e.nativeEvent.layout
-                    // 减去间隔，书籍之间的两个 20
-                    // 然后剩余的宽度根据列数评分，即列数 - 1
-                    const iw = (width - 20 * (columns - 1)) / columns
-                    setItemWidth(iw)
-                }}
-            >
-                {bookList.map((item, index) => {
-                    return (
-                        <View
-                            style={[styles.bookRow]}
-                            key={index}
-                        >
-                            {item.map(book => {
-                                return (
-                                    <View
-                                        // @ts-ignore
-                                        style={[styles.BookShelfItem, { width: itemWidth }]}
-                                        key={book.bookId}
-                                    >
-                                        <View style={styles.bookCover}></View>
-                                        <Text
-                                            numberOfLines={1}
-                                            ellipsizeMode='tail'
-                                            style={styles.bookTitle}
-                                        >
-                                            {book.bookName}
-                                        </Text>
-                                        <Text
-                                            numberOfLines={1}
-                                            ellipsizeMode='tail'
-                                            style={styles.bookProgress}
-                                        >
-                                            第{book.lastReadChapter}章/第{book.totalChapterCount}章
-                                        </Text>
+        <View style={{ width: '100%' }}>
+            {bookList.map((item, index) => {
+                return (
+                    <View
+                        style={[styles.bookRow]}
+                        key={index}
+                    >
+                        {item.map(book => {
+                            return (
+                                <View
+                                    // @ts-ignore
+                                    style={[styles.BookShelfItem, { width: itemWidth, height: itemHeight }]}
+                                    key={book.bookId}
+                                >
+                                    <View style={styles.bookCover}>
+                                        <ImgPlus src={book.cover} />
                                     </View>
-                                )
-                            })}
-                        </View>
-                    )
-                })}
-            </View>
-        </>
+                                    <Text
+                                        numberOfLines={1}
+                                        ellipsizeMode='tail'
+                                        style={styles.bookTitle}
+                                    >
+                                        {book.bookName}
+                                    </Text>
+                                    <Text
+                                        numberOfLines={1}
+                                        ellipsizeMode='tail'
+                                        style={styles.bookProgress}
+                                    >
+                                        第{book.lastReadChapter}章/第{book.totalChapterCount}章
+                                    </Text>
+                                </View>
+                            )
+                        })}
+                    </View>
+                )
+            })}
+        </View>
     )
 }
 
@@ -169,7 +177,9 @@ function BookListLayout(props: BookLayoutProps) {
                             style={styles.bookItem}
                             key={book.bookId}
                         >
-                            <View style={styles.bookCover}></View>
+                            <View style={styles.bookCover}>
+                                <ImgPlus src={book.cover} />
+                            </View>
                             <View style={styles.bookInfo}>
                                 <Text style={styles.bookTitle}>{book.bookName}</Text>
                                 <Text style={styles.bookAuthor}>{book.author}</Text>
@@ -192,18 +202,32 @@ function HomeContent(props: HomeContentProps) {
 
     const styles = homeContentStyles(theme)
 
-    const originBookList: BookShelfItem[] = []
+    const [bookList, setBookList] = useState<BookShelfItem[]>([])
+
+    async function init() {
+        const resp = await bookshelfStorage.getBookshelfList()
+        setBookList(resp)
+    }
+
+    const navigation = useNavigation()
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            init()
+        })
+        return unsubscribe
+    }, [])
 
     const layoutComp: Record<BookLayout, React.ReactNode> = {
-        [BookLayout.Grid]: BookGridLayout({ bookList: originBookList }),
-        [BookLayout.List]: BookListLayout({ bookList: originBookList })
+        [BookLayout.Grid]: BookGridLayout({ bookList: bookList }),
+        [BookLayout.List]: BookListLayout({ bookList: bookList })
     }
 
     return (
         <>
             <SafeAreaView style={styles.homeContent}>
                 <ScrollView style={styles.homeContentInner}>
-                    {originBookList.length ? (
+                    {bookList.length ? (
                         layoutComp[props.bookLayout]
                     ) : (
                         <View style={styles.emptyTips}>
@@ -221,7 +245,7 @@ export default function Index() {
 
     const styles = homeStyles(theme)
 
-    const [bookLayout, setBookLayout] = useState<BookLayout>(BookLayout.Grid)
+    const [bookLayout, setBookLayout] = useState<BookLayout>(BookLayout.List)
 
     return (
         <>
