@@ -5,4 +5,5 @@ export interface ViewBookDetailParams {
 
 export interface GetContentParams extends ViewBookDetailParams {
     chapterId: number | string
+    contentUrl: string
 }

@@ -110,7 +110,9 @@ export async function chapter(bookId: SearchBookItem['bookId']): Promise<Chapter
 }
 
 export async function content({ contentUrl }: ContentParams): Promise<ContentResult> {
+    const resp = await axios.get(contentUrl!)
+
     return {
-        content: ''
+        content: resp.data.content
     }
 }

@@ -27,7 +27,8 @@ export async function viewBookContentController(ctx: Context) {
     const data: GetContentParams = ctx.request.body
     const result = await BookSourceMap[data._source].content!({
         bookId: data.bookId,
-        chapterId: data.chapterId
+        chapterId: data.chapterId,
+        contentUrl: data.contentUrl
     })
     throw new DataSuccess(result)
 }
