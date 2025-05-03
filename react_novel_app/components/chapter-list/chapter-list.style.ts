@@ -26,20 +26,26 @@ export const chapterListStyles = (theme: Theme) => {
             borderBottomColor: theme.borderColor
         },
         title: {
-            fontSize: RFValue(18),
+            fontSize: RFValue(16),
             fontWeight: '600',
             color: theme.textPrimaryColor
         },
         content: {
-            flex: 1,
-            paddingHorizontal: 10
+            flex: 1
         },
         chapterItem: {
-            paddingVertical: 10
+            padding: 10,
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center'
         },
         chapterItemText: {
             fontSize: RFValue(14),
             color: theme.textSecondaryColor
+        },
+        chapterItemActive: {
+            backgroundColor: theme.bgSecondaryColor
         }
     })
 }

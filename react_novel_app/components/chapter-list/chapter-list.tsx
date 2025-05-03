@@ -12,6 +12,7 @@ interface ChapterListProps {
     chaperList: ChapterItem[]
     closeChapterList: () => void
     clickChapter?: (csn: number) => void
+    activeIndex?: number
 }
 
 export default function ChapterList(props: ChapterListProps) {
@@ -55,10 +56,17 @@ export default function ChapterList(props: ChapterListProps) {
     const renderItem = ({ item, index }: { item: ChapterItem; index: number }) => {
         return (
             <TouchableOpacity
-                style={styles.chapterItem}
+                style={[styles.chapterItem, index === props.activeIndex && styles.chapterItemActive]}
                 onPress={() => props.clickChapter && props.clickChapter(index)}
             >
                 <Text style={styles.chapterItemText}>{item.chapterName}</Text>
+                {index === props.activeIndex && (
+                    <Feather
+                        name='check'
+                        size={RFValue(18)}
+                        color={theme.textSecondaryColor}
+                    />
+                )}
             </TouchableOpacity>
         )
     }
