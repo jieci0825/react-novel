@@ -16,7 +16,7 @@ import PageHeader from '@/components/page-header/page-header'
 import { BookshelfItem } from '@/types'
 import bookshelfStorage from '@/utils/bookshelf.storage'
 import ImgPlus from '@/components/img-plus/img-plus'
-import { useNavigation } from 'expo-router'
+import { RelativePathString, router, useNavigation } from 'expo-router'
 
 enum BookLayout {
     Grid = 1,
@@ -90,6 +90,7 @@ function HomeHeader(props: HomeHeaderProps) {
 
 interface BookLayoutProps {
     bookList: BookshelfItem[]
+    onClick: (book: BookshelfItem) => void
 }
 function BookGridLayout(props: BookLayoutProps) {
     const { theme } = useTheme()
@@ -143,10 +144,14 @@ function BookGridLayout(props: BookLayoutProps) {
                     >
                         {item.map(book => {
                             return (
-                                <View
+                                <TouchableOpacity
                                     // @ts-ignore
                                     style={[styles.BookshelfItem, { width: itemWidth, height: itemHeight }]}
                                     key={book.bookId}
+                                    activeOpacity={0.8}
+                                    onPress={() => {
+                                        props.onClick(book)
+                                    }}
                                 >
                                     <View style={styles.bookCover}>
                                         <ImgPlus src={book.cover} />
@@ -165,7 +170,7 @@ function BookGridLayout(props: BookLayoutProps) {
                                     >
                                         第{book.lastReadChapter}章/第{book.totalChapterCount}章
                                     </Text>
-                                </View>
+                                </TouchableOpacity>
                             )
                         })}
                     </View>
@@ -185,9 +190,13 @@ function BookListLayout(props: BookLayoutProps) {
             <View style={styles.bookListWrap}>
                 {props.bookList.map(book => {
                     return (
-                        <View
+                        <TouchableOpacity
                             style={styles.bookItem}
                             key={book.bookId}
+                            activeOpacity={0.8}
+                            onPress={() => {
+                                props.onClick(book)
+                            }}
                         >
                             <View style={styles.bookCover}>
                                 <ImgPlus src={book.cover} />
@@ -198,7 +207,7 @@ function BookListLayout(props: BookLayoutProps) {
                                 <Text style={styles.bookProgress}>第{book.lastReadChapter}章</Text>
                                 <Text style={styles.bookProgress}>第{book.totalChapterCount}章</Text>
                             </View>
-                        </View>
+                        </TouchableOpacity>
                     )
                 })}
             </View>
@@ -230,9 +239,21 @@ function HomeContent(props: HomeContentProps) {
         return unsubscribe
     }, [])
 
+    const toRead = (book: BookshelfItem) => {
+        router.push({
+            pathname: '/read',
+            params: {
+                bid: book.bookId,
+                source: book.source,
+                c_sn: book.lastReadChapter,
+                read_progress: book.lastReadChapterProgress
+            }
+        })
+    }
+
     const layoutComp: Record<BookLayout, React.ReactNode> = {
-        [BookLayout.Grid]: BookGridLayout({ bookList: bookList }),
-        [BookLayout.List]: BookListLayout({ bookList: bookList })
+        [BookLayout.Grid]: BookGridLayout({ bookList: bookList, onClick: toRead }),
+        [BookLayout.List]: BookListLayout({ bookList: bookList, onClick: toRead })
     }
 
     return (
