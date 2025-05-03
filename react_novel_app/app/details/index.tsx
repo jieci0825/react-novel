@@ -14,6 +14,8 @@ import DetailsFooter from './details-footer'
 import ChapterList from '@/components/chapter-list/chapter-list'
 import { BookshelfItem } from '@/types'
 import bookshelfStorage from '@/utils/bookshelf.storage'
+import { LocalCache } from '@/utils'
+import { CURRENT_READ_CHAPTER_KEY } from '@/constants'
 
 export default function DetailsPage() {
     const { theme } = useTheme()
@@ -103,15 +105,14 @@ export default function DetailsPage() {
             // 如果不存在于书架中且没指定章节，则默认从第一章开始，进度也是 0
         }
 
-        router.push({
-            pathname: '/read' as RelativePathString,
-            params: {
-                bid: params.bid,
-                source: params.source,
-                c_sn,
-                read_progress: readProgress
-            }
+        await LocalCache.storeData(CURRENT_READ_CHAPTER_KEY, {
+            bID: params.bid,
+            cSN: c_sn,
+            source: params.source,
+            readProgress
         })
+
+        router.push({ pathname: '/read' as RelativePathString })
     }
 
     // 这里只会首次添加书籍到书架才会触发

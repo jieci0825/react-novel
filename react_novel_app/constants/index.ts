@@ -15,3 +15,6 @@ export const MY_BOOKSHELF = 'MY_BOOKSHELF'
 
 // 书架布局key
 export const BOOKSHELF_LAYOUT = 'BOOKSHELF_LAYOUT'
+
+// 当前阅读章节
+export const CURRENT_READ_CHAPTER_KEY = 'CURRENT_READ_CHAPTER'

@@ -11,6 +11,8 @@ import { RFValue } from 'react-native-responsive-fontsize'
 
 interface ReadHeaderProps {
     isVisible: boolean
+    bookName: string
+    chapterName: string
 }
 
 export default function ReadHeader(props: ReadHeaderProps) {
@@ -54,8 +56,8 @@ export default function ReadHeader(props: ReadHeaderProps) {
                     />
                 </TouchableOpacity>
                 <View>
-                    <Text style={styles.bookName}>斗破苍穹</Text>
-                    <Text style={styles.chapterName}>第一章：陨落的天才</Text>
+                    <Text style={styles.bookName}>{props.bookName}</Text>
+                    <Text style={styles.chapterName}>{props.chapterName}</Text>
                 </View>
                 <View style={styles.readHeaderRight}>
                     <FontAwesome

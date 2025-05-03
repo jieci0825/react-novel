@@ -8,3 +8,10 @@ export interface BookshelfItem {
     lastReadChapterProgress: number
     totalChapterCount: number
 }
+
+export interface CurrentReadChapterInfo {
+    bID: number | string
+    cSN: number
+    source: number
+    readProgress: number
+}

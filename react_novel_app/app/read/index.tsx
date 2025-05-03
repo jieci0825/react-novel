@@ -6,8 +6,11 @@ import { useEffect, useState } from 'react'
 import ReadFooter from './read-footer'
 import { bookApi } from '@/api'
 import { useLocalSearchParams } from 'expo-router'
-import { ChapterItem } from '@/api/modules/book/type'
+import { ChapterItem, GetBookDetailsData } from '@/api/modules/book/type'
 import ChapterList from '@/components/chapter-list/chapter-list'
+import { CurrentReadChapterInfo } from '@/types'
+import { LocalCache } from '@/utils'
+import { CURRENT_READ_CHAPTER_KEY } from '@/constants'
 
 export default function ReadPage() {
     const { theme } = useTheme()
@@ -27,26 +30,47 @@ export default function ReadPage() {
         setIsVisible(false)
     }
 
-    // 路径参数
-    const params = useLocalSearchParams()
+    // 当前阅读章节
+    const [curChapter, setCurChapter] = useState<CurrentReadChapterInfo | null>(null)
 
+    // 书籍详情
+    const [bookDetails, setBookDetails] = useState<GetBookDetailsData>()
+
+    // 章节列表
     const [chapterList, setChapterList] = useState<ChapterItem[]>([])
+
+    async function init() {
+        const currentReadChapter: CurrentReadChapterInfo = await LocalCache.getData(CURRENT_READ_CHAPTER_KEY)
+        if (currentReadChapter) {
+            setCurChapter(currentReadChapter)
+            try {
+                // 获取章节详情
+                const bookResp = await bookApi.reqGetBookDetails({
+                    bookId: curChapter!.bID as string,
+                    _source: curChapter!.source
+                })
+                setChapterList(bookResp.data.chapters)
+                setBookDetails(bookResp.data)
+            } catch (error) {}
+        } else {
+            return
+        }
+    }
+
     useEffect(() => {
-        bookApi
-            .reqGetBookChapters({
-                bookId: params.bid as string,
-                _source: +params.source as any
-            })
-            .then(res => {
-                setChapterList(res.data)
-            })
-            .catch(() => {})
+        init()
     }, [])
 
     return (
         <>
             <View style={[styles.container]}>
-                <ReadHeader isVisible={isVisible} />
+                {bookDetails && (
+                    <ReadHeader
+                        chapterName={chapterList[0].chapterName}
+                        bookName={bookDetails.title}
+                        isVisible={isVisible}
+                    />
+                )}
                 <View
                     style={{
                         marginTop: 200
