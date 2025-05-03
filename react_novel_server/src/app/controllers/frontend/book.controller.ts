@@ -25,6 +25,9 @@ export async function viewBookChapterController(ctx: Context) {
 // 获取小说正文
 export async function viewBookContentController(ctx: Context) {
     const data: GetContentParams = ctx.request.body
-    const result = await BookSourceMap[data._source].content!(data.bookId, data.chapterId)
+    const result = await BookSourceMap[data._source].content!({
+        bookId: data.bookId,
+        chapterId: data.chapterId
+    })
     throw new DataSuccess(result)
 }

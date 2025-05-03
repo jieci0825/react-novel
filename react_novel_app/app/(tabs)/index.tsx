@@ -39,6 +39,10 @@ function HomeHeader(props: HomeHeaderProps) {
     }
 
     const slots = {
+        // 这里点击可以弹出一个才菜单列表
+        //  - 导入本地书籍
+        //  - 导入云端书架
+        //  - ...
         left: () => (
             <Entypo
                 name='menu'

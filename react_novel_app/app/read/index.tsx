@@ -1,8 +1,8 @@
 import { useTheme } from '@/hooks/useTheme'
 import { readStyles } from '@/styles/pages/read.styles'
-import { Button, View } from 'react-native'
+import { Button, TouchableOpacity, View } from 'react-native'
 import ReadHeader from './read-header'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import ReadFooter from './read-footer'
 import { bookApi } from '@/api'
 import { useLocalSearchParams } from 'expo-router'
@@ -16,6 +16,9 @@ import { jcShowToast } from '@/components/jc-toast/jc-toast'
 export default function ReadPage() {
     const { theme } = useTheme()
     const styles = readStyles(theme)
+
+    // 缓存数量
+    const cacheNum = useRef(3).current
 
     // 控制上下菜单的显示与隐藏
     const [isVisible, setIsVisible] = useState(false)
@@ -33,12 +36,12 @@ export default function ReadPage() {
 
     // 当前阅读章节
     const [curReadChapter, setCurReadChapter] = useState<CurrentReadChapterInfo | null>(null)
-
     // 书籍详情
     const [bookDetails, setBookDetails] = useState<GetBookDetailsData>()
-
     // 章节列表
     const [chapterList, setChapterList] = useState<ChapterItem[]>([])
+    // 存储章节内容
+    const [chapterContent, setChapterContent] = useState<Array<{ chapterIndex: number; content: string }>>([])
 
     async function init() {
         const currentReadChapter: CurrentReadChapterInfo = await LocalCache.getData(CURRENT_READ_CHAPTER_KEY)
@@ -56,6 +59,12 @@ export default function ReadPage() {
             })
             setChapterList(bookResp.data.chapters)
             setBookDetails(bookResp.data)
+
+            // 获取当前章节正文
+            //  - 检测当前章节信息是否携带访问正文内容的 url
+            const chapter = bookResp.data.chapters[curReadChapter!.cSN]
+            if (chapter.contentUrl) {
+            }
         } catch (error) {
             console.log(error)
             jcShowToast({ text: '获取书籍数据失败', type: 'error' })
@@ -74,7 +83,11 @@ export default function ReadPage() {
 
     return (
         <>
-            <View style={[styles.container]}>
+            <TouchableOpacity
+                activeOpacity={1}
+                onPress={() => setIsVisible(!isVisible)}
+                style={[styles.container]}
+            >
                 {bookDetails && (
                     <ReadHeader
                         chapterName={curChapterName}
@@ -82,16 +95,6 @@ export default function ReadPage() {
                         isVisible={isVisible}
                     />
                 )}
-                <View
-                    style={{
-                        marginTop: 200
-                    }}
-                >
-                    <Button
-                        onPress={() => setIsVisible(!isVisible)}
-                        title='切换'
-                    ></Button>
-                </View>
                 <ReadFooter
                     isVisible={isVisible}
                     showChapterList={showChapterList}
@@ -102,7 +105,7 @@ export default function ReadPage() {
                     closeChapterList={() => setIsChapterListVisible(false)}
                     activeIndex={curReadChapter?.cSN || 0}
                 />
-            </View>
+            </TouchableOpacity>
         </>
     )
 }

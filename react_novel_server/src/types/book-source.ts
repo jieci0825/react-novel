@@ -34,11 +34,17 @@ export interface ContentResult {
     content: string
 }
 
+export interface ContentParams {
+    bookId?: SearchBookItem['bookId']
+    chapterId?: ChapterItem['chapterId']
+    contentUrl?: ChapterItem['contentUrl']
+}
+
 export type BookSourceImpl = {
     search: (data: SearchBookParams) => Promise<BookSourceSearchResult>
     detail: (bookId: SearchBookItem['bookId']) => Promise<BookDetailResult>
     chapter: (bookId: SearchBookItem['bookId']) => Promise<ChapterItem[]>
-    content?: (bookId: SearchBookItem['bookId'], chapterId: ChapterItem['chapterId']) => Promise<ContentResult>
+    content: (params: ContentParams) => Promise<ContentResult>
 }
 
 export type BookSourceImplKey = keyof BookSourceImpl

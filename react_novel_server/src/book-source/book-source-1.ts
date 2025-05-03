@@ -1,6 +1,13 @@
 import axios from 'axios'
 import { SearchBookParams } from '@/app/types/backend/book-store.type'
-import { BookDetailResult, BookSourceSearchResult, ChapterItem, ContentResult, SearchBookItem } from '@/types'
+import {
+    BookDetailResult,
+    BookSourceSearchResult,
+    ChapterItem,
+    ContentParams,
+    ContentResult,
+    SearchBookItem
+} from '@/types'
 import { formatToTenThousand, getBookCoverUrl } from '@/utils'
 
 export async function search(data: SearchBookParams): Promise<BookSourceSearchResult> {
@@ -82,10 +89,7 @@ export async function chapter(bookId: SearchBookItem['bookId']): Promise<any> {
     return chapters
 }
 
-export async function content(
-    bookId: SearchBookItem['bookId'],
-    chapterId: ChapterItem['chapterId']
-): Promise<ContentResult> {
+export async function content({ bookId, chapterId }: ContentParams): Promise<ContentResult> {
     const data = {
         Scene: 'chapter',
         ContentAnchorBatch: [
@@ -110,6 +114,6 @@ export async function content(
     }
 
     return {
-        content: result.Content
+        content: result.Content[0] || ''
     }
 }

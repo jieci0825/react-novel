@@ -15,6 +15,7 @@ export default function DetailsFooter(props: DetailsFooterProps) {
     return (
         <View style={styles.detailsFooterWrap}>
             {/* 不存在书架时才显示放入书架 */}
+            {/* 存在则显示移除书架 */}
             {!props.isExist && (
                 <TouchableOpacity
                     activeOpacity={0.5}

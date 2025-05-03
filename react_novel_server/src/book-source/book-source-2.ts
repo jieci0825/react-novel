@@ -1,7 +1,14 @@
 import CryptoJS from 'crypto-js'
 import axios from 'axios'
 import { SearchBookParams } from '@/app/types/backend/book-store.type'
-import { BookDetailResult, BookSourceSearchResult, ChapterItem, SearchBookItem } from '@/types'
+import {
+    BookDetailResult,
+    BookSourceSearchResult,
+    ChapterItem,
+    ContentParams,
+    ContentResult,
+    SearchBookItem
+} from '@/types'
 
 // 配置密钥和IV（需与后端一致）
 const key = CryptoJS.enc.Utf8.parse('f041c49714d39908')
@@ -100,4 +107,10 @@ export async function chapter(bookId: SearchBookItem['bookId']): Promise<Chapter
     })
 
     return chapters
+}
+
+export async function content({ contentUrl }: ContentParams): Promise<ContentResult> {
+    return {
+        content: ''
+    }
 }
