@@ -246,7 +246,9 @@ function HomeContent(props: HomeContentProps) {
             bID: book.bookId,
             cSN: book.lastReadChapter,
             source: book.source,
-            readProgress: book.lastReadChapterProgress
+            readProgress: book.lastReadChapterProgress,
+            bookName: book.bookName,
+            author: book.author
         })
 
         router.push({ pathname: '/read' })

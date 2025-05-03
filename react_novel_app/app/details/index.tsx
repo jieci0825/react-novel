@@ -87,7 +87,7 @@ export default function DetailsPage() {
     const toRead = async (cSN?: number) => {
         const item = await getBookItem()
 
-        let c_sn = 1
+        let c_sn = 0
         let readProgress = 0
         if (cSN) {
             // 指定了章节的话，则默认都从 0 开始
@@ -109,7 +109,9 @@ export default function DetailsPage() {
             bID: params.bid,
             cSN: c_sn,
             source: params.source,
-            readProgress
+            readProgress,
+            bookName: details?.title,
+            author: details?.author
         })
 
         router.push({ pathname: '/read' as RelativePathString })
@@ -126,7 +128,7 @@ export default function DetailsPage() {
             bookName,
             author,
             cover: details?.cover || '',
-            lastReadChapter: 1,
+            lastReadChapter: 0,
             lastReadChapterProgress: 0,
             totalChapterCount: details?.chapters.length || 0
         }
@@ -156,7 +158,7 @@ export default function DetailsPage() {
                             onMoreChapter={onMoreChapter}
                             item={details}
                             onChapterClick={index => {
-                                toRead(index + 1)
+                                toRead(index)
                             }}
                         />
                     )}
@@ -169,7 +171,7 @@ export default function DetailsPage() {
                 <ChapterList
                     clickChapter={index => {
                         setIsChapterListVisible(false)
-                        toRead(index + 1)
+                        toRead(index)
                     }}
                     isVisible={isChapterListVisible}
                     chaperList={details?.chapters || []}

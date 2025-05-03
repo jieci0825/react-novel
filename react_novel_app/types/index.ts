@@ -11,7 +11,9 @@ export interface BookshelfItem {
 
 export interface CurrentReadChapterInfo {
     bID: number | string
-    cSN: number
+    cSN: number // 章节列表索引
     source: number
     readProgress: number
+    author: string
+    bookName: string
 }

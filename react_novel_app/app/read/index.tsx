@@ -2,7 +2,7 @@ import { useTheme } from '@/hooks/useTheme'
 import { readStyles } from '@/styles/pages/read.styles'
 import { Button, View } from 'react-native'
 import ReadHeader from './read-header'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ReadFooter from './read-footer'
 import { bookApi } from '@/api'
 import { useLocalSearchParams } from 'expo-router'
@@ -11,6 +11,7 @@ import ChapterList from '@/components/chapter-list/chapter-list'
 import { CurrentReadChapterInfo } from '@/types'
 import { LocalCache } from '@/utils'
 import { CURRENT_READ_CHAPTER_KEY } from '@/constants'
+import { jcShowToast } from '@/components/jc-toast/jc-toast'
 
 export default function ReadPage() {
     const { theme } = useTheme()
@@ -31,7 +32,7 @@ export default function ReadPage() {
     }
 
     // 当前阅读章节
-    const [curChapter, setCurChapter] = useState<CurrentReadChapterInfo | null>(null)
+    const [curReadChapter, setCurReadChapter] = useState<CurrentReadChapterInfo | null>(null)
 
     // 书籍详情
     const [bookDetails, setBookDetails] = useState<GetBookDetailsData>()
@@ -42,18 +43,22 @@ export default function ReadPage() {
     async function init() {
         const currentReadChapter: CurrentReadChapterInfo = await LocalCache.getData(CURRENT_READ_CHAPTER_KEY)
         if (currentReadChapter) {
-            setCurChapter(currentReadChapter)
-            try {
-                // 获取章节详情
-                const bookResp = await bookApi.reqGetBookDetails({
-                    bookId: curChapter!.bID as string,
-                    _source: curChapter!.source
-                })
-                setChapterList(bookResp.data.chapters)
-                setBookDetails(bookResp.data)
-            } catch (error) {}
+            setCurReadChapter(currentReadChapter)
         } else {
             return
+        }
+
+        try {
+            // 获取章节详情
+            const bookResp = await bookApi.reqGetBookDetails({
+                bookId: curReadChapter!.bID as string,
+                _source: +curReadChapter!.source
+            })
+            setChapterList(bookResp.data.chapters)
+            setBookDetails(bookResp.data)
+        } catch (error) {
+            console.log(error)
+            jcShowToast({ text: '获取书籍数据失败', type: 'error' })
         }
     }
 
@@ -61,12 +66,18 @@ export default function ReadPage() {
         init()
     }, [])
 
+    // 当前章节名称
+    const curChapterName = useMemo(() => {
+        const chapter = chapterList[curReadChapter?.cSN || 0]
+        return chapter ? chapter.chapterName : ''
+    }, [curReadChapter, chapterList])
+
     return (
         <>
             <View style={[styles.container]}>
                 {bookDetails && (
                     <ReadHeader
-                        chapterName={chapterList[0].chapterName}
+                        chapterName={curChapterName}
                         bookName={bookDetails.title}
                         isVisible={isVisible}
                     />
@@ -89,6 +100,7 @@ export default function ReadPage() {
                     isVisible={isChapterListVisible}
                     chaperList={chapterList}
                     closeChapterList={() => setIsChapterListVisible(false)}
+                    activeIndex={curReadChapter?.cSN || 0}
                 />
             </View>
         </>
