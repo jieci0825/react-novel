@@ -1,5 +1,6 @@
 import { DESIGN_WIDTH, DESIGN_HEIGHT } from '@/constants/Size'
 import { useWindowDimensions } from 'react-native'
+import { isString } from './check-type'
 
 interface Options {
     standardSize?: number
@@ -52,4 +53,19 @@ export function getAdjacentIndexes(
     }
 
     return result
+}
+
+/**
+ * 将文本按换行符切割成数组，并过滤空行
+ */
+export function splitTextByLine(text: string): string[] {
+    if (!isString(text)) {
+        console.warn('请输入字符串')
+        return []
+    }
+
+    // 匹配所有换行符：\n, \r\n, \r
+    const lines = text.split(/\r?\n|\r/)
+
+    return lines.filter(line => line.trim() !== '')
 }
