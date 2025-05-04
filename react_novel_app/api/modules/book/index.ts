@@ -1,6 +1,6 @@
 import request from '@/api/request'
 import { IBaseListType, IBaseType } from '@/api/modules/types'
-import { ChapterItem, GetBookContentParams, GetBookDetailsData, GetBookDetailsParams } from './type'
+import { ChapterItem, GetBookContentData, GetBookContentParams, GetBookDetailsData, GetBookDetailsParams } from './type'
 
 /**
  * 获取书籍详情
@@ -20,5 +20,5 @@ export const reqGetBookChapters = (data: GetBookDetailsParams) => {
  * 获取正文
  */
 export const reqGetBookContent = (data: GetBookContentParams) => {
-    return request.post<IBaseType<string>>({ url: '/book/content', data })
+    return request.post<IBaseType<GetBookContentData>>({ url: '/book/content', data })
 }

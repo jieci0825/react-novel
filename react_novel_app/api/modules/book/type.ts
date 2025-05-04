@@ -27,4 +27,9 @@ export interface GetBookContentParams {
     bookId: string | number
     chapterId: number | string
     _source: number
+    contentUrl: string
+}
+
+export interface GetBookContentData {
+    content: string
 }
