@@ -1,13 +1,19 @@
-import { PixelRatio, Text, useWindowDimensions, View } from 'react-native'
+import { FlatList, PixelRatio, Text, useWindowDimensions, View } from 'react-native'
 import { CharacterSizeMap, ReadContentBase } from './read.type'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import { readContentHorizontalStyles } from '@/styles/pages/read.styles'
 import { isArray, isChineseChar, splitTextByLine } from '@/utils'
+import processContentPage from '@/utils/process-content-page'
 
 // 根据缓存的字符 size，来计算当前章节的分页数据
 function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentBase) {
-    const [pageData, setPageData] = useState<Array<string[]>>([])
+    interface PageDataItem {
+        isNeedIndent: boolean
+        content: string
+    }
+
+    const [pageData, setPageData] = useState<Array<PageDataItem[]>>([])
 
     // 中文字符宽度
     const chineseWidth = characterSizeMap.current.get('chinese')?.width || 0
@@ -24,212 +30,30 @@ function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentBase)
     const paragraphIndent = props.readSetting.indent * chineseWidth + props.readSetting.indent * letterSpacing
 
     const startCalc = (containerSize: { width: number; height: number }) => {
-        if (containerSize.width === 0) return
-
-        interface CharItem {
-            char: string
-            charIndex: number
-            contentIndex: number
-            isChineseChar: boolean
-            width: number
-        }
-        const sources: CharItem[] = []
-        for (let i = 0; i < props.contents.length; i++) {
-            const content = props.contents[i]
-            for (let j = 0; j < content.length; j++) {
-                const char = content[j]
-
-                const _isChineseChar = isChineseChar(char)
-
-                const width = _isChineseChar ? chineseWidth : characterSizeMap.current.get(char)?.width || 0
-
-                sources.push({
-                    char,
-                    charIndex: j,
-                    contentIndex: i,
-                    isChineseChar: _isChineseChar,
-                    width
-                })
-            }
-        }
-
-        interface PageDataContext {
-            _s: CharItem[] // 源数据
-            curCharIndx: number // 当前字符索引。即遍历时整体数据时的位置
-            curParagraphIndx: number // 上一个段落索引
-            curParagraphCharIndx: number // 上一个段落字符索引，即本字符在本段落中的位置
-            letterSpacing: number // 字间距
-            indent: number // 缩进
-            lineHeight: number // 行高
-            paragraphSpacing: number // 段落间距
-            curPageHeight: number // 当前页的高度
-            curLineWidth: number // 当前行目前的宽度
-            curPageNum: number // 当前页码
-            curPageData: string[] // 当前页的数据
-            curParagraphData: string // 当前段落的数据
-            pageData: Record<number, string[]> // 分页数据 {1:[[第一段...],[第一段...],[第一段...]], 2:[[第一段...],[第一段...],[第一段...]]}
-            increaseLineWidth: (width: number) => void // 增加行宽
-            newLine: () => void // 新行
-            newParagraph: () => void // 新段落
-            newPage: () => void // 新页
-            isNeedNewLine: (charItem: CharItem) => boolean // 是否需要新行
-            isNeedNewParagraph: (charItem: CharItem) => boolean // 是否需要新段落
-            isNeedNewPage: () => boolean // 是否需要新开一页
-        }
-
-        const context: PageDataContext = {
-            _s: JSON.parse(JSON.stringify(sources)), // 源数据
-            curCharIndx: -1,
-            curParagraphIndx: -1,
-            curParagraphCharIndx: 0,
-            letterSpacing: letterSpacing,
-            indent: paragraphIndent,
+        const result = processContentPage({
+            characterSizeMap,
+            letterSpacing,
+            paragraphIndent,
             lineHeight,
             paragraphSpacing,
-            curPageHeight: 0,
-            curLineWidth: 0,
-            curPageNum: 1,
-            curPageData: [],
-            curParagraphData: '',
-            pageData: {},
-            increaseLineWidth(width) {
-                // width 即为当前字符的宽度
-                this.curLineWidth += width
-                // 还需要加上字符间距
-                this.curLineWidth += this.letterSpacing
-            },
-            newLine() {
-                // 开新行，则叠加页面高度
-                this.curPageHeight += this.lineHeight
-                // 重置行宽
-                this.curLineWidth = 0
-            },
-            newParagraph() {
-                // 叠加段落间隔。增加新开一个段落后的页面高度
-                //  - -1 表示初始化，不要要叠加段间距
-                if (this.curParagraphIndx !== -1) {
-                    this.curPageHeight += this.paragraphSpacing
-                }
+            containerSize,
+            contents: props.contents
+        })
 
-                // 新开段落的行宽需要重置为缩进
-                this.curLineWidth = this.indent
-                // 新开段落需要更新行高。因为新开了段落重新设置了行宽。所以后续的行高的逻辑就不会加上、需要手动设置
-                this.curPageHeight += this.lineHeight
+        console.log(result)
 
-                // 将本段落数据保存到当前页数据中。有数据才保存
-                if (this.curParagraphData.length > 0) {
-                    this.curPageData.push(this.curParagraphData)
-                    // 重置当前段落数据
-                    this.curParagraphData = ''
-                }
-            },
-            newPage() {
-                // 如果还存在当前段落的字符，则保存当前段落数据
-                if (this.curParagraphData.length > 0) {
-                    this.curPageData.push(this.curParagraphData)
-                }
+        // const result = []
 
-                // 保存当前页的数据
-                this.pageData[this.curPageNum] = this.curPageData
+        // for (const key in context.pageData) {
+        //     const content = context.pageData[key]
+        //     const idx = +key - 1
+        //     result[idx] = content
+        // }
 
-                // 重置数据
-                this.curParagraphData = ''
-                this.curPageData = []
-
-                this.curPageNum++ // 页码+1
-                this.curPageHeight = 0 // 页高重置
-                // 行宽新的一页无需重置。
-                //  - 因为如果是切换段落之后需要分页，则行宽已经重置为缩进
-                //  - 如果是段落中的某一行需要截断，则行宽已经重置为0
-            },
-            isNeedNewLine(charItem) {
-                // 如果当前行宽加上当前字符的宽度大于容器宽度，则表示这个字符是新行的第一个字符
-                const isNewLine = this.curLineWidth + charItem.width > containerSize.width
-                if (isNewLine) {
-                    return true
-                } else {
-                    // * 换行这里有个特殊情况，如果当前字符是中文，且加上字符宽度就是新行第一个字符就无所谓。
-                    // * 但是如果是中文，加上这个字符宽度之后，不是新行第一个字符，就需要检测他下一个字符是否是中文：
-                    //  - 如果是中文，则不做处理。返回 false。表是这个中文字符不是新行的第一个字符
-                    //  - 如果不是中文，则还要加上下一个非中文字符的宽度，如果超出了容器宽度，则返回 true，将当前中文字符作为新行第一个字符，因为标点符号这些。通常来说不能作为新行的第一个字符，段落开头就可以是，所以不需要处理段落
-                    const nextChar = this._s[this.curCharIndx + 1]
-                    // 如果下一个字符不存在。则直接返回之前的判断结果
-                    if (!nextChar) {
-                        return isNewLine
-                    }
-
-                    // 检查这个下一个字符是否和当前字符是同一段落。不是同一个段落不处理
-                    if (nextChar.contentIndex !== charItem.contentIndex) {
-                        return isNewLine
-                    }
-
-                    if (nextChar.isChineseChar) {
-                        return false
-                    } else {
-                        if (this.curLineWidth + charItem.width + nextChar.width > containerSize.width) {
-                            return true
-                        }
-                        return false
-                    }
-                }
-            },
-            isNeedNewParagraph(charItem) {
-                // 如果当前的 charItem 的 contentIndex 大于上下文中的 curParagraphIndx，则表示需要新段落
-                return charItem.contentIndex > this.curParagraphIndx
-            },
-            isNeedNewPage() {
-                // 当前页高度大于等于容器高度时，需要新开一页。如果只是相等的话，则有可能是最后一行，无需新开一页
-                return this.curPageHeight > containerSize.height
-            }
-        }
-
-        while (sources.length > 0) {
-            context.curCharIndx++
-
-            // 开始消费数据
-            const charItem = sources.shift()!
-
-            // 检测是否需要新段落
-            if (context.isNeedNewParagraph(charItem)) {
-                context.newParagraph()
-                // 更新段落索引
-                context.curParagraphIndx = charItem.contentIndex
-
-                // 检测是否需要新页
-                if (context.isNeedNewPage()) {
-                    context.newPage()
-                }
-            }
-
-            // 检测是否需要新行
-            if (context.isNeedNewLine(charItem)) {
-                context.newLine()
-                // 检测是否需要新页
-                if (context.isNeedNewPage()) {
-                    context.newPage()
-                }
-            }
-
-            // 更新当前行宽
-            //  - 换行后会把行宽重置为0，所以这里需要加上当前行宽
-            //  - 不换行则同样需要更新
-            context.increaseLineWidth(charItem.width)
-            // 将当前字符添加到当前段落数据中
-            context.curParagraphData += charItem.char
-        }
-
-        // 当遍历完成之后，需要检查当前页是否有数据，有数据则保存到当前页数据中。
-        if (context.curParagraphData.length > 0) {
-            // 即手动调用 newPage。因为 while 中没有处理
-            context.newPage()
-        }
-
-        console.log(context)
-
-        return
+        // setPageData(result)
     }
 
-    return { startCalc, paragraphIndent }
+    return { startCalc, paragraphIndent, pageData }
 }
 
 export default function ReadContentHorizontal(props: ReadContentBase) {
@@ -238,11 +62,44 @@ export default function ReadContentHorizontal(props: ReadContentBase) {
 
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
 
-    const { startCalc, paragraphIndent } = usePageData(props.characterSizeMap, props)
+    const { pageData, startCalc, paragraphIndent } = usePageData(props.characterSizeMap, props)
 
     useEffect(() => {
         startCalc(containerSize)
     }, [containerSize])
+
+    const { width: screenWidth, height: screenHeight } = useWindowDimensions()
+
+    const renderPage = ({ item }: { item: string[] }) => {
+        return (
+            <View
+                style={{
+                    width: screenWidth - props.readSetting.paddingHorizontal * 2,
+                    backgroundColor: 'red',
+                    justifyContent: 'space-between'
+                }}
+            >
+                {item.map((content, index) => {
+                    return (
+                        <Text
+                            selectable={true}
+                            key={index}
+                            style={[
+                                styles.contentText,
+                                props.dynamicTextStyles,
+                                {
+                                    textIndent: `${paragraphIndent}px`,
+                                    marginBottom: index === item.length - 1 ? 0 : props.dynamicTextStyles.marginBottom
+                                }
+                            ]}
+                        >
+                            {content}
+                        </Text>
+                    )
+                })}
+            </View>
+        )
+    }
 
     return (
         <>
@@ -262,24 +119,18 @@ export default function ReadContentHorizontal(props: ReadContentBase) {
                         setContainerSize(nativeEvent.layout)
                     }}
                 >
-                    {true &&
-                        props.contents.map((content, index) => {
-                            return (
-                                <Text
-                                    selectable={true}
-                                    key={index}
-                                    style={[
-                                        styles.contentText,
-                                        props.dynamicTextStyles,
-                                        {
-                                            textIndent: `${paragraphIndent}px`
-                                        }
-                                    ]}
-                                >
-                                    {content}
-                                </Text>
-                            )
-                        })}
+                    {/* <FlatList
+                        style={{
+                            height: '100%'
+                        }}
+                        horizontal={true}
+                        data={pageData}
+                        pagingEnabled={true}
+                        showsHorizontalScrollIndicator={false}
+                        decelerationRate='fast'
+                        keyExtractor={(_, index) => String(index)}
+                        renderItem={renderPage}
+                    /> */}
                 </View>
             </View>
         </>

@@ -157,7 +157,8 @@ export const readContentHorizontalStyles = (theme: Theme) => {
     return StyleSheet.create({
         container: {
             width: '100%',
-            height: '100%'
+            height: '100%',
+            backgroundColor: 'blue'
         },
         containerInner: {
             width: '100%',
