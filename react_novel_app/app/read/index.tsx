@@ -1,6 +1,6 @@
-import { useTheme } from '@/hooks/useTheme'
+import { Theme, useTheme } from '@/hooks/useTheme'
 import { readStyles } from '@/styles/pages/read.styles'
-import { Button, TouchableOpacity, View } from 'react-native'
+import { Button, PixelRatio, Text, TouchableOpacity, View } from 'react-native'
 import ReadHeader from './read-header'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ReadFooter from './read-footer'
@@ -9,9 +9,13 @@ import { useLocalSearchParams } from 'expo-router'
 import { ChapterItem, GetBookDetailsData } from '@/api/modules/book/type'
 import ChapterList from '@/components/chapter-list/chapter-list'
 import { CurrentReadChapterInfo } from '@/types'
-import { getAdjacentIndexes, LocalCache } from '@/utils'
+import { extractNonChineseChars, getAdjacentIndexes, LocalCache, splitTextByLine } from '@/utils'
 import { CURRENT_READ_CHAPTER_KEY } from '@/constants'
 import { jcShowToast } from '@/components/jc-toast/jc-toast'
+import ReadContentHorizontal from './read-content-wrap'
+import { CharacterSizeMap, ReaderSetting } from './read.type'
+import ReadContentFooter from './read-content-footer'
+import CalcTextSize from './calc-text-size'
 
 // 页面UI状态
 function useUIState() {
@@ -53,6 +57,7 @@ function useBookData() {
         })
         setChapterList(bookResp.data.chapters)
         setBookDetails(bookResp.data)
+        return bookResp.data.chapters
     }
 
     return { bookDetails, chapterList, setChapterList, getBookDetails }
@@ -61,7 +66,7 @@ function useBookData() {
 // 章节正文
 function useChapterContent() {
     // 存储章节内容
-    const [chapterContent, setChapterContent] = useState<Array<{ chapterIndex: number; content: string }>>([])
+    const [chapterContents, setChapterContents] = useState<Array<{ chapterIndex: number; content: string }>>([])
 
     // 缓存数量：即当前章节上下章节的缓存数量
     const cacheNum = useRef(2).current
@@ -91,20 +96,76 @@ function useChapterContent() {
         ).map((item, index) => {
             return {
                 chapterIndex: allIndex[index],
-                content: item.data.content
+                content: item.data.content,
+                chapterName: chapterList[allIndex[index]].chapterName
             }
         })
 
-        setChapterContent(allChapterContents)
+        setChapterContents(allChapterContents)
+
+        return allChapterContents
     }
 
-    return { chapterContent, getCacheChapterContentsInit }
+    return { chapterContents, getCacheChapterContentsInit }
+}
+
+// 阅读器界面设置
+function useReaderSetting(theme: Theme) {
+    const [readStyle, setReadStyle] = useState<ReaderSetting>({
+        fontSize: 16, // 基础字体大小
+        lineHeight: 24, // 行高
+        letterSpacing: 1, // 字间距
+        paragraphSpacing: 14, // 段间距
+        fontFamily: 'Arial', // 字体
+        paddingHorizontal: 16, // 左右边距
+        paddingVertical: 24, // 上下边距
+        backgroundColor: theme.bgColor,
+        textColor: theme.textSecondaryColor,
+        indent: 2
+    })
+
+    return { readStyle, setReadStyle }
+}
+
+// 缓存字符的size
+function useCacheCharacterSize(readStyle: ReaderSetting) {
+    const fontScale = PixelRatio.getFontScale()
+
+    const dynamicTextStyles = useMemo(() => {
+        return {
+            color: readStyle.textColor,
+            fontSize: readStyle.fontSize * fontScale,
+            lineHeight: readStyle.lineHeight * fontScale,
+            letterSpacing: readStyle.letterSpacing * fontScale,
+            fontFamily: readStyle.fontFamily,
+            marginBottom: readStyle.paragraphSpacing * fontScale
+        }
+    }, [readStyle])
+
+    const [noChineseCharacterList, setNoChineseCharacterList] = useState<string[]>([])
+
+    const characterSizeMap = useRef(new Map<string, { width: number; height: number }>())
+
+    // 动态添加数据
+    const addData = (key: string, value: { width: number; height: number }) => {
+        characterSizeMap.current.set(key, value)
+    }
+
+    // 获取非中文的字符
+    const getNoChineseCharacterList = (content: string) => {
+        setNoChineseCharacterList([...new Set(extractNonChineseChars(content).split(''))])
+    }
+
+    return { characterSizeMap, dynamicTextStyles, addData, noChineseCharacterList, getNoChineseCharacterList }
 }
 
 export default function ReadPage() {
     // 主题样式
     const { theme } = useTheme()
     const styles = readStyles(theme)
+
+    // 是否开始正式正式渲染
+    const [isRender, setIsRender] = useState(false)
 
     // 页面hooks
     const {
@@ -117,7 +178,10 @@ export default function ReadPage() {
         setIsChapterListVisible
     } = useUIState()
     const { bookDetails, chapterList, setChapterList, getBookDetails } = useBookData()
-    const { chapterContent, getCacheChapterContentsInit } = useChapterContent()
+    const { chapterContents, getCacheChapterContentsInit } = useChapterContent()
+    const { readStyle, setReadStyle } = useReaderSetting(theme)
+    const { characterSizeMap, dynamicTextStyles, addData, noChineseCharacterList, getNoChineseCharacterList } =
+        useCacheCharacterSize(readStyle)
 
     // 当前阅读章节
     const [curReadChapter, setCurReadChapter] = useState<CurrentReadChapterInfo | null>(null)
@@ -133,13 +197,19 @@ export default function ReadPage() {
         const source = currentReadChapter.source
 
         // 2. 获取书籍详情
-        await getBookDetails(bookId, source)
+        const _chapters = await getBookDetails(bookId, source)
 
-        setChapterList(prev => {
-            // 3. 获取初始化的缓存章节内容
-            getCacheChapterContentsInit(currentReadChapter.cSN, prev, bookId, source)
-            return prev
-        })
+        // 3. 获取初始化的缓存章节内容
+        const _allChapterContents = await getCacheChapterContentsInit(currentReadChapter.cSN, _chapters, bookId, source)
+
+        // 4. 拿到当前的正文，获取章节字符的尺寸信息
+        const _currentChapterContent = _allChapterContents.find(item => item.chapterIndex === currentReadChapter.cSN)
+        if (_currentChapterContent) {
+            const content = _currentChapterContent.content
+            getNoChineseCharacterList(content)
+        }
+        // 5. 开启渲染
+        setIsRender(true)
     }
 
     useEffect(() => {
@@ -154,29 +224,67 @@ export default function ReadPage() {
 
     return (
         <>
-            <TouchableOpacity
-                activeOpacity={1}
-                onPress={() => setIsVisible(!isVisible)}
-                style={[styles.container]}
-            >
-                {bookDetails && (
-                    <ReadHeader
-                        chapterName={curChapterName}
-                        bookName={bookDetails.title}
-                        isVisible={isVisible}
+            {/* 中文字符固定使用一来检测，中文字符的宽度都是一样的，无需重复计算 */}
+            <CalcTextSize
+                text='一'
+                textStyle={dynamicTextStyles}
+                onSizeInfo={({ width, height }) => {
+                    addData('chinese', { width, height })
+                }}
+            />
+            {/* 其他字符动态计算 */}
+            {noChineseCharacterList.map((item, index) => {
+                return (
+                    <CalcTextSize
+                        key={index}
+                        text={item}
+                        textStyle={dynamicTextStyles}
+                        onSizeInfo={({ width, height }) => {
+                            // 检测当前 key 是否存在
+                            if (characterSizeMap.current.has(item)) return
+                            addData(item, { width, height })
+                        }}
                     />
-                )}
-                <ReadFooter
-                    isVisible={isVisible}
-                    showChapterList={showChapterList}
-                />
-                <ChapterList
-                    isVisible={isChapterListVisible}
-                    chaperList={chapterList}
-                    closeChapterList={() => setIsChapterListVisible(false)}
-                    activeIndex={curReadChapter?.cSN || 0}
-                />
-            </TouchableOpacity>
+                )
+            })}
+            {/* 只有等字符都计算好了才渲染 */}
+            {isRender && (
+                <TouchableOpacity
+                    activeOpacity={1}
+                    onPress={() => setIsVisible(!isVisible)}
+                    style={[styles.container]}
+                >
+                    {bookDetails && (
+                        <ReadHeader
+                            chapterName={curChapterName}
+                            bookName={bookDetails.title}
+                            isVisible={isVisible}
+                        />
+                    )}
+                    <View style={styles.main}>
+                        {/* 正文渲染区域 */}
+                        <ReadContentHorizontal
+                            animation='none'
+                            content={chapterContents[curReadChapter?.cSN || 0]?.content || ''}
+                            contents={splitTextByLine(chapterContents[curReadChapter?.cSN || 0]?.content || '')}
+                            readSetting={readStyle}
+                            dynamicTextStyles={dynamicTextStyles}
+                            characterSizeMap={characterSizeMap}
+                        />
+                    </View>
+                    <ReadContentFooter />
+                    <ReadFooter
+                        isVisible={isVisible}
+                        showChapterList={showChapterList}
+                    />
+                    <ChapterList
+                        isVisible={isChapterListVisible}
+                        chaperList={chapterList}
+                        closeChapterList={() => setIsChapterListVisible(false)}
+                        activeIndex={curReadChapter?.cSN || 0}
+                    />
+                </TouchableOpacity>
+            )}
         </>
     )
 }

@@ -15,7 +15,8 @@ export const readStyles = (theme: Theme) => {
             overflow: 'hidden'
         },
         main: {
-            flex: 1
+            flex: 1,
+            overflow: 'hidden'
         }
     })
 }
@@ -34,7 +35,8 @@ export const readHeaderStyles = (theme: Theme) => {
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
-            paddingHorizontal: 20
+            paddingHorizontal: 20,
+            zIndex: 1
         },
         backBtn: {
             marginRight: 20
@@ -73,7 +75,8 @@ export const readFooterStyles = (theme: Theme) => {
             paddingHorizontal: 20,
             paddingVertical: 10,
             gap: adaptiveSize(10),
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            zIndex: 1
         },
         footerTop: {
             display: 'flex',
@@ -146,6 +149,42 @@ export const readChapterListStyles = (theme: Theme) => {
         chapterItemText: {
             fontSize: RFValue(14),
             color: theme.textSecondaryColor
+        }
+    })
+}
+
+export const readContentHorizontalStyles = (theme: Theme) => {
+    return StyleSheet.create({
+        container: {
+            width: '100%',
+            height: '100%'
+        },
+        containerInner: {
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
+            backgroundColor: 'yellow'
+        },
+        contentText: {
+            textIndent: '1px'
+        }
+    })
+}
+
+export const readContentFooterStyles = (theme: Theme) => {
+    return StyleSheet.create({
+        container: {
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            borderTopWidth: 1,
+            borderTopColor: theme.textTertiaryColor
+        },
+        text: {
+            color: theme.textSecondaryColor,
+            fontSize: RFValue(12)
         }
     })
 }

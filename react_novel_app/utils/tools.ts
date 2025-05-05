@@ -67,5 +67,15 @@ export function splitTextByLine(text: string): string[] {
     // 匹配所有换行符：\n, \r\n, \r
     const lines = text.split(/\r?\n|\r/)
 
-    return lines.filter(line => line.trim() !== '')
+    return lines.filter(line => line.trim() !== '').map(line => line.trim())
+}
+
+/**
+ * 提取非中文字符
+ */
+export function extractNonChineseChars(str: string) {
+    // 正则表达式匹配非中文字符，同时排除回车(\r)和换行(\n)
+    const regex = /[^\u4e00-\u9fa5\r\n]/g
+    const matches = str.match(regex)
+    return matches ? matches.join('') : ''
 }

@@ -19,9 +19,9 @@ export default function ChapterList(props: ChapterListProps) {
     const { theme } = useTheme()
     const styles = chapterListStyles(theme)
 
-    const screenWidth = useWindowDimensions().width
+    const offsetWidth = useWindowDimensions().width + 30
 
-    const translateX = useRef(new Animated.Value(screenWidth)).current
+    const translateX = useRef(new Animated.Value(offsetWidth)).current
 
     useEffect(() => {
         if (props.isVisible) {
@@ -32,7 +32,7 @@ export default function ChapterList(props: ChapterListProps) {
             }).start()
         } else {
             Animated.timing(translateX, {
-                toValue: screenWidth,
+                toValue: offsetWidth,
                 duration: 300,
                 useNativeDriver: true
             }).start()

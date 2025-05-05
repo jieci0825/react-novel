@@ -18,3 +18,6 @@ export const BOOKSHELF_LAYOUT = 'BOOKSHELF_LAYOUT'
 
 // 当前阅读章节
 export const CURRENT_READ_CHAPTER_KEY = 'CURRENT_READ_CHAPTER'
+
+// 阅读器界面设置
+export const READER_SETTING = 'READER_SETTING'

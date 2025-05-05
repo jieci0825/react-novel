@@ -19,3 +19,7 @@ export const isFunction = (value: any): value is Function => {
 }
 
 export const isArray = Array.isArray
+
+export function isChineseChar(char: string) {
+    return /^[\u4E00-\u9FA5]$/.test(char)
+}
