@@ -124,6 +124,11 @@ function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentBase)
                 }
             },
             newPage() {
+                // 如果还存在当前段落的字符，则保存当前段落数据
+                if (this.curParagraphData.length > 0) {
+                    this.curPageData.push(this.curParagraphData)
+                }
+
                 // 保存当前页的数据
                 this.pageData[this.curPageNum] = this.curPageData
 
@@ -187,27 +192,21 @@ function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentBase)
             // 检测是否需要新段落
             if (context.isNeedNewParagraph(charItem)) {
                 context.newParagraph()
-                console.log('换段落', charItem.char, context._s[context.curCharIndx + 1].char, context.curPageHeight)
                 // 更新段落索引
                 context.curParagraphIndx = charItem.contentIndex
 
                 // 检测是否需要新页
                 if (context.isNeedNewPage()) {
                     context.newPage()
-                    console.log('需要新开一页', context)
-                    return
                 }
             }
 
             // 检测是否需要新行
             if (context.isNeedNewLine(charItem)) {
                 context.newLine()
-                console.log('换行：', charItem.char, context.curPageHeight)
                 // 检测是否需要新页
                 if (context.isNeedNewPage()) {
                     context.newPage()
-                    console.log('需要新开一页', context)
-                    return
                 }
             }
 
@@ -217,6 +216,12 @@ function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentBase)
             context.increaseLineWidth(charItem.width)
             // 将当前字符添加到当前段落数据中
             context.curParagraphData += charItem.char
+        }
+
+        // 当遍历完成之后，需要检查当前页是否有数据，有数据则保存到当前页数据中。
+        if (context.curParagraphData.length > 0) {
+            // 即手动调用 newPage。因为 while 中没有处理
+            context.newPage()
         }
 
         console.log(context)
