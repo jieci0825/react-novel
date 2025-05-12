@@ -45,6 +45,140 @@ export interface PageDataContext {
     resetCurParagraphData: () => void // 重置当前段落数据
 }
 
+function createParseContext({
+    charItemList,
+    letterSpacing,
+    paragraphIndent,
+    paragraphSpacing,
+    lineHeight,
+    containerSize
+}: GetCharItemListParams): PageDataContext {
+    const context: PageDataContext = {
+        _s: JSON.parse(JSON.stringify(charItemList)), // 源数据
+        curCharIndx: -1,
+        curParagraphIndx: -1,
+        curParagraphCharIndx: 0,
+        letterSpacing: letterSpacing,
+        indent: paragraphIndent,
+        lineHeight,
+        paragraphSpacing,
+        curPageHeight: 0,
+        curLineWidth: 0,
+        curPageNum: 1,
+        curPageData: [],
+        isNeedIndent: true,
+        curParagraphData: {
+            isNeedIndent: true,
+            content: ''
+        },
+        pageData: {},
+        increaseLineWidth(width) {
+            // width 即为当前字符的宽度
+            this.curLineWidth += width
+            // 还需要加上字符间距
+            this.curLineWidth += this.letterSpacing
+        },
+        newLine() {
+            // 开新行，则叠加页面高度
+            this.curPageHeight += this.lineHeight
+            // 重置行宽
+            this.curLineWidth = 0
+        },
+        newParagraph() {
+            // 叠加段落间隔。增加新开一个段落后的页面高度
+            //  - -1 表示初始化，不要要叠加段间距
+            if (this.curParagraphIndx !== -1) {
+                this.curPageHeight += this.paragraphSpacing
+            }
+
+            // 新开段落的行宽需要重置为缩进
+            this.curLineWidth = this.indent
+            // 新开段落需要更新行高。因为新开了段落重新设置了行宽。所以后续的行高的逻辑就不会加上、需要手动设置
+            this.curPageHeight += this.lineHeight
+
+            // 将本段落数据保存到当前页数据中。有数据才保存
+            if (this.curParagraphData.content.length > 0) {
+                this.curPageData.push(this.curParagraphData)
+                // 重置当前段落数据
+                this.resetCurParagraphData()
+            }
+        },
+        newPage() {
+            // 如果还存在当前段落的字符，则保存当前段落数据
+            if (this.curParagraphData.content.length > 0) {
+                this.curPageData.push(this.curParagraphData)
+            }
+
+            // 保存当前页的数据
+            this.pageData[this.curPageNum] = this.curPageData
+
+            // 重置数据
+            this.resetCurParagraphData()
+            this.curPageData = []
+
+            this.curPageNum++ // 页码+1
+            this.curPageHeight = this.lineHeight // 页高重置为第一行的高度
+            // 行宽新的一页无需重置。
+            //  - 因为如果是切换段落之后需要分页，则行宽已经重置为缩进
+            //  - 如果是段落中的某一行需要截断，则行宽已经重置为0
+        },
+        isNeedNewLine(charItem) {
+            // 如果当前行宽加上当前字符的宽度大于容器宽度，则表示这个字符是新行的第一个字符
+            const isNewLine = this.curLineWidth + charItem.width > containerSize.width
+            if (isNewLine) {
+                return true
+            } else {
+                // * 换行这里有个特殊情况，如果当前字符是中文，且加上字符宽度就是新行第一个字符就无所谓。
+                // * 但是如果是中文，加上这个字符宽度之后，不是新行第一个字符，就需要检测他下一个字符是否是中文：
+                //  - 如果是中文，则不做处理。返回 false。表是这个中文字符不是新行的第一个字符
+                //  - 如果不是中文，则还要加上下一个非中文字符的宽度，如果超出了容器宽度，则返回 true，将当前中文字符作为新行第一个字符，因为标点符号这些。通常来说不能作为新行的第一个字符，段落开头就可以是，所以不需要处理段落
+                const nextChar = this._s[this.curCharIndx + 1]
+                // 如果下一个字符不存在。则直接返回之前的判断结果
+                if (!nextChar) {
+                    return isNewLine
+                }
+
+                // 检查这个下一个字符是否和当前字符是同一段落。不是同一个段落不处理
+                if (nextChar.contentIndex !== charItem.contentIndex) {
+                    return isNewLine
+                }
+
+                if (nextChar.isChineseChar) {
+                    return false
+                } else {
+                    if (this.curLineWidth + charItem.width + nextChar.width > containerSize.width) {
+                        return true
+                    }
+                    return false
+                }
+            }
+        },
+        isNeedNewParagraph(charItem) {
+            // 如果当前的 charItem 的 contentIndex 大于上下文中的 curParagraphIndx，则表示需要新段落
+            return charItem.contentIndex > this.curParagraphIndx
+        },
+        isNeedNewPage() {
+            // 当前页高度大于等于容器高度时，需要新开一页。如果只是相等的话，则有可能是最后一行，无需新开一页
+            if (this.curPageHeight > containerSize.height) {
+                return true
+            }
+            return false
+        },
+        addCurParagraphData(char) {
+            this.curParagraphData.content += char
+            this.curParagraphData.isNeedIndent = this.isNeedIndent
+        },
+        resetCurParagraphData() {
+            this.curParagraphData = {
+                isNeedIndent: this.isNeedIndent,
+                content: ''
+            }
+        }
+    }
+
+    return context
+}
+
 interface ProcessContentPageParams {
     characterSizeMap: CharacterSizeMap // 字符大小映射表
     containerSize: { width: number; height: number } // 容器大小
@@ -141,136 +275,6 @@ interface GetCharItemListParams {
     lineHeight: number
     paragraphSpacing: number
     containerSize: { width: number; height: number }
-}
-function createParseContext({
-    charItemList,
-    letterSpacing,
-    paragraphIndent,
-    paragraphSpacing,
-    lineHeight,
-    containerSize
-}: GetCharItemListParams): PageDataContext {
-    const context: PageDataContext = {
-        _s: JSON.parse(JSON.stringify(charItemList)), // 源数据
-        curCharIndx: -1,
-        curParagraphIndx: -1,
-        curParagraphCharIndx: 0,
-        letterSpacing: letterSpacing,
-        indent: paragraphIndent,
-        lineHeight,
-        paragraphSpacing,
-        curPageHeight: 0,
-        curLineWidth: 0,
-        curPageNum: 1,
-        curPageData: [],
-        isNeedIndent: true,
-        curParagraphData: {
-            isNeedIndent: true,
-            content: ''
-        },
-        pageData: {},
-        increaseLineWidth(width) {
-            // width 即为当前字符的宽度
-            this.curLineWidth += width
-            // 还需要加上字符间距
-            this.curLineWidth += this.letterSpacing
-        },
-        newLine() {
-            // 开新行，则叠加页面高度
-            this.curPageHeight += this.lineHeight
-            // 重置行宽
-            this.curLineWidth = 0
-        },
-        newParagraph() {
-            // 叠加段落间隔。增加新开一个段落后的页面高度
-            //  - -1 表示初始化，不要要叠加段间距
-            if (this.curParagraphIndx !== -1) {
-                this.curPageHeight += this.paragraphSpacing
-            }
-
-            // 新开段落的行宽需要重置为缩进
-            this.curLineWidth = this.indent
-            // 新开段落需要更新行高。因为新开了段落重新设置了行宽。所以后续的行高的逻辑就不会加上、需要手动设置
-            this.curPageHeight += this.lineHeight
-
-            // 将本段落数据保存到当前页数据中。有数据才保存
-            if (this.curParagraphData.content.length > 0) {
-                this.curPageData.push(this.curParagraphData)
-                // 重置当前段落数据
-                this.resetCurParagraphData()
-            }
-        },
-        newPage() {
-            // 如果还存在当前段落的字符，则保存当前段落数据
-            if (this.curParagraphData.content.length > 0) {
-                this.curPageData.push(this.curParagraphData)
-            }
-
-            // 保存当前页的数据
-            this.pageData[this.curPageNum] = this.curPageData
-
-            // 重置数据
-            this.resetCurParagraphData()
-            this.curPageData = []
-
-            this.curPageNum++ // 页码+1
-            this.curPageHeight = 0 // 页高重置
-            // 行宽新的一页无需重置。
-            //  - 因为如果是切换段落之后需要分页，则行宽已经重置为缩进
-            //  - 如果是段落中的某一行需要截断，则行宽已经重置为0
-        },
-        isNeedNewLine(charItem) {
-            // 如果当前行宽加上当前字符的宽度大于容器宽度，则表示这个字符是新行的第一个字符
-            const isNewLine = this.curLineWidth + charItem.width > containerSize.width
-            if (isNewLine) {
-                return true
-            } else {
-                // * 换行这里有个特殊情况，如果当前字符是中文，且加上字符宽度就是新行第一个字符就无所谓。
-                // * 但是如果是中文，加上这个字符宽度之后，不是新行第一个字符，就需要检测他下一个字符是否是中文：
-                //  - 如果是中文，则不做处理。返回 false。表是这个中文字符不是新行的第一个字符
-                //  - 如果不是中文，则还要加上下一个非中文字符的宽度，如果超出了容器宽度，则返回 true，将当前中文字符作为新行第一个字符，因为标点符号这些。通常来说不能作为新行的第一个字符，段落开头就可以是，所以不需要处理段落
-                const nextChar = this._s[this.curCharIndx + 1]
-                // 如果下一个字符不存在。则直接返回之前的判断结果
-                if (!nextChar) {
-                    return isNewLine
-                }
-
-                // 检查这个下一个字符是否和当前字符是同一段落。不是同一个段落不处理
-                if (nextChar.contentIndex !== charItem.contentIndex) {
-                    return isNewLine
-                }
-
-                if (nextChar.isChineseChar) {
-                    return false
-                } else {
-                    if (this.curLineWidth + charItem.width + nextChar.width > containerSize.width) {
-                        return true
-                    }
-                    return false
-                }
-            }
-        },
-        isNeedNewParagraph(charItem) {
-            // 如果当前的 charItem 的 contentIndex 大于上下文中的 curParagraphIndx，则表示需要新段落
-            return charItem.contentIndex > this.curParagraphIndx
-        },
-        isNeedNewPage() {
-            // 当前页高度大于等于容器高度时，需要新开一页。如果只是相等的话，则有可能是最后一行，无需新开一页
-            return this.curPageHeight > containerSize.height
-        },
-        addCurParagraphData(char) {
-            this.curParagraphData.content += char
-            this.curParagraphData.isNeedIndent = this.isNeedIndent
-        },
-        resetCurParagraphData() {
-            this.curParagraphData = {
-                isNeedIndent: this.isNeedIndent,
-                content: ''
-            }
-        }
-    }
-
-    return context
 }
 
 function getCharItemList(contents: string[], chineseWidth: number, characterSizeMap: CharacterSizeMap) {

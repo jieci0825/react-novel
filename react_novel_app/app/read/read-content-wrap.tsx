@@ -1,30 +1,25 @@
-import { FlatList, PixelRatio, Text, useWindowDimensions, View } from 'react-native'
+import { FlatList, PixelRatio, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native'
 import { CharacterSizeMap, ReadContentBase } from './read.type'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import { readContentHorizontalStyles } from '@/styles/pages/read.styles'
-import { isArray, isChineseChar, splitTextByLine } from '@/utils'
-import processContentPage from '@/utils/process-content-page'
+import processContentPage, { PageDataItem } from '@/utils/process-content-page'
+import PageHorizontal from './page-horizontal'
+import ReadContentFooter from './read-content-footer'
 
 // 根据缓存的字符 size，来计算当前章节的分页数据
 function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentBase) {
-    interface PageDataItem {
-        isNeedIndent: boolean
-        content: string
-    }
-
+    // 分页数据
     const [pageData, setPageData] = useState<Array<PageDataItem[]>>([])
 
     // 中文字符宽度
     const chineseWidth = characterSizeMap.current.get('chinese')?.width || 0
-
     // 行高
     const lineHeight = props.dynamicTextStyles.lineHeight || 0
     // 段落间距
     const paragraphSpacing = parseInt((props.dynamicTextStyles.marginBottom as any) || 0)
     // 字间距
     const letterSpacing = props.dynamicTextStyles.letterSpacing || 0
-
     // 段落缩进
     //  - 缩进的字符数 * 中文字符的宽度 + 缩进的字符数 * 字符间距
     const paragraphIndent = props.readSetting.indent * chineseWidth + props.readSetting.indent * letterSpacing
@@ -40,17 +35,9 @@ function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentBase)
             contents: props.contents
         })
 
-        console.log(result)
+        if (!result) return
 
-        // const result = []
-
-        // for (const key in context.pageData) {
-        //     const content = context.pageData[key]
-        //     const idx = +key - 1
-        //     result[idx] = content
-        // }
-
-        // setPageData(result)
+        setPageData(result)
     }
 
     return { startCalc, paragraphIndent, pageData }
@@ -64,74 +51,57 @@ export default function ReadContentHorizontal(props: ReadContentBase) {
 
     const { pageData, startCalc, paragraphIndent } = usePageData(props.characterSizeMap, props)
 
+    // 当前页
+    const [currentPage, setCurrentPage] = useState(0)
+    let w: any = window
+    // 当前页的起始索引
+    w.nextPage = () => {
+        setCurrentPage(currentPage => currentPage + 1)
+        console.log(pageData[currentPage + 1])
+    }
+    w.prePage = () => {
+        setCurrentPage(currentPage => currentPage - 1)
+        console.log(pageData[currentPage - 1])
+    }
+
     useEffect(() => {
         startCalc(containerSize)
     }, [containerSize])
 
-    const { width: screenWidth, height: screenHeight } = useWindowDimensions()
-
-    const renderPage = ({ item }: { item: string[] }) => {
-        return (
-            <View
-                style={{
-                    width: screenWidth - props.readSetting.paddingHorizontal * 2,
-                    backgroundColor: 'red',
-                    justifyContent: 'space-between'
-                }}
-            >
-                {item.map((content, index) => {
-                    return (
-                        <Text
-                            selectable={true}
-                            key={index}
-                            style={[
-                                styles.contentText,
-                                props.dynamicTextStyles,
-                                {
-                                    textIndent: `${paragraphIndent}px`,
-                                    marginBottom: index === item.length - 1 ? 0 : props.dynamicTextStyles.marginBottom
-                                }
-                            ]}
-                        >
-                            {content}
-                        </Text>
-                    )
-                })}
-            </View>
-        )
-    }
-
     return (
         <>
-            <View
-                style={[
-                    styles.container,
-                    {
-                        paddingHorizontal: props.readSetting.paddingHorizontal,
-                        paddingVertical: props.readSetting.paddingVertical,
-                        backgroundColor: props.readSetting.backgroundColor
-                    }
-                ]}
-            >
+            <View style={[styles.container]}>
                 <View
-                    style={styles.containerInner}
-                    onLayout={({ nativeEvent }) => {
-                        setContainerSize(nativeEvent.layout)
-                    }}
+                    style={[
+                        styles.containerWrap,
+                        {
+                            paddingHorizontal: props.readSetting.paddingHorizontal,
+                            paddingVertical: props.readSetting.paddingVertical,
+                            backgroundColor: props.readSetting.backgroundColor
+                        }
+                    ]}
                 >
-                    {/* <FlatList
-                        style={{
-                            height: '100%'
+                    <View
+                        style={styles.containerInner}
+                        onLayout={({ nativeEvent }) => {
+                            setContainerSize(nativeEvent.layout)
                         }}
-                        horizontal={true}
-                        data={pageData}
-                        pagingEnabled={true}
-                        showsHorizontalScrollIndicator={false}
-                        decelerationRate='fast'
-                        keyExtractor={(_, index) => String(index)}
-                        renderItem={renderPage}
-                    /> */}
+                    >
+                        {/* 根据阅读进度计算展示第几页 */}
+                        {!!containerSize.width && (
+                            <>
+                                <PageHorizontal
+                                    pageList={pageData}
+                                    currentPage={currentPage}
+                                    setCurrentPage={setCurrentPage}
+                                    textStyle={props.dynamicTextStyles}
+                                    paragraphIndent={paragraphIndent}
+                                />
+                            </>
+                        )}
+                    </View>
                 </View>
+                <ReadContentFooter />
             </View>
         </>
     )

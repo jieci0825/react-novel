@@ -118,7 +118,7 @@ function useReaderSetting(theme: Theme) {
         paragraphSpacing: 14, // 段间距
         fontFamily: 'Arial', // 字体
         paddingHorizontal: 16, // 左右边距
-        paddingVertical: 24, // 上下边距
+        paddingVertical: 10, // 上下边距
         backgroundColor: theme.bgColor,
         textColor: theme.textSecondaryColor,
         indent: 2
@@ -272,7 +272,6 @@ export default function ReadPage() {
                             characterSizeMap={characterSizeMap}
                         />
                     </View>
-                    <ReadContentFooter />
                     <ReadFooter
                         isVisible={isVisible}
                         showChapterList={showChapterList}

@@ -160,6 +160,10 @@ export const readContentHorizontalStyles = (theme: Theme) => {
             height: '100%',
             backgroundColor: 'blue'
         },
+        containerWrap: {
+            width: '100%',
+            flex: 1
+        },
         containerInner: {
             width: '100%',
             height: '100%',
@@ -175,17 +179,28 @@ export const readContentHorizontalStyles = (theme: Theme) => {
 export const readContentFooterStyles = (theme: Theme) => {
     return StyleSheet.create({
         container: {
+            height: adaptiveSize(30),
             paddingHorizontal: 10,
-            paddingVertical: 6,
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
             borderTopWidth: 1,
-            borderTopColor: theme.textTertiaryColor
+            borderTopColor: theme.textTertiaryColor,
+            backgroundColor: 'orange'
         },
         text: {
             color: theme.textSecondaryColor,
             fontSize: RFValue(12)
+        }
+    })
+}
+
+export const pageHorizontalStyles = (theme: Theme) => {
+    return StyleSheet.create({
+        contianer: {
+            width: '100%',
+            height: '100%'
+            // justifyContent: 'space-between'
         }
     })
 }
