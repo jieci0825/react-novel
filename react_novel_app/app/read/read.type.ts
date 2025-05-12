@@ -26,7 +26,7 @@ export interface ReaderSetting {
 export interface ReadContentBase {
     content: string
     contents: string[]
-    animation: 'scroll' | 'page' | 'none' | 'simulation'
+    animation: 'scroll' | 'page' | 'none' | 'simulation' | 'slide'
     readSetting: ReaderSetting
     dynamicTextStyles: TextStyle
     characterSizeMap: CharacterSizeMap

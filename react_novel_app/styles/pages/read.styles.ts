@@ -157,8 +157,7 @@ export const readContentHorizontalStyles = (theme: Theme) => {
     return StyleSheet.create({
         container: {
             width: '100%',
-            height: '100%',
-            backgroundColor: 'blue'
+            height: '100%'
         },
         containerWrap: {
             width: '100%',
@@ -167,8 +166,7 @@ export const readContentHorizontalStyles = (theme: Theme) => {
         containerInner: {
             width: '100%',
             height: '100%',
-            overflow: 'hidden',
-            backgroundColor: 'yellow'
+            overflow: 'hidden'
         },
         contentText: {
             textIndent: '1px'
@@ -185,8 +183,7 @@ export const readContentFooterStyles = (theme: Theme) => {
             flexDirection: 'row',
             alignItems: 'center',
             borderTopWidth: 1,
-            borderTopColor: theme.textTertiaryColor,
-            backgroundColor: 'orange'
+            borderTopColor: theme.textTertiaryColor
         },
         text: {
             color: theme.textSecondaryColor,
@@ -200,6 +197,14 @@ export const pageHorizontalStyles = (theme: Theme) => {
         contianer: {
             width: '100%',
             height: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+            overflow: 'scroll'
+        },
+        containerInner: {
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
             justifyContent: 'space-between'
         }
     })

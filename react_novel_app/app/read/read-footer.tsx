@@ -14,6 +14,8 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 interface ReadFooterProps {
     isVisible: boolean
     showChapterList: () => void
+    prevChapter: () => void
+    nextChapter: () => void
 }
 
 export default function ReadFooter(props: ReadFooterProps) {
@@ -36,7 +38,7 @@ export default function ReadFooter(props: ReadFooterProps) {
         <>
             <Animated.View style={[styles.readFooterWrap, { transform: [{ translateY: bottomAnim }] }]}>
                 <View style={styles.footerTop}>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={props.prevChapter}>
                         <Text style={styles.footerTopText}>上一章</Text>
                     </TouchableOpacity>
                     <View style={styles.footerTopCenter}>
@@ -53,7 +55,7 @@ export default function ReadFooter(props: ReadFooterProps) {
                             <SliderThumb />
                         </Slider>
                     </View>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={props.nextChapter}>
                         <Text style={styles.footerTopText}>下一章</Text>
                     </TouchableOpacity>
                 </View>

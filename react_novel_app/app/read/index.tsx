@@ -186,6 +186,16 @@ export default function ReadPage() {
     // 当前阅读章节
     const [curReadChapter, setCurReadChapter] = useState<CurrentReadChapterInfo | null>(null)
 
+    // 上一章
+    const prevChapter = () => {
+        console.log('prevChapter')
+    }
+
+    // 下一章
+    const nextChapter = () => {
+        console.log('nextChapter')
+    }
+
     async function init() {
         // 1. 获取当前的阅读章节
         //  - 在每次进入阅读页面之前，都会处理当前阅读章节，所以一般而言，肯定会有当前阅读章节数据
@@ -264,6 +274,9 @@ export default function ReadPage() {
                     <View style={styles.main}>
                         {/* 正文渲染区域 */}
                         <ReadContentHorizontal
+                            handleCenter={() => setIsVisible(!isVisible)}
+                            prevChapter={prevChapter}
+                            nextChapter={nextChapter}
                             animation='none'
                             content={chapterContents[curReadChapter?.cSN || 0]?.content || ''}
                             contents={splitTextByLine(chapterContents[curReadChapter?.cSN || 0]?.content || '')}
@@ -273,6 +286,8 @@ export default function ReadPage() {
                         />
                     </View>
                     <ReadFooter
+                        prevChapter={prevChapter}
+                        nextChapter={nextChapter}
                         isVisible={isVisible}
                         showChapterList={showChapterList}
                     />

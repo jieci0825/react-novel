@@ -1,11 +1,13 @@
 import { FlatList, PixelRatio, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native'
 import { CharacterSizeMap, ReadContentBase } from './read.type'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import { readContentHorizontalStyles } from '@/styles/pages/read.styles'
 import processContentPage, { PageDataItem } from '@/utils/process-content-page'
 import PageHorizontal from './page-horizontal'
 import ReadContentFooter from './read-content-footer'
+import { GestureResponderEvent } from 'react-native'
+import { jcShowToast } from '@/components/jc-toast/jc-toast'
 
 // 根据缓存的字符 size，来计算当前章节的分页数据
 function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentBase) {
@@ -43,9 +45,24 @@ function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentBase)
     return { startCalc, paragraphIndent, pageData }
 }
 
-export default function ReadContentHorizontal(props: ReadContentBase) {
+interface ReadContentHorizontalMethods {
+    nextPage: () => void
+    prevPage: () => void
+}
+
+interface ReadContentHorizontalProps extends ReadContentBase {
+    handleCenter: () => void
+    prevChapter: () => void
+    nextChapter: () => void
+}
+
+export default forwardRef<ReadContentHorizontalMethods, ReadContentHorizontalProps>(function ReadContentHorizontal(
+    props,
+    ref
+) {
     const { theme } = useTheme()
     const styles = readContentHorizontalStyles(theme)
+    const screenWidth = useWindowDimensions().width
 
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
 
@@ -53,24 +70,56 @@ export default function ReadContentHorizontal(props: ReadContentBase) {
 
     // 当前页
     const [currentPage, setCurrentPage] = useState(0)
-    let w: any = window
-    // 当前页的起始索引
-    w.nextPage = () => {
-        setCurrentPage(currentPage => currentPage + 1)
-        console.log(pageData[currentPage + 1])
-    }
-    w.prePage = () => {
-        setCurrentPage(currentPage => currentPage - 1)
-        console.log(pageData[currentPage - 1])
-    }
 
     useEffect(() => {
         startCalc(containerSize)
     }, [containerSize])
 
+    const nextPage = () => {
+        if (currentPage >= pageData.length - 1) {
+            props.nextChapter()
+            return
+        }
+        setCurrentPage(currentPage + 1)
+    }
+
+    const prevPage = () => {
+        if (currentPage <= 0) {
+            props.prevChapter()
+            return
+        }
+        setCurrentPage(currentPage - 1)
+    }
+
+    useImperativeHandle(ref, () => {
+        return {
+            nextPage,
+            prevPage
+        }
+    })
+
+    const containerClick = (e: GestureResponderEvent) => {
+        const x = e.nativeEvent.pageX
+        const leftRange = screenWidth / 3
+        const rightRange = (screenWidth / 3) * 2
+
+        if (x < leftRange) {
+            prevPage()
+        } else if (x > rightRange) {
+            nextPage()
+        } else {
+            // 都不是则表示中间
+            props.handleCenter()
+        }
+    }
+
     return (
         <>
-            <View style={[styles.container]}>
+            <TouchableOpacity
+                activeOpacity={1}
+                onPress={containerClick}
+                style={[styles.container]}
+            >
                 <View
                     style={[
                         styles.containerWrap,
@@ -96,13 +145,14 @@ export default function ReadContentHorizontal(props: ReadContentBase) {
                                     setCurrentPage={setCurrentPage}
                                     textStyle={props.dynamicTextStyles}
                                     paragraphIndent={paragraphIndent}
+                                    animation={props.animation}
                                 />
                             </>
                         )}
                     </View>
                 </View>
                 <ReadContentFooter />
-            </View>
+            </TouchableOpacity>
         </>
     )
-}
+})
