@@ -21,3 +21,6 @@ export const CURRENT_READ_CHAPTER_KEY = 'CURRENT_READ_CHAPTER'
 
 // 阅读器界面设置
 export const READER_SETTING = 'READER_SETTING'
+
+// 热度器区域划分指引
+export const READER_GUIDE_AREA = 'READER_GUIDE_AREA'

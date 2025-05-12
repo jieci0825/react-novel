@@ -153,7 +153,7 @@ export const readChapterListStyles = (theme: Theme) => {
     })
 }
 
-export const readContentHorizontalStyles = (theme: Theme) => {
+export const readContentWrapStyles = (theme: Theme) => {
     return StyleSheet.create({
         container: {
             width: '100%',
@@ -168,8 +168,32 @@ export const readContentHorizontalStyles = (theme: Theme) => {
             height: '100%',
             overflow: 'hidden'
         },
-        contentText: {
-            textIndent: '1px'
+        contentText: {},
+        portionMask: {
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'row'
+        },
+        portionMaskTextWrap: {
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center'
+        },
+        portionMaskTextWrapCenter: {
+            borderLeftWidth: 2,
+            borderRightWidth: 2,
+            borderLeftColor: '#b3aeae',
+            borderRightColor: '#b3aeae'
+        },
+        portionMaskText: {
+            color: theme.bgColor,
+            fontSize: RFValue(20),
+            textAlign: 'center'
         }
     })
 }
@@ -198,8 +222,7 @@ export const pageHorizontalStyles = (theme: Theme) => {
             width: '100%',
             height: '100%',
             display: 'flex',
-            flexDirection: 'row',
-            overflow: 'scroll'
+            flexDirection: 'row'
         },
         containerInner: {
             width: '100%',
