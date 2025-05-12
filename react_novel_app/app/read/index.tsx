@@ -17,6 +17,9 @@ import { CharacterSizeMap, ReaderSetting } from './read.type'
 import ReadContentFooter from './read-content-footer'
 import CalcTextSize from './calc-text-size'
 
+// 缓存数量：即当前章节上下章节的缓存数量
+const cacheNum = 2
+
 // 页面UI状态
 function useUIState() {
     const [isVisible, setIsVisible] = useState(false)
@@ -63,13 +66,16 @@ function useBookData() {
     return { bookDetails, chapterList, setChapterList, getBookDetails }
 }
 
+interface CacheChapterItem {
+    chapterIndex: number
+    content: string
+    chapterName: string
+    chapterId: string | number
+}
 // 章节正文
 function useChapterContent() {
     // 存储章节内容
-    const [chapterContents, setChapterContents] = useState<Array<{ chapterIndex: number; content: string }>>([])
-
-    // 缓存数量：即当前章节上下章节的缓存数量
-    const cacheNum = useRef(2).current
+    const [chapterContents, setChapterContents] = useState<CacheChapterItem[]>([])
 
     //  获取一开始进入需要缓存的章节内容
     const getCacheChapterContentsInit = async (
@@ -82,7 +88,23 @@ function useChapterContent() {
 
         const allIndex = [...prevIndex, currentChapterIndex, ...nextIndex]
 
-        const allChapterContents = (
+        const allChapterContents = await getCacheChapterContentsByIndexs(allIndex, chapterList, bookId, source)
+
+        setChapterContents(allChapterContents)
+
+        return allChapterContents
+    }
+
+    // 根据章节索引获取章节内容
+    async function getCacheChapterContentsByIndexs(
+        allIndex: number[],
+        chapterList: ChapterItem[],
+        bookId: string | number,
+        source: number
+    ) {
+        // TODO 每次获取章节内容后，将内容进行缓存到本地，下次获取时先从本地获取，没有在筛选index去请求
+
+        const result = (
             await Promise.all(
                 allIndex.map(item => {
                     return bookApi.reqGetBookContent({
@@ -97,16 +119,15 @@ function useChapterContent() {
             return {
                 chapterIndex: allIndex[index],
                 content: item.data.content,
-                chapterName: chapterList[allIndex[index]].chapterName
+                chapterName: chapterList[allIndex[index]].chapterName,
+                chapterId: chapterList[allIndex[index]].chapterId
             }
         })
 
-        setChapterContents(allChapterContents)
-
-        return allChapterContents
+        return result
     }
 
-    return { chapterContents, getCacheChapterContentsInit }
+    return { chapterContents, setChapterContents, getCacheChapterContentsInit, getCacheChapterContentsByIndexs }
 }
 
 // 阅读器界面设置
@@ -153,10 +174,133 @@ function useCacheCharacterSize(readStyle: ReaderSetting) {
 
     // 获取非中文的字符
     const getNoChineseCharacterList = (content: string) => {
-        setNoChineseCharacterList([...new Set(extractNonChineseChars(content).split(''))])
+        const list = [...new Set(extractNonChineseChars(content).split(''))]
+
+        setNoChineseCharacterList(
+            list.filter(item => {
+                // 已经存在的则无需再次添加计算字符大小
+                return !characterSizeMap.current.has(item)
+            })
+        )
     }
 
     return { characterSizeMap, dynamicTextStyles, addData, noChineseCharacterList, getNoChineseCharacterList }
+}
+
+interface useChapterSwitchParams {
+    curReadChapter: CurrentReadChapterInfo | null
+    chapterList: ChapterItem[]
+    chapterContents: CacheChapterItem[]
+    setCurChapterProgress: (progress: number) => void
+    setCurReadChapter: (chapter: CurrentReadChapterInfo) => void
+    getNoChineseCharacterList: (content: string) => void
+    getCacheChapterContentsByIndexs: (
+        allIndex: number[],
+        chapterList: ChapterItem[],
+        bookId: string | number,
+        source: number
+    ) => Promise<CacheChapterItem[]>
+    setChapterContents: React.Dispatch<React.SetStateAction<CacheChapterItem[]>>
+}
+// 切换章节
+function useChapterSwitch({
+    curReadChapter,
+    chapterList,
+    chapterContents,
+    setCurChapterProgress,
+    setCurReadChapter,
+    getNoChineseCharacterList,
+    getCacheChapterContentsByIndexs,
+    setChapterContents
+}: useChapterSwitchParams) {
+    // 上一章
+    const prevChapter = () => {
+        // 上一章的时候，判断是否是第一章节，如果是第一章节，则不进行任何操作
+        if (curReadChapter?.cSN === 0) {
+            jcShowToast({ text: '已经是第一章了', type: 'info' })
+            return
+        }
+
+        const index = curReadChapter?.cSN || 0
+        processChapterSwitch(index - 1, index)
+    }
+
+    // 下一章
+    const nextChapter = () => {
+        // 下一章的时候，判断是否是最后一章节，如果是最后一章节，则不进行任何操作
+        if (curReadChapter?.cSN === chapterList.length - 1) {
+            jcShowToast({ text: '已经是最后一章了', type: 'info' })
+            return
+        }
+
+        // 切换到下一章节
+        const index = curReadChapter?.cSN || 0
+        processChapterSwitch(index + 1, index)
+    }
+
+    // 处理章节切换
+    const processChapterSwitch = async (newIndex: number, oldIndex: number) => {
+        // 根据当前章节index获取需要的缓存章节index
+        const { prevIndex, nextIndex } = getAdjacentIndexes(newIndex, chapterList.length, cacheNum)
+        const newIndexs = [...prevIndex, newIndex, ...nextIndex]
+
+        const cacheChapterIndexs = chapterContents.map(item => item.chapterIndex)
+
+        // 根据 cacheChapterIndexs 进行过滤，如果当前缓存的章节内容中，存在indexs中的章节，则直接使用，不存在才重新获取
+        // 得到需要去请求获取的章节index
+        const _chapterIndexList = newIndexs.filter(item => !cacheChapterIndexs.includes(item))
+
+        // 是否完整章节的切换
+        let isProcessChapterSwitch = false
+
+        // 如果缓存章节的内容中，存在当前章节，则直接使用
+        const chapterItem = chapterContents.find(item => item.chapterIndex === newIndex)
+
+        if (chapterItem && curReadChapter) {
+            // 重置章节阅读进度
+            setCurChapterProgress(0)
+            // 切换当前阅读章节
+            setCurReadChapter({ ...curReadChapter, cSN: newIndex })
+            // 获取新章节中非中文的字符
+            getNoChineseCharacterList(chapterItem.content)
+
+            // 完成章节切换
+            isProcessChapterSwitch = true
+        }
+
+        // 如果有需要获取的章节，则进行获取
+        if (_chapterIndexList.length > 0 && curReadChapter) {
+            const result = await getCacheChapterContentsByIndexs(
+                _chapterIndexList,
+                chapterList,
+                curReadChapter.bID,
+                curReadChapter.source
+            )
+
+            // 遍历上一次缓存的章节内容，如果上一次的章节内容 index 不存在于本次需要的缓存章节index中，则删除，不加入这次更新的章节内容中
+            //  - 这样可以保证，如果用户在阅读过程中，切换到其他章节时，一直都是保持着最大缓存章节内容，避免内存占用过大
+            const list = chapterContents.filter(item => newIndexs.includes(item.chapterIndex))
+
+            // 合并章节内容
+            const newChapterContents = list.concat(result)
+
+            setChapterContents(newChapterContents)
+            setChapterContents(prev => {
+                const item = prev.find(item => item.chapterIndex === newIndex)
+                if (item) {
+                    // 重置章节阅读进度
+                    setCurChapterProgress(0)
+                    // 切换当前阅读章节
+                    setCurReadChapter({ ...curReadChapter, cSN: newIndex })
+                    // 获取新章节中非中文的字符
+                    getNoChineseCharacterList(item.content)
+                }
+                return newChapterContents
+            })
+        }
+    }
+
+    return { prevChapter, nextChapter }
 }
 
 export default function ReadPage() {
@@ -178,23 +322,24 @@ export default function ReadPage() {
         setIsChapterListVisible
     } = useUIState()
     const { bookDetails, chapterList, setChapterList, getBookDetails } = useBookData()
-    const { chapterContents, getCacheChapterContentsInit } = useChapterContent()
+    const { chapterContents, setChapterContents, getCacheChapterContentsInit, getCacheChapterContentsByIndexs } =
+        useChapterContent()
     const { readStyle, setReadStyle } = useReaderSetting(theme)
     const { characterSizeMap, dynamicTextStyles, addData, noChineseCharacterList, getNoChineseCharacterList } =
         useCacheCharacterSize(readStyle)
-
     // 当前阅读章节
     const [curReadChapter, setCurReadChapter] = useState<CurrentReadChapterInfo | null>(null)
-
-    // 上一章
-    const prevChapter = () => {
-        console.log('prevChapter')
-    }
-
-    // 下一章
-    const nextChapter = () => {
-        console.log('nextChapter')
-    }
+    // 切换阅读章节
+    const { prevChapter, nextChapter } = useChapterSwitch({
+        curReadChapter,
+        chapterList,
+        chapterContents,
+        setCurChapterProgress,
+        setCurReadChapter,
+        getNoChineseCharacterList,
+        getCacheChapterContentsByIndexs,
+        setChapterContents
+    })
 
     async function init() {
         // 1. 获取当前的阅读章节
@@ -231,6 +376,11 @@ export default function ReadPage() {
         const chapter = chapterList[curReadChapter?.cSN || 0]
         return chapter ? chapter.chapterName : ''
     }, [curReadChapter, chapterList])
+    // 当前章节内容
+    const chapterContent = useMemo(() => {
+        const chapter = chapterContents.find(item => item.chapterIndex === curReadChapter?.cSN)
+        return chapter?.content || ''
+    }, [curReadChapter, chapterList, chapterContents])
 
     return (
         <>
@@ -279,8 +429,8 @@ export default function ReadPage() {
                             prevChapter={prevChapter}
                             nextChapter={nextChapter}
                             animation='none'
-                            content={chapterContents[curReadChapter?.cSN || 0]?.content || ''}
-                            contents={splitTextByLine(chapterContents[curReadChapter?.cSN || 0]?.content || '')}
+                            content={chapterContent}
+                            contents={splitTextByLine(chapterContent)}
                             readSetting={readStyle}
                             dynamicTextStyles={dynamicTextStyles}
                             characterSizeMap={characterSizeMap}

@@ -15,6 +15,11 @@ import { READER_GUIDE_AREA } from '@/constants'
 function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentBase) {
     // 分页数据
     const [pageData, setPageData] = useState<Array<PageDataItem[]>>([])
+    // 切换章节时的动作
+    //  - 比如一直是上一页的切换，则下一次激活的章节是上一章的最后一页，反之则是下一章的第一页
+    const [switchAction, setSwitchAction] = useState<'prev' | 'next'>('next')
+    // 当前页
+    const [currentPage, setCurrentPage] = useState(0)
 
     // 中文字符宽度
     const chineseWidth = characterSizeMap.current.get('chinese')?.width || 0
@@ -41,10 +46,17 @@ function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentBase)
 
         if (!result) return
 
+        // 如果是切换章节，则根据上一次的切换动作，来决定当前章节的起始页
+        if (switchAction === 'prev') {
+            setCurrentPage(result.length - 1)
+        } else {
+            setCurrentPage(0)
+        }
+
         setPageData(result)
     }
 
-    return { startCalc, paragraphIndent, pageData }
+    return { startCalc, paragraphIndent, pageData, currentPage, setCurrentPage, switchAction, setSwitchAction }
 }
 
 // 控制指引
@@ -97,26 +109,28 @@ export default forwardRef<ReadContentHorizontalMethods, ReadContentHorizontalPro
 
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
 
-    const { pageData, startCalc, paragraphIndent } = usePageData(props.characterSizeMap, props)
-
-    // 当前页
-    const [currentPage, setCurrentPage] = useState(0)
+    const { pageData, startCalc, paragraphIndent, currentPage, setCurrentPage, switchAction, setSwitchAction } =
+        usePageData(props.characterSizeMap, props)
 
     useEffect(() => {
         startCalc(containerSize)
-    }, [containerSize])
+    }, [containerSize, props.contents])
 
+    // 下一页
     const nextPage = () => {
         if (currentPage >= pageData.length - 1) {
             props.nextChapter()
+            setSwitchAction('next')
             return
         }
         setCurrentPage(currentPage + 1)
     }
 
+    // 上一页
     const prevPage = () => {
         if (currentPage <= 0) {
             props.prevChapter()
+            setSwitchAction('prev')
             return
         }
         setCurrentPage(currentPage - 1)
