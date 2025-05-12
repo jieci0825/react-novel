@@ -29,10 +29,10 @@ export default function PageHorizontal(props: PageHorizontalProps) {
                                 style={[
                                     props.textStyle,
                                     {
-                                        textIndent: item.isNeedIndent ? String(props.paragraphIndent) + 'px' : '0'
+                                        textIndent: item.isNeedIndent ? String(props.paragraphIndent) + 'px' : '0',
                                         // 取消最后一段的段间距
-                                        // marginBottom:
-                                        //     index === contentList.length - 1 ? 0 : props.textStyle.marginBottom
+                                        marginBottom:
+                                            index === contentList.length - 1 ? 0 : props.textStyle.marginBottom
                                     }
                                 ]}
                                 key={index}

@@ -199,8 +199,8 @@ export const pageHorizontalStyles = (theme: Theme) => {
     return StyleSheet.create({
         contianer: {
             width: '100%',
-            height: '100%'
-            // justifyContent: 'space-between'
+            height: '100%',
+            justifyContent: 'space-between'
         }
     })
 }
