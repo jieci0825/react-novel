@@ -2,7 +2,13 @@ import { useTheme } from '@/hooks/useTheme'
 import { readContentFooterStyles } from '@/styles/pages/read.styles'
 import { Text, View } from 'react-native'
 
-export default function ReadContentFooter() {
+interface ReadContentFooterProps {
+    chapterName: string
+    currentPage: number
+    totalPage: number
+}
+
+export default function ReadContentFooter(props: ReadContentFooterProps) {
     const { theme } = useTheme()
 
     const styles = readContentFooterStyles(theme)
@@ -10,7 +16,7 @@ export default function ReadContentFooter() {
     return (
         <>
             <View style={styles.container}>
-                <Text style={styles.text}>第一章：陨落的天才</Text>
+                <Text style={styles.text}>{props.chapterName}</Text>
                 <Text
                     style={[
                         styles.text,
@@ -19,17 +25,7 @@ export default function ReadContentFooter() {
                         }
                     ]}
                 >
-                    1/21
-                </Text>
-                <Text
-                    style={[
-                        styles.text,
-                        {
-                            marginLeft: 10
-                        }
-                    ]}
-                >
-                    1.12%
+                    {props.currentPage}/{props.totalPage}
                 </Text>
             </View>
         </>

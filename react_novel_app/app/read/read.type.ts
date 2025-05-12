@@ -10,6 +10,8 @@ export type CharacterSizeMap = React.MutableRefObject<
     >
 >
 
+export type AnimationType = 'scroll' | 'page' | 'none' | 'simulation' | 'slide'
+
 export interface ReaderSetting {
     fontSize: number // 字体大小
     lineHeight: number // 行高
@@ -24,9 +26,10 @@ export interface ReaderSetting {
 }
 
 export interface ReadContentBase {
+    currentChapterName: string
     content: string
     contents: string[]
-    animation: 'scroll' | 'page' | 'none' | 'simulation' | 'slide'
+    animation: AnimationType
     readSetting: ReaderSetting
     dynamicTextStyles: TextStyle
     characterSizeMap: CharacterSizeMap

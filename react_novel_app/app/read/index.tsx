@@ -274,6 +274,7 @@ export default function ReadPage() {
                     <View style={styles.main}>
                         {/* 正文渲染区域 */}
                         <ReadContentHorizontal
+                            currentChapterName={curChapterName}
                             handleCenter={() => setIsVisible(!isVisible)}
                             prevChapter={prevChapter}
                             nextChapter={nextChapter}

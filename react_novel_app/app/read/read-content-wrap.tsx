@@ -1,5 +1,5 @@
 import { FlatList, PixelRatio, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native'
-import { CharacterSizeMap, ReadContentBase } from './read.type'
+import { AnimationType, CharacterSizeMap, ReadContentBase } from './read.type'
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import { readContentHorizontalStyles } from '@/styles/pages/read.styles'
@@ -145,13 +145,17 @@ export default forwardRef<ReadContentHorizontalMethods, ReadContentHorizontalPro
                                     setCurrentPage={setCurrentPage}
                                     textStyle={props.dynamicTextStyles}
                                     paragraphIndent={paragraphIndent}
-                                    animation={props.animation}
+                                    animation={props.animation as Exclude<AnimationType, 'scroll'>}
                                 />
                             </>
                         )}
                     </View>
                 </View>
-                <ReadContentFooter />
+                <ReadContentFooter
+                    chapterName={props.currentChapterName}
+                    currentPage={currentPage + 1}
+                    totalPage={pageData.length}
+                />
             </TouchableOpacity>
         </>
     )
