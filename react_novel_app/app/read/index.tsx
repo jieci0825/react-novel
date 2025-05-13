@@ -516,6 +516,7 @@ export default function ReadPage() {
                 characterSizeMap={characterSizeMap}
                 currentPage={currentPage}
                 calcPageDataCallback={calcPageDataCallback}
+                chapterName={curChapterName}
             />
         )
         // TODO 依赖项，后期增加

@@ -8,6 +8,7 @@ import { isChineseChar } from './check-type'
 export interface PageDataItem {
     isNeedIndent: boolean
     content: string
+    isTitle?: boolean
 }
 
 export interface CharItem {
@@ -43,6 +44,8 @@ export interface PageDataContext {
     isNeedNewPage: () => boolean // 是否需要新开一页
     addCurParagraphData: (char: string) => void // 给当前段落添加数据
     resetCurParagraphData: () => void // 重置当前段落数据
+    // 从当前非中文字符开始，找出连续的非中文字符，并返回其宽度
+    getNonChineseCharWidth: (index: number) => number
 }
 
 function createParseContext({
@@ -62,7 +65,9 @@ function createParseContext({
         indent: paragraphIndent,
         lineHeight,
         paragraphSpacing,
-        curPageHeight: 0,
+        // 初始高度，预留标题高度。标题高度为 行高 + 2倍段落间距
+        // curPageHeight: 0,
+        curPageHeight: lineHeight + paragraphSpacing * 2,
         curLineWidth: 0,
         curPageNum: 1,
         curPageData: [],
@@ -143,10 +148,14 @@ function createParseContext({
                     return isNewLine
                 }
 
+                // 如果是下一个字符是中文，则直接 false ，交给下一次循环检测
                 if (nextChar.isChineseChar) {
                     return false
                 } else {
-                    if (this.curLineWidth + charItem.width + nextChar.width > containerSize.width) {
+                    // 如果不是中文字符，则继续查找，直到找到下一个中文字符，然后根据这些字符来计算是否需要换行
+                    const noChineseCharWidth = this.getNonChineseCharWidth(this.curCharIndx + 1)
+                    // console.log('noChineseCharWidth', noChineseCharWidth)
+                    if (this.curLineWidth + charItem.width + noChineseCharWidth > containerSize.width) {
                         return true
                     }
                     return false
@@ -173,6 +182,20 @@ function createParseContext({
                 isNeedIndent: this.isNeedIndent,
                 content: ''
             }
+        },
+        getNonChineseCharWidth(index) {
+            const chars = []
+
+            for (let i = index; i < this._s.length; i++) {
+                const char = this._s[i]
+                if (!char.isChineseChar) {
+                    chars.push(char)
+                } else {
+                    break
+                }
+            }
+
+            return chars.reduce((acc, cur) => acc + cur.width, 0)
         }
     }
 
@@ -187,10 +210,19 @@ interface ProcessContentPageParams {
     letterSpacing: number // 字间距
     paragraphIndent: number // 段落缩进距离
     contents: string[] // 内容数组
+    chapterName: string // 章节名称
 }
 export default function processContentPage(params: ProcessContentPageParams) {
-    const { characterSizeMap, containerSize, letterSpacing, lineHeight, paragraphSpacing, paragraphIndent, contents } =
-        params
+    const {
+        characterSizeMap,
+        containerSize,
+        letterSpacing,
+        lineHeight,
+        paragraphSpacing,
+        paragraphIndent,
+        contents,
+        chapterName
+    } = params
 
     if (containerSize.width === 0) return
 
@@ -208,6 +240,13 @@ export default function processContentPage(params: ProcessContentPageParams) {
         lineHeight,
         paragraphSpacing,
         containerSize
+    })
+
+    // 给第一页的段落数据中，初始化一个标题
+    context.curPageData.push({
+        isNeedIndent: false,
+        content: chapterName,
+        isTitle: true
     })
 
     // 开始解析

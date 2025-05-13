@@ -11,6 +11,7 @@ interface NoneAnimationProps {
 }
 // 无动画-水平阅读
 function NoneAnimation(props: NoneAnimationProps) {
+    const { theme } = useTheme()
     const currentPageList = props.pageList[props.currentPage]
 
     return (
@@ -24,14 +25,35 @@ function NoneAnimation(props: NoneAnimationProps) {
                 }}
             >
                 {currentPageList.map((item, index) => {
-                    return (
+                    return props.currentPage === 0 && item.isTitle ? (
+                        <View
+                            style={{
+                                height:
+                                    (props.textStyle.lineHeight as number) +
+                                    (props.textStyle.marginBottom as number) * 2
+                            }}
+                            key={index}
+                        >
+                            <Text
+                                style={{
+                                    ...props.textStyle,
+                                    fontWeight: 'bold',
+                                    fontSize: (props.textStyle.fontSize as number) * 1.3,
+                                    color: theme.textPrimaryColor
+                                }}
+                            >
+                                {item.content}
+                            </Text>
+                        </View>
+                    ) : (
                         <Text
                             key={index}
                             style={[
                                 props.textStyle,
                                 {
                                     textIndent: item.isNeedIndent ? String(props.paragraphIndent) + 'px' : '0',
-                                    marginBottom: index === currentPageList.length - 1 ? 0 : 10
+                                    marginBottom:
+                                        index === currentPageList.length - 1 ? 0 : props.textStyle.marginBottom
                                 }
                             ]}
                         >

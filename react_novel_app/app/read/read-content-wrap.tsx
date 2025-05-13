@@ -36,7 +36,8 @@ function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentHoriz
             lineHeight,
             paragraphSpacing,
             containerSize,
-            contents: props.contents
+            contents: props.contents,
+            chapterName: props.chapterName
         })
 
         if (!result) return
@@ -56,6 +57,7 @@ interface ReadContentHorizontalProps extends ReadContentBase {
     currentPage: number
     // 重新计算分页后的回调
     calcPageDataCallback: (maxPageIndex: number) => void
+    chapterName: string
 }
 
 export default function ReadContentWrap(props: ReadContentHorizontalProps) {
