@@ -9,7 +9,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { ChapterItem, GetBookDetailsData } from '@/api/modules/book/type'
 import ChapterList from '@/components/chapter-list/chapter-list'
 import { CurrentReadChapterInfo } from '@/types'
-import { extractNonChineseChars, getAdjacentIndexes, LocalCache, splitTextByLine } from '@/utils'
+import { debounce, extractNonChineseChars, getAdjacentIndexes, LocalCache, splitTextByLine } from '@/utils'
 import { CURRENT_READ_CHAPTER_KEY, READER_GUIDE_AREA } from '@/constants'
 import { jcShowToast } from '@/components/jc-toast/jc-toast'
 import ReadContentWrap from './read-content-wrap'
@@ -400,6 +400,20 @@ function useGuide() {
     return { showGuide, closeGuide }
 }
 
+// 防抖处理保存当前章节信息
+function useDebouncedSave(key: string, value: CurrentReadChapterInfo | null, delay = 300) {
+    const debouncedSave = useRef(
+        debounce((k: string, v: CurrentReadChapterInfo) => {
+            LocalCache.storeData(k, v)
+        }, delay)
+    ).current
+
+    useEffect(() => {
+        debouncedSave(key, value)
+        return () => debouncedSave.cancel()
+    }, [key, value, debouncedSave])
+}
+
 export default function ReadPage() {
     // 主题样式
     const { theme } = useTheme()
@@ -444,6 +458,8 @@ export default function ReadPage() {
     })
     // 指引
     const { showGuide, closeGuide } = useGuide()
+    // 保存当前阅读章节
+    useDebouncedSave(CURRENT_READ_CHAPTER_KEY, curReadChapter)
 
     useEffect(() => {
         if (maxPageIndexRef.current === 0) return setCurChapterProgress(0)
