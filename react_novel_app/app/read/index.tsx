@@ -2,7 +2,7 @@ import { Theme, useTheme } from '@/hooks/useTheme'
 import { readStyles } from '@/styles/pages/read.styles'
 import { Button, PixelRatio, Text, TouchableOpacity, View } from 'react-native'
 import ReadHeader from './read-header'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import ReadFooter from './read-footer'
 import { bookApi } from '@/api'
 import { useLocalSearchParams } from 'expo-router'
@@ -10,9 +10,9 @@ import { ChapterItem, GetBookDetailsData } from '@/api/modules/book/type'
 import ChapterList from '@/components/chapter-list/chapter-list'
 import { CurrentReadChapterInfo } from '@/types'
 import { extractNonChineseChars, getAdjacentIndexes, LocalCache, splitTextByLine } from '@/utils'
-import { CURRENT_READ_CHAPTER_KEY } from '@/constants'
+import { CURRENT_READ_CHAPTER_KEY, READER_GUIDE_AREA } from '@/constants'
 import { jcShowToast } from '@/components/jc-toast/jc-toast'
-import ReadContentHorizontal from './read-content-wrap'
+import ReadContentWrap from './read-content-wrap'
 import { CharacterSizeMap, ReaderSetting } from './read.type'
 import ReadContentFooter from './read-content-footer'
 import CalcTextSize from './calc-text-size'
@@ -303,6 +303,103 @@ function useChapterSwitch({
     return { prevChapter, nextChapter }
 }
 
+interface usePageSwitchParams {
+    nextChapter: () => void
+    prevChapter: () => void
+}
+// 切换上下页
+function usePageSwitch({ nextChapter, prevChapter }: usePageSwitchParams) {
+    // 切换章节时的动作
+    //  - 比如一直是上一页的切换，则下一次激活的章节是上一章的最后一页，反之则是下一章的第一页
+    const [switchAction, setSwitchAction] = useState<'prev' | 'next'>('next')
+    // 当前页
+    const [currentPage, setCurrentPage] = useState(0)
+    // // 最大页数
+    // const [maxPageIndex, setMaxPageIndex] = useState(0)
+    // // 下一页
+    // const nextPage = () => {
+    //     if (currentPage >= maxPageIndex) {
+    //         nextChapter()
+    //         setSwitchAction('next')
+    //         return
+    //     }
+    //     setCurrentPage(currentPage + 1)
+    // }
+    // * 上述这种使用 maxPageIndex 会存在一个问题，当 maxPageIndex 更新时，会重新执行 usePageSwitch。在重新执行的过程中，可能由于视图尚未更新，事件绑定或异步操作中引用的仍是旧的闭包函数。就会导致 maxPageIndex 的值依然是旧值 0，从而发生逻辑错误。
+
+    const [maxPageIndex, setMaxPageIndex] = useState(0)
+    // 借用 useRef
+    const maxPageIndexRef = useRef(0)
+
+    useEffect(() => {
+        maxPageIndexRef.current = maxPageIndex
+    }, [maxPageIndex])
+
+    const nextPage = () => {
+        if (currentPage >= maxPageIndexRef.current) {
+            nextChapter()
+            setSwitchAction('next')
+            return
+        }
+        setCurrentPage(currentPage + 1)
+    }
+
+    // 上一页
+    const prevPage = () => {
+        if (currentPage <= 0) {
+            prevChapter()
+            setSwitchAction('prev')
+            return
+        }
+        setCurrentPage(currentPage - 1)
+    }
+
+    const calcPageDataCallback = (_maxPageIndex: number) => {
+        setMaxPageIndex(_maxPageIndex)
+        //  如果是切换章节，则根据上一次的切换动作，来决定当前章节的起始页
+        if (switchAction === 'prev') {
+            setCurrentPage(_maxPageIndex)
+        } else {
+            setCurrentPage(0)
+        }
+    }
+
+    return {
+        switchAction,
+        setSwitchAction,
+        currentPage,
+        setCurrentPage,
+        nextPage,
+        prevPage,
+        calcPageDataCallback,
+        maxPageIndexRef
+    }
+}
+
+// 控制指引
+function useGuide() {
+    const [showGuide, setShowGuide] = useState(false)
+
+    const closeGuide = () => {
+        LocalCache.storeData(READER_GUIDE_AREA, true)
+        setShowGuide(false)
+    }
+
+    async function init() {
+        const guide = await LocalCache.getData(READER_GUIDE_AREA)
+        // 如果缓存中没有，则显示引导，如果有则后续不需要显示了
+        if (!guide) {
+            setShowGuide(true)
+        }
+    }
+
+    useEffect(() => {
+        init()
+    }, [])
+
+    return { showGuide, closeGuide }
+}
+
 export default function ReadPage() {
     // 主题样式
     const { theme } = useTheme()
@@ -340,6 +437,28 @@ export default function ReadPage() {
         getCacheChapterContentsByIndexs,
         setChapterContents
     })
+    // 切换上下页
+    const { currentPage, setCurrentPage, nextPage, prevPage, calcPageDataCallback, maxPageIndexRef } = usePageSwitch({
+        prevChapter,
+        nextChapter
+    })
+    // 指引
+    const { showGuide, closeGuide } = useGuide()
+
+    useEffect(() => {
+        if (maxPageIndexRef.current === 0) return setCurChapterProgress(0)
+        const progress = Math.round((currentPage / maxPageIndexRef.current) * 100 * 100) / 100
+        // 四舍五入
+        setCurChapterProgress(progress)
+        // 更新当前阅读章节的进度
+        setCurReadChapter(prev => {
+            if (!prev) return prev
+            return {
+                ...prev,
+                readProgress: progress
+            }
+        })
+    }, [currentPage])
 
     async function init() {
         // 1. 获取当前的阅读章节
@@ -382,6 +501,26 @@ export default function ReadPage() {
         return chapter?.content || ''
     }, [curReadChapter, chapterList, chapterContents])
 
+    const memoizedReadContentWrap = useMemo(() => {
+        return (
+            <ReadContentWrap
+                currentChapterName={curChapterName}
+                handleCenter={() => setIsVisible(!isVisible)}
+                nextPage={nextPage}
+                prevPage={prevPage}
+                animation='none'
+                content={chapterContent}
+                contents={splitTextByLine(chapterContent)}
+                readSetting={readStyle}
+                dynamicTextStyles={dynamicTextStyles}
+                characterSizeMap={characterSizeMap}
+                currentPage={currentPage}
+                calcPageDataCallback={calcPageDataCallback}
+            />
+        )
+        // TODO 依赖项，后期增加
+    }, [currentPage, chapterContent, isVisible])
+
     return (
         <>
             {/* 中文字符固定使用一来检测，中文字符的宽度都是一样的，无需重复计算 */}
@@ -423,31 +562,44 @@ export default function ReadPage() {
                     )}
                     <View style={styles.main}>
                         {/* 正文渲染区域 */}
-                        <ReadContentHorizontal
-                            currentChapterName={curChapterName}
-                            handleCenter={() => setIsVisible(!isVisible)}
-                            prevChapter={prevChapter}
-                            nextChapter={nextChapter}
-                            animation='none'
-                            content={chapterContent}
-                            contents={splitTextByLine(chapterContent)}
-                            readSetting={readStyle}
-                            dynamicTextStyles={dynamicTextStyles}
-                            characterSizeMap={characterSizeMap}
-                        />
+                        {memoizedReadContentWrap}
                     </View>
                     <ReadFooter
                         prevChapter={prevChapter}
                         nextChapter={nextChapter}
                         isVisible={isVisible}
                         showChapterList={showChapterList}
+                        curChapterProgress={curChapterProgress}
                     />
                     <ChapterList
                         isVisible={isChapterListVisible}
                         chaperList={chapterList}
                         closeChapterList={() => setIsChapterListVisible(false)}
                         activeIndex={curReadChapter?.cSN || 0}
+                        clickChapter={chapterIndex => {
+                            setIsChapterListVisible(false)
+                            if (chapterIndex === curReadChapter?.cSN) {
+                                console.log('当前章节')
+                            }
+                        }}
                     />
+                </TouchableOpacity>
+            )}
+            {showGuide && (
+                <TouchableOpacity
+                    activeOpacity={1}
+                    onPress={closeGuide}
+                    style={styles.portionMask}
+                >
+                    <View style={styles.portionMaskTextWrap}>
+                        <Text style={styles.portionMaskText}>上一页</Text>
+                    </View>
+                    <View style={[styles.portionMaskTextWrap, styles.portionMaskTextWrapCenter]}>
+                        <Text style={styles.portionMaskText}>呼唤菜单</Text>
+                    </View>
+                    <View style={styles.portionMaskTextWrap}>
+                        <Text style={styles.portionMaskText}>下一页</Text>
+                    </View>
                 </TouchableOpacity>
             )}
         </>

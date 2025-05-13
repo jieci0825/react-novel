@@ -16,6 +16,7 @@ interface ReadFooterProps {
     showChapterList: () => void
     prevChapter: () => void
     nextChapter: () => void
+    curChapterProgress: number
 }
 
 export default function ReadFooter(props: ReadFooterProps) {
@@ -43,10 +44,14 @@ export default function ReadFooter(props: ReadFooterProps) {
                     </TouchableOpacity>
                     <View style={styles.footerTopCenter}>
                         <Slider
-                            defaultValue={30}
+                            defaultValue={props.curChapterProgress}
+                            value={props.curChapterProgress}
                             size='sm'
+                            onChange={val => {
+                                console.log('change', val)
+                            }}
                             orientation='horizontal'
-                            isDisabled={false}
+                            isDisabled={true}
                             isReversed={false}
                         >
                             <SliderTrack>

@@ -1,6 +1,6 @@
 import { FlatList, PixelRatio, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native'
 import { AnimationType, CharacterSizeMap, ReadContentBase } from './read.type'
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import { readContentWrapStyles } from '@/styles/pages/read.styles'
 import processContentPage, { PageDataItem } from '@/utils/process-content-page'
@@ -12,14 +12,9 @@ import { LocalCache } from '@/utils'
 import { READER_GUIDE_AREA } from '@/constants'
 
 // 根据缓存的字符 size，来计算当前章节的分页数据
-function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentBase) {
+function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentHorizontalProps) {
     // 分页数据
     const [pageData, setPageData] = useState<Array<PageDataItem[]>>([])
-    // 切换章节时的动作
-    //  - 比如一直是上一页的切换，则下一次激活的章节是上一章的最后一页，反之则是下一章的第一页
-    const [switchAction, setSwitchAction] = useState<'prev' | 'next'>('next')
-    // 当前页
-    const [currentPage, setCurrentPage] = useState(0)
 
     // 中文字符宽度
     const chineseWidth = characterSizeMap.current.get('chinese')?.width || 0
@@ -46,102 +41,39 @@ function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentBase)
 
         if (!result) return
 
-        // 如果是切换章节，则根据上一次的切换动作，来决定当前章节的起始页
-        if (switchAction === 'prev') {
-            setCurrentPage(result.length - 1)
-        } else {
-            setCurrentPage(0)
-        }
+        props.calcPageDataCallback(result.length - 1)
 
         setPageData(result)
     }
 
-    return { startCalc, paragraphIndent, pageData, currentPage, setCurrentPage, switchAction, setSwitchAction }
-}
-
-// 控制指引
-function useGuide() {
-    const [showGuide, setShowGuide] = useState(false)
-
-    const closeGuide = () => {
-        LocalCache.storeData(READER_GUIDE_AREA, true)
-        setShowGuide(false)
-    }
-
-    async function init() {
-        const guide = await LocalCache.getData(READER_GUIDE_AREA)
-        // 如果缓存中没有，则显示引导，如果有则后续不需要显示了
-        if (!guide) {
-            setShowGuide(true)
-        }
-    }
-
-    useEffect(() => {
-        init()
-    }, [])
-
-    return { showGuide, closeGuide }
-}
-
-interface ReadContentHorizontalMethods {
-    nextPage: () => void
-    prevPage: () => void
+    return { startCalc, paragraphIndent, pageData }
 }
 
 interface ReadContentHorizontalProps extends ReadContentBase {
     handleCenter: () => void
-    prevChapter: () => void
-    nextChapter: () => void
+    prevPage: () => void
+    nextPage: () => void
+    currentPage: number
+    // 重新计算分页后的回调
+    calcPageDataCallback: (maxPageIndex: number) => void
 }
 
-export default forwardRef<ReadContentHorizontalMethods, ReadContentHorizontalProps>(function ReadContentHorizontal(
-    props,
-    ref
-) {
+export default function ReadContentWrap(props: ReadContentHorizontalProps) {
     const { theme } = useTheme()
     const styles = readContentWrapStyles(theme)
     const screenWidth = useWindowDimensions().width
-
-    const { showGuide, closeGuide } = useGuide()
 
     // 屏幕划分为几部分
     const portion = useRef(3).current
 
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
 
-    const { pageData, startCalc, paragraphIndent, currentPage, setCurrentPage, switchAction, setSwitchAction } =
-        usePageData(props.characterSizeMap, props)
+    const { pageData, startCalc, paragraphIndent } = usePageData(props.characterSizeMap, props)
 
     useEffect(() => {
         startCalc(containerSize)
-    }, [containerSize, props.contents])
-
-    // 下一页
-    const nextPage = () => {
-        if (currentPage >= pageData.length - 1) {
-            props.nextChapter()
-            setSwitchAction('next')
-            return
-        }
-        setCurrentPage(currentPage + 1)
-    }
-
-    // 上一页
-    const prevPage = () => {
-        if (currentPage <= 0) {
-            props.prevChapter()
-            setSwitchAction('prev')
-            return
-        }
-        setCurrentPage(currentPage - 1)
-    }
-
-    useImperativeHandle(ref, () => {
-        return {
-            nextPage,
-            prevPage
-        }
-    })
+        // props.content 这里来监听 props.content 字符串的内容变化。如果是 props.contents 则因为每次都是新对象，导致会不停的触发计算
+    }, [containerSize, props.content])
 
     const containerClick = (e: GestureResponderEvent) => {
         const x = e.nativeEvent.pageX
@@ -149,9 +81,9 @@ export default forwardRef<ReadContentHorizontalMethods, ReadContentHorizontalPro
         const rightRange = (screenWidth / portion) * 2
 
         if (x < leftRange) {
-            prevPage()
+            props.prevPage()
         } else if (x > rightRange) {
-            nextPage()
+            props.nextPage()
         } else {
             // 都不是则表示中间
             props.handleCenter()
@@ -186,8 +118,7 @@ export default forwardRef<ReadContentHorizontalMethods, ReadContentHorizontalPro
                             <>
                                 <PageHorizontal
                                     pageList={pageData}
-                                    currentPage={currentPage}
-                                    setCurrentPage={setCurrentPage}
+                                    currentPage={props.currentPage}
                                     textStyle={props.dynamicTextStyles}
                                     paragraphIndent={paragraphIndent}
                                     animation={props.animation as Exclude<AnimationType, 'scroll'>}
@@ -198,27 +129,10 @@ export default forwardRef<ReadContentHorizontalMethods, ReadContentHorizontalPro
                 </View>
                 <ReadContentFooter
                     chapterName={props.currentChapterName}
-                    currentPage={currentPage + 1}
+                    currentPage={props.currentPage + 1}
                     totalPage={pageData.length}
                 />
             </TouchableOpacity>
-            {showGuide && (
-                <TouchableOpacity
-                    activeOpacity={1}
-                    onPress={closeGuide}
-                    style={styles.portionMask}
-                >
-                    <View style={styles.portionMaskTextWrap}>
-                        <Text style={styles.portionMaskText}>上一页</Text>
-                    </View>
-                    <View style={[styles.portionMaskTextWrap, styles.portionMaskTextWrapCenter]}>
-                        <Text style={styles.portionMaskText}>呼唤菜单</Text>
-                    </View>
-                    <View style={styles.portionMaskTextWrap}>
-                        <Text style={styles.portionMaskText}>下一页</Text>
-                    </View>
-                </TouchableOpacity>
-            )}
         </>
     )
-})
+}

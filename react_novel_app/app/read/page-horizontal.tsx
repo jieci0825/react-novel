@@ -47,7 +47,6 @@ function NoneAnimation(props: NoneAnimationProps) {
 interface PageHorizontalProps {
     pageList: PageDataItem[][]
     currentPage: number
-    setCurrentPage: (page: number) => void
     nextPage?: () => void
     prevPage?: () => void
     textStyle: TextStyle

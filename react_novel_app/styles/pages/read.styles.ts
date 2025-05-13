@@ -17,6 +17,32 @@ export const readStyles = (theme: Theme) => {
         main: {
             flex: 1,
             overflow: 'hidden'
+        },
+        portionMask: {
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'row'
+        },
+        portionMaskTextWrap: {
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center'
+        },
+        portionMaskTextWrapCenter: {
+            borderLeftWidth: 2,
+            borderRightWidth: 2,
+            borderLeftColor: '#b3aeae',
+            borderRightColor: '#b3aeae'
+        },
+        portionMaskText: {
+            color: theme.bgColor,
+            fontSize: RFValue(20),
+            textAlign: 'center'
         }
     })
 }
@@ -168,33 +194,7 @@ export const readContentWrapStyles = (theme: Theme) => {
             height: '100%',
             overflow: 'hidden'
         },
-        contentText: {},
-        portionMask: {
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
-            zIndex: 1000,
-            display: 'flex',
-            flexDirection: 'row'
-        },
-        portionMaskTextWrap: {
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center'
-        },
-        portionMaskTextWrapCenter: {
-            borderLeftWidth: 2,
-            borderRightWidth: 2,
-            borderLeftColor: '#b3aeae',
-            borderRightColor: '#b3aeae'
-        },
-        portionMaskText: {
-            color: theme.bgColor,
-            fontSize: RFValue(20),
-            textAlign: 'center'
-        }
+        contentText: {}
     })
 }
 
