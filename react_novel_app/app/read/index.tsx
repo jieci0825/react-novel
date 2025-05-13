@@ -300,7 +300,7 @@ function useChapterSwitch({
         }
     }
 
-    return { prevChapter, nextChapter }
+    return { prevChapter, nextChapter, processChapterSwitch }
 }
 
 interface usePageSwitchParams {
@@ -427,7 +427,7 @@ export default function ReadPage() {
     // 当前阅读章节
     const [curReadChapter, setCurReadChapter] = useState<CurrentReadChapterInfo | null>(null)
     // 切换阅读章节
-    const { prevChapter, nextChapter } = useChapterSwitch({
+    const { prevChapter, nextChapter, processChapterSwitch } = useChapterSwitch({
         curReadChapter,
         chapterList,
         chapterContents,
@@ -584,8 +584,9 @@ export default function ReadPage() {
                         activeIndex={curReadChapter?.cSN || 0}
                         clickChapter={chapterIndex => {
                             setIsChapterListVisible(false)
-                            if (chapterIndex === curReadChapter?.cSN) {
-                                console.log('当前章节')
+                            // 章节不一致时才需要改变
+                            if (chapterIndex !== curReadChapter?.cSN) {
+                                processChapterSwitch(chapterIndex, curReadChapter?.cSN!)
                             }
                         }}
                     />
