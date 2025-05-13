@@ -43,6 +43,12 @@ export const readStyles = (theme: Theme) => {
             color: theme.bgColor,
             fontSize: RFValue(20),
             textAlign: 'center'
+        },
+        menuMask: {
+            position: 'fixed',
+            inset: 0,
+            zIndex: 1,
+            opacity: 0
         }
     })
 }
@@ -62,7 +68,7 @@ export const readHeaderStyles = (theme: Theme) => {
             flexDirection: 'row',
             alignItems: 'center',
             paddingHorizontal: 20,
-            zIndex: 1
+            zIndex: 2
         },
         backBtn: {
             marginRight: 20
@@ -102,7 +108,7 @@ export const readFooterStyles = (theme: Theme) => {
             paddingVertical: 10,
             gap: adaptiveSize(10),
             justifyContent: 'space-between',
-            zIndex: 1
+            zIndex: 2
         },
         footerTop: {
             display: 'flex',

@@ -571,6 +571,12 @@ export default function ReadPage() {
                         showChapterList={showChapterList}
                         curChapterProgress={curChapterProgress}
                     />
+                    {isVisible && (
+                        <TouchableOpacity
+                            onPress={() => setIsVisible(false)}
+                            style={styles.menuMask}
+                        ></TouchableOpacity>
+                    )}
                     <ChapterList
                         isVisible={isChapterListVisible}
                         chaperList={chapterList}
