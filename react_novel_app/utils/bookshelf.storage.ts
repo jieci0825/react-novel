@@ -30,6 +30,18 @@ async function addToBookshelf(data: BookshelfItem) {
     return true
 }
 
+// 更新书架中书籍的最后阅读章节
+async function updateBookshelfLastChapter(chapterNum: number, key: string) {
+    const bookshelfs = await getBookshelfList()
+    const index = bookshelfs.findIndex(item => getKey(item) === key)
+    if (index === -1) {
+        return false
+    }
+    bookshelfs[index].lastReadChapter = chapterNum
+    await LocalCache.storeData(MY_BOOKSHELF, bookshelfs)
+    return true
+}
+
 // 检测是否存在于书架中
 async function isInBookshelf(key: string) {
     const bookshelfs = await getBookshelfList()
@@ -52,6 +64,7 @@ const bookshelfStorage = {
     isInBookshelf,
     getBookshelfList,
     getBookshelfItem,
+    updateBookshelfLastChapter,
     genKey
 }
 

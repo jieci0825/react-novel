@@ -240,6 +240,7 @@ function HomeContent(props: HomeContentProps) {
     const navigation = useNavigation()
 
     useEffect(() => {
+        // TODO 解决从详情页返回不会重新获取导致章节进度没有更新的问题
         const unsubscribe = navigation.addListener('focus', () => {
             init()
         })

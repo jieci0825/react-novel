@@ -24,6 +24,7 @@ import ReadContentWrap from './read-content-wrap'
 import { CharacterSizeMap, ReaderSetting } from './read.type'
 import ReadContentFooter from './read-content-footer'
 import CalcTextSize from './calc-text-size'
+import bookshelfStorage from '@/utils/bookshelf.storage'
 
 // 缓存数量：即当前章节上下章节的缓存数量
 const cacheNum = 2
@@ -557,6 +558,12 @@ export default function ReadPage() {
             // 组件卸载时，保存阅读进度到本地
             if (!curReadChapterRef.current) return
             updateReadStorage(curReadChapterRef.current)
+            // 同时更新一下书架中记录的阅读进度，只需要更新阅读章节即可，主要用作渲染，不具备实际作用
+            const { updateBookshelfLastChapter, genKey } = bookshelfStorage
+            updateBookshelfLastChapter(
+                curReadChapterRef.current.cSN + 1,
+                genKey(curReadChapterRef.current.bookName, curReadChapterRef.current.author)
+            )
         }
     }, [])
 
