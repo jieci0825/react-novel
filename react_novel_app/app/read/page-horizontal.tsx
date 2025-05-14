@@ -2,17 +2,21 @@ import { useTheme } from '@/hooks/useTheme'
 import { pageHorizontalStyles } from '@/styles/pages/read.styles'
 import { PageDataItem } from '@/utils'
 import { Text, TextStyle, View } from 'react-native'
+import { ReaderSetting } from './read.type'
 
 interface NoneAnimationProps {
     textStyle: TextStyle
     paragraphIndent: number
     pageList: PageDataItem[][]
     currentPage: number
+    indent: number
 }
 // 无动画-水平阅读
 function NoneAnimation(props: NoneAnimationProps) {
     const { theme } = useTheme()
     const currentPageList = props.pageList[props.currentPage]
+
+    const fullText = Array(props.indent).fill('一').join('')
 
     return (
         <>
@@ -51,13 +55,17 @@ function NoneAnimation(props: NoneAnimationProps) {
                             style={[
                                 props.textStyle,
                                 {
-                                    textIndent: item.isNeedIndent ? String(props.paragraphIndent) + 'px' : '0',
+                                    // 这段样式代码在真机中无效，所以采取一个曲线救国的方案。在段落文本前面填充一个空格文本，这个文本的宽度是缩进的宽度
+                                    // textIndent: item.isNeedIndent ? String(props.paragraphIndent) + 'px' : '0',
                                     marginBottom:
                                         index === currentPageList.length - 1 ? 0 : props.textStyle.marginBottom
                                 }
                             ]}
                         >
-                            {item.content}
+                            {item.isNeedIndent && (
+                                <Text style={{ opacity: 0, color: 'rgba(0,0,0,0)' }}>{fullText}</Text>
+                            )}
+                            <Text>{item.content}</Text>
                         </Text>
                     )
                 })}
@@ -74,6 +82,7 @@ interface PageHorizontalProps {
     textStyle: TextStyle
     paragraphIndent: number
     animation: 'slide' | 'page' | 'none' | 'simulation'
+    readerSetting: ReaderSetting
 }
 
 export default function PageHorizontal(props: PageHorizontalProps) {
@@ -85,7 +94,12 @@ export default function PageHorizontal(props: PageHorizontalProps) {
     const showPageComp = {
         slide: <></>,
         page: <></>,
-        none: <NoneAnimation {...props} />,
+        none: (
+            <NoneAnimation
+                {...props}
+                indent={props.readerSetting.indent}
+            />
+        ),
         simulation: <></>
     }
 
