@@ -14,7 +14,7 @@ import DetailsFooter from './details-footer'
 import ChapterList from '@/components/chapter-list/chapter-list'
 import { BookshelfItem } from '@/types'
 import bookshelfStorage from '@/utils/bookshelf.storage'
-import { LocalCache } from '@/utils'
+import { getReadStorage, LocalCache, updateReadStorage } from '@/utils'
 import { CURRENT_READ_CHAPTER_KEY } from '@/constants'
 
 export default function DetailsPage() {
@@ -37,9 +37,7 @@ export default function DetailsPage() {
             })
             setDetails(data)
             // 检查书籍是否存在于书架中
-            const result = await bookshelfStorage.isInBookshelf(
-                bookshelfStorage.genKey(data.bookId, data._source, data.title, data.author)
-            )
+            const result = await bookshelfStorage.isInBookshelf(bookshelfStorage.genKey(data.title, data.author))
             setIsExistBookShelf(result)
         } catch (error) {}
     }
@@ -70,51 +68,28 @@ export default function DetailsPage() {
         )
     }
 
-    // 如果存在于书架中，则获取该书籍阅读进度
-    async function getBookItem() {
-        // 没有指定章节，则检测是否存在于书架中
-        if (isExistBookShelf && details) {
-            // 如果存在于书架中，则将其上次阅读的章节作为默认章节
-            const item = await bookshelfStorage.getBookshelfItem(
-                bookshelfStorage.genKey(details.bookId, details._source, details.title, details.author)
-            )
-            return item
-        } else {
-            return null
-        }
-    }
-
     const toRead = async (cSN?: number) => {
-        const item = await getBookItem()
-
-        let c_sn = 0
-        let readProgress = 0
-        if (cSN) {
-            // 指定了章节的话，则默认都从 0 开始
-            c_sn = cSN
-            // 检测指定章节是否与上次阅读章节一致，一致则使用上次阅读进度
-            if (item && item.lastReadChapter === cSN) {
-                readProgress = item.lastReadChapterProgress
-            }
-        } else {
-            // 如果存在于书架中，则将其上次阅读的章节作为默认章节
+        // 如果有 cSN 则表示打开书籍，需要定位到这个章节，且进度为 0
+        if (cSN && details) {
+            const item = await getReadStorage({
+                bookName: details.title,
+                author: details.author
+            })
             if (item) {
-                c_sn = item.lastReadChapter
-                readProgress = item.lastReadChapterProgress
+                item.cSN = cSN
+                item.readProgress = 0
+                updateReadStorage(item)
             }
-            // 如果不存在于书架中且没指定章节，则默认从第一章开始，进度也是 0
         }
 
-        await LocalCache.storeData(CURRENT_READ_CHAPTER_KEY, {
-            bID: params.bid,
-            cSN: c_sn,
-            source: params.source,
-            readProgress,
-            bookName: details?.title,
-            author: details?.author
+        router.push({
+            pathname: '/read' as RelativePathString,
+            params: {
+                bookId: params.bid,
+                bookName: details?.title,
+                author: details?.author
+            }
         })
-
-        router.push({ pathname: '/read' as RelativePathString })
     }
 
     // 这里只会首次添加书籍到书架才会触发
@@ -128,8 +103,6 @@ export default function DetailsPage() {
             bookName,
             author,
             cover: details?.cover || '',
-            lastReadChapter: 0,
-            lastReadChapterProgress: 0,
             totalChapterCount: details?.chapters.length || 0
         }
 

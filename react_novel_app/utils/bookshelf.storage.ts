@@ -4,11 +4,11 @@ import { MY_BOOKSHELF } from '@/constants'
 import { jcShowToast } from '@/components/jc-toast/jc-toast'
 
 function getKey(data: BookshelfItem) {
-    return `${data.bookId}-${data.source}-${data.bookName}-${data.author}`
+    return `${data.bookName}-${data.author}`
 }
 
-export function genKey(bookId: string | number, source: number, bookName: string, author: string) {
-    return `${bookId}-${source}-${bookName}-${author}`
+export function genKey(bookName: string, author: string) {
+    return `${bookName}-${author}`
 }
 
 // 添加到书架

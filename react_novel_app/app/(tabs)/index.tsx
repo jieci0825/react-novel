@@ -169,12 +169,13 @@ function BookGridLayout(props: BookLayoutProps) {
                                     >
                                         {book.bookName}
                                     </Text>
+                                    {/* todo 补全进度 */}
                                     <Text
                                         numberOfLines={1}
                                         ellipsizeMode='tail'
                                         style={styles.bookProgress}
                                     >
-                                        第{book.lastReadChapter}章/第{book.totalChapterCount}章
+                                        第{1}章/第{book.totalChapterCount}章
                                     </Text>
                                 </TouchableOpacity>
                             )
@@ -210,7 +211,7 @@ function BookListLayout(props: BookLayoutProps) {
                             <View style={styles.bookInfo}>
                                 <Text style={styles.bookTitle}>{book.bookName}</Text>
                                 <Text style={styles.bookAuthor}>{book.author}</Text>
-                                <Text style={styles.bookProgress}>第{book.lastReadChapter}章</Text>
+                                <Text style={styles.bookProgress}>第{1}章</Text>
                                 <Text style={styles.bookProgress}>第{book.totalChapterCount}章</Text>
                             </View>
                         </TouchableOpacity>

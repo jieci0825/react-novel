@@ -4,8 +4,6 @@ export interface BookshelfItem {
     cover: string
     author: string
     bookName: string
-    lastReadChapter: number
-    lastReadChapterProgress: number
     totalChapterCount: number
 }
 
