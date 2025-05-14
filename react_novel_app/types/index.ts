@@ -1,6 +1,5 @@
 export interface BookshelfItem {
     bookId: number | string
-    source: number
     cover: string
     author: string
     bookName: string

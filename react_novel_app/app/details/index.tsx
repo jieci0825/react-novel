@@ -99,7 +99,6 @@ export default function DetailsPage() {
 
         const data: BookshelfItem = {
             bookId: params.bid as string,
-            source: +params.source,
             bookName,
             author,
             cover: details?.cover || '',
