@@ -641,6 +641,13 @@ export default function ReadPage() {
                     <View style={styles.main}>
                         {/* 正文渲染区域 */}
                         {memoizedReadContentWrap}
+                        {isVisible && (
+                            <TouchableOpacity
+                                style={styles.menuMask}
+                                onPress={() => setIsVisible(false)}
+                                activeOpacity={1}
+                            ></TouchableOpacity>
+                        )}
                     </View>
                     <ReadFooter
                         prevChapter={prevChapter}
@@ -649,13 +656,6 @@ export default function ReadPage() {
                         showChapterList={showChapterList}
                         curChapterProgress={0}
                     />
-                    {/* curChapterProgress={curChapterProgress} */}
-                    {isVisible && (
-                        <TouchableOpacity
-                            onPress={() => setIsVisible(false)}
-                            style={styles.menuMask}
-                        ></TouchableOpacity>
-                    )}
                     <ChapterList
                         isVisible={isChapterListVisible}
                         chaperList={chapterList}

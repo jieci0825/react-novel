@@ -16,7 +16,8 @@ export const readStyles = (theme: Theme) => {
         },
         main: {
             flex: 1,
-            overflow: 'hidden'
+            overflow: 'hidden',
+            position: 'relative'
         },
         portionMask: {
             position: 'fixed',
@@ -45,9 +46,13 @@ export const readStyles = (theme: Theme) => {
             textAlign: 'center'
         },
         menuMask: {
-            position: 'fixed',
-            inset: 0,
-            zIndex: 1,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'transparent',
+            zIndex: 10,
             opacity: 0
         }
     })
