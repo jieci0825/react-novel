@@ -56,7 +56,6 @@ function createParseContext({
     lineHeight,
     containerSize
 }: GetCharItemListParams): PageDataContext {
-    console.log('createParseContext', lineHeight + paragraphSpacing * 2, containerSize)
     const context: PageDataContext = {
         _s: JSON.parse(JSON.stringify(charItemList)), // 源数据
         curCharIndx: -1,

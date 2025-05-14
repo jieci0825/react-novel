@@ -85,7 +85,9 @@ export const bookListStyles = (theme: Theme) => {
         bookItem: {
             width: '100%',
             display: 'flex',
-            flexDirection: 'row'
+            flexDirection: 'row',
+            borderRadius: 4,
+            overflow: 'hidden'
         },
         bookCover: {
             width: adaptiveSize(75),

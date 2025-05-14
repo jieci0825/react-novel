@@ -15,7 +15,7 @@ import ChapterList from '@/components/chapter-list/chapter-list'
 import { BookshelfItem } from '@/types'
 import bookshelfStorage from '@/utils/bookshelf.storage'
 import { getReadStorage, LocalCache, updateReadStorage } from '@/utils'
-import { CURRENT_READ_CHAPTER_KEY } from '@/constants'
+import { CURRENT_READ_CHAPTER_KEY, CURRENT_SOURCE } from '@/constants'
 
 export default function DetailsPage() {
     const { theme } = useTheme()
@@ -30,10 +30,11 @@ export default function DetailsPage() {
 
     async function init() {
         try {
+            const s = await LocalCache.getData(CURRENT_SOURCE)
             // 获取书籍详情
             const { data } = await bookApi.reqGetBookDetails({
                 bookId: params.bid as string,
-                _source: +params.source
+                _source: s
             })
             setDetails(data)
             // 检查书籍是否存在于书架中
@@ -144,7 +145,7 @@ export default function DetailsPage() {
                     )}
                 </View>
                 <DetailsFooter
-                    toRead={toRead}
+                    toRead={() => toRead()}
                     addBookShelf={addBookShelf}
                     delBookShelf={delBookShelf}
                     isExist={isExistBookShelf}

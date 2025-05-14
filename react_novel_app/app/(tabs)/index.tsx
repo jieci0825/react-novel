@@ -1,4 +1,4 @@
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native'
+import { Pressable, SafeAreaView, ScrollView, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native'
 import Entypo from '@expo/vector-icons/Entypo'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
@@ -10,7 +10,7 @@ import {
     homeHeaderStyles,
     homeStyles
 } from '@/styles/tabs/index.style'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { RFValue } from 'react-native-responsive-fontsize'
 import PageHeader from '@/components/page-header/page-header'
 import { BookshelfItem } from '@/types'
@@ -19,6 +19,7 @@ import ImgPlus from '@/components/img-plus/img-plus'
 import { RelativePathString, router, useNavigation } from 'expo-router'
 import { getReadStorage, LocalCache, updateReadStorage } from '@/utils'
 import { CURRENT_READ_CHAPTER_KEY } from '@/constants'
+import useReactiveState from '@/hooks/useReactiveState'
 
 enum BookLayout {
     Grid = 1,
@@ -94,9 +95,15 @@ function HomeHeader(props: HomeHeaderProps) {
     )
 }
 
+interface RenderBookshelfItem extends BookshelfItem {
+    isActive: boolean
+}
+
 interface BookLayoutProps {
-    bookList: BookshelfItem[]
-    onClick: (book: BookshelfItem) => void
+    bookList: RenderBookshelfItem[]
+    onClick: (book: RenderBookshelfItem) => void
+    onLongPress: (book: RenderBookshelfItem) => void
+    toggleActive: (index: number, isActive: boolean) => void
 }
 function BookGridLayout(props: BookLayoutProps) {
     const { theme } = useTheme()
@@ -117,7 +124,7 @@ function BookGridLayout(props: BookLayoutProps) {
     const columns = screenWidth < baseWidth ? baseColumns : Math.floor((screenWidth - baseWidth) / 100) + baseColumns
 
     // 因为不支持 grid 布局，所以需要手动分配成一个二维数组，每一项排列三个
-    function chunkArray(array: BookshelfItem[], chunkSize: number = columns) {
+    function chunkArray(array: RenderBookshelfItem[], chunkSize: number = columns) {
         const result = []
         for (let i = 0; i < array.length; i += chunkSize) {
             result.push(array.slice(i, i + chunkSize))
@@ -140,6 +147,8 @@ function BookGridLayout(props: BookLayoutProps) {
         calcWidthAndHeight()
     }, [screenWidth])
 
+    const [isClickRef, setIsClickOut] = useReactiveState(true)
+
     return (
         <View style={{ width: '100%' }}>
             {bookList.map((item, index) => {
@@ -150,14 +159,36 @@ function BookGridLayout(props: BookLayoutProps) {
                     >
                         {item.map(book => {
                             return (
-                                <TouchableOpacity
+                                <Pressable
                                     // @ts-ignore
-                                    style={[styles.BookshelfItem, { width: itemWidth, height: itemHeight }]}
+                                    style={[
+                                        styles.bookItem,
+                                        { width: itemWidth as number, height: itemHeight as number },
+                                        styles.bookItem,
+                                        book.isActive && {
+                                            backgroundColor: theme.bgSecondaryColor
+                                        }
+                                    ]}
                                     key={book.bookId}
-                                    activeOpacity={0.8}
-                                    onPress={() => {
-                                        props.onClick(book)
+                                    onPressIn={() => {
+                                        // 每次按压一触发，就设置是可以触发 click 事件的
+                                        setIsClickOut(true)
+                                        props.toggleActive(index, true)
                                     }}
+                                    onLongPress={() => {
+                                        // 但是一但触发了点击事件，就设置不可以触发 click 事件
+                                        setIsClickOut(false)
+                                        props.onLongPress(book)
+                                    }}
+                                    onPressOut={() => {
+                                        props.toggleActive(index, false)
+
+                                        // 为 true 才可以触发
+                                        if (isClickRef.current) {
+                                            props.onClick(book)
+                                        }
+                                    }}
+                                    delayLongPress={500}
                                 >
                                     <View style={styles.bookCover}>
                                         <ImgPlus src={book.cover} />
@@ -177,7 +208,7 @@ function BookGridLayout(props: BookLayoutProps) {
                                     >
                                         第{book.lastReadChapter}章/第{book.totalChapterCount}章
                                     </Text>
-                                </TouchableOpacity>
+                                </Pressable>
                             )
                         })}
                     </View>
@@ -192,33 +223,53 @@ function BookListLayout(props: BookLayoutProps) {
 
     const styles = bookListStyles(theme)
 
+    const [isClickRef, setIsClickOut] = useReactiveState(true)
+
     return (
-        <>
-            <View style={styles.bookListWrap}>
-                {props.bookList.map(book => {
-                    return (
-                        <TouchableOpacity
-                            style={styles.bookItem}
-                            key={book.bookId}
-                            activeOpacity={0.8}
-                            onPress={() => {
+        <View style={styles.bookListWrap}>
+            {props.bookList.map((book, index) => {
+                return (
+                    <Pressable
+                        style={[
+                            styles.bookItem,
+                            book.isActive && {
+                                backgroundColor: theme.bgSecondaryColor
+                            }
+                        ]}
+                        key={book.bookId}
+                        onPressIn={() => {
+                            // 每次按压一触发，就设置是可以触发 click 事件的
+                            setIsClickOut(true)
+                            props.toggleActive(index, true)
+                        }}
+                        onLongPress={() => {
+                            // 但是一但触发了点击事件，就设置不可以触发 click 事件
+                            setIsClickOut(false)
+                            props.onLongPress(book)
+                        }}
+                        onPressOut={() => {
+                            props.toggleActive(index, false)
+
+                            // 为 true 才可以触发
+                            if (isClickRef.current) {
                                 props.onClick(book)
-                            }}
-                        >
-                            <View style={styles.bookCover}>
-                                <ImgPlus src={book.cover} />
-                            </View>
-                            <View style={styles.bookInfo}>
-                                <Text style={styles.bookTitle}>{book.bookName}</Text>
-                                <Text style={styles.bookAuthor}>{book.author}</Text>
-                                <Text style={styles.bookProgress}>第{book.lastReadChapter}章</Text>
-                                <Text style={styles.bookProgress}>第{book.totalChapterCount}章</Text>
-                            </View>
-                        </TouchableOpacity>
-                    )
-                })}
-            </View>
-        </>
+                            }
+                        }}
+                        delayLongPress={500}
+                    >
+                        <View style={styles.bookCover}>
+                            <ImgPlus src={book.cover} />
+                        </View>
+                        <View style={styles.bookInfo}>
+                            <Text style={styles.bookTitle}>{book.bookName}</Text>
+                            <Text style={styles.bookAuthor}>{book.author}</Text>
+                            <Text style={styles.bookProgress}>第{book.lastReadChapter}章</Text>
+                            <Text style={styles.bookProgress}>第{book.totalChapterCount}章</Text>
+                        </View>
+                    </Pressable>
+                )
+            })}
+        </View>
     )
 }
 
@@ -230,11 +281,14 @@ function HomeContent(props: HomeContentProps) {
 
     const styles = homeContentStyles(theme)
 
-    const [bookList, setBookList] = useState<BookshelfItem[]>([])
+    const [bookList, setBookList] = useState<RenderBookshelfItem[]>([])
 
     async function init() {
         const resp = await bookshelfStorage.getBookshelfList()
-        setBookList(resp)
+        const list = resp.map(item => {
+            return { ...item, isActive: false }
+        })
+        setBookList(list)
     }
 
     const navigation = useNavigation()
@@ -258,9 +312,33 @@ function HomeContent(props: HomeContentProps) {
         })
     }
 
+    const toggleBookItemActive = (index: number, isActive: boolean) => {
+        const list = [...bookList]
+        list[index].isActive = isActive
+        setBookList(list)
+    }
+
+    const handleBookItemLongPress = (book: RenderBookshelfItem) => {
+        // 长按则跳转到详情页面
+        router.push({
+            pathname: '/details',
+            params: { bid: book.bookId }
+        })
+    }
+
     const layoutComp: Record<BookLayout, React.ReactNode> = {
-        [BookLayout.Grid]: BookGridLayout({ bookList: bookList, onClick: toRead }),
-        [BookLayout.List]: BookListLayout({ bookList: bookList, onClick: toRead })
+        [BookLayout.Grid]: BookGridLayout({
+            bookList: bookList,
+            onClick: toRead,
+            toggleActive: toggleBookItemActive,
+            onLongPress: handleBookItemLongPress
+        }),
+        [BookLayout.List]: BookListLayout({
+            bookList: bookList,
+            onClick: toRead,
+            toggleActive: toggleBookItemActive,
+            onLongPress: handleBookItemLongPress
+        })
     }
 
     return (

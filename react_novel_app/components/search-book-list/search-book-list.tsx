@@ -39,7 +39,7 @@ export default function SearchBookList(props: SearchBookResultProps) {
         setSelectedId(bookId)
         router.push({
             pathname: '/details' as RelativePathString,
-            params: { bid: bookId, source }
+            params: { bid: bookId }
         })
     }
 
