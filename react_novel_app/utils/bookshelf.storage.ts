@@ -30,6 +30,18 @@ async function addToBookshelf(data: BookshelfItem) {
     return true
 }
 
+// 删除书架中的书籍
+async function delBookshelfItem(key: string) {
+    const bookshelfs = await getBookshelfList()
+    const index = bookshelfs.findIndex(item => getKey(item) === key)
+    if (index === -1) {
+        return false
+    }
+    bookshelfs.splice(index, 1)
+    await LocalCache.storeData(MY_BOOKSHELF, bookshelfs)
+    return true
+}
+
 // 更新书架中书籍的最后阅读章节
 async function updateBookshelfLastChapter(chapterNum: number, key: string) {
     const bookshelfs = await getBookshelfList()
@@ -65,6 +77,7 @@ const bookshelfStorage = {
     getBookshelfList,
     getBookshelfItem,
     updateBookshelfLastChapter,
+    delBookshelfItem,
     genKey
 }
 

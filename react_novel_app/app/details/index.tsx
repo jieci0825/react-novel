@@ -92,7 +92,7 @@ export default function DetailsPage() {
         })
     }
 
-    // 这里只会首次添加书籍到书架才会触发
+    // 添加书籍到书架
     const addBookShelf = async () => {
         const bookName = details?.title || '[未知]'
         const author = details?.author || '[未知]'
@@ -109,6 +109,13 @@ export default function DetailsPage() {
         await bookshelfStorage.addToBookshelf(data)
 
         setIsExistBookShelf(true)
+    }
+
+    // 移除书籍
+    const delBookShelf = async () => {
+        if (!details) return
+        await bookshelfStorage.delBookshelfItem(bookshelfStorage.genKey(details.title, details.author))
+        setIsExistBookShelf(false)
     }
 
     // 目录的显示与隐藏
@@ -139,6 +146,7 @@ export default function DetailsPage() {
                 <DetailsFooter
                     toRead={toRead}
                     addBookShelf={addBookShelf}
+                    delBookShelf={delBookShelf}
                     isExist={isExistBookShelf}
                 />
                 <ChapterList
