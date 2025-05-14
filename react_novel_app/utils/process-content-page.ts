@@ -56,7 +56,7 @@ function createParseContext({
     lineHeight,
     containerSize
 }: GetCharItemListParams): PageDataContext {
-    console.log('createParseContext', lineHeight + paragraphSpacing * 2)
+    console.log('createParseContext', lineHeight + paragraphSpacing * 2, containerSize)
     const context: PageDataContext = {
         _s: JSON.parse(JSON.stringify(charItemList)), // 源数据
         curCharIndx: -1,
@@ -130,7 +130,8 @@ function createParseContext({
         },
         isNeedNewLine(charItem) {
             // 如果当前行宽加上当前字符的宽度大于容器宽度，则表示这个字符是新行的第一个字符
-            const isNewLine = this.curLineWidth + charItem.width > containerSize.width
+            //  - 还需要额外考虑字间距的问题，所以计算的时候，还需要加上一个字符间距
+            const isNewLine = this.letterSpacing + this.curLineWidth + charItem.width > containerSize.width
             if (isNewLine) {
                 return true
             } else {
@@ -192,11 +193,16 @@ function createParseContext({
                 if (!char.isChineseChar) {
                     chars.push(char)
                 } else {
+                    // 例如语句：难道不是给男人看的？"萧炎摸了摸鼻子
+                    //  - 因为除了段落的段首之外，文字的换行规则会导致这些符号不能出现在一行的第一个字符。
+                    //  - 原先的猜想是只需要计算 的？" 这三个字符+字间距和当前行宽度是否大于容器宽度，如果大于则需要换行。
+                    //  - 但是实际测试发现，还需要加上一个中文字符的宽度。
+                    chars.push(char)
                     break
                 }
             }
 
-            return chars.reduce((acc, cur) => acc + cur.width, 0)
+            return chars.reduce((pre, cur) => pre + cur.width, 0) + chars.length * letterSpacing
         }
     }
 

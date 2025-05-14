@@ -10,6 +10,7 @@ interface NoneAnimationProps {
     pageList: PageDataItem[][]
     currentPage: number
     indent: number
+    containerSize: { width: number; height: number }
 }
 // 无动画-水平阅读
 function NoneAnimation(props: NoneAnimationProps) {
@@ -83,6 +84,7 @@ interface PageHorizontalProps {
     paragraphIndent: number
     animation: 'slide' | 'page' | 'none' | 'simulation'
     readerSetting: ReaderSetting
+    containerSize: { width: number; height: number }
 }
 
 export default function PageHorizontal(props: PageHorizontalProps) {

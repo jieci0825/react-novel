@@ -125,6 +125,7 @@ export default function ReadContentWrap(props: ReadContentHorizontalProps) {
                                     paragraphIndent={paragraphIndent}
                                     animation={props.animation as Exclude<AnimationType, 'scroll'>}
                                     readerSetting={props.readSetting}
+                                    containerSize={containerSize}
                                 />
                             </>
                         )}

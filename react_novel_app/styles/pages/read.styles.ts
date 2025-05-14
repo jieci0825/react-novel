@@ -202,7 +202,7 @@ export const readContentWrapStyles = (theme: Theme) => {
         },
         containerInner: {
             width: '100%',
-            height: '100%',
+            flex: 1,
             overflow: 'hidden'
         },
         contentText: {}
