@@ -2,15 +2,23 @@ import { Theme, useTheme } from '@/hooks/useTheme'
 import { readStyles } from '@/styles/pages/read.styles'
 import { Button, PixelRatio, Text, TouchableOpacity, View } from 'react-native'
 import ReadHeader from './read-header'
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReadFooter from './read-footer'
 import { bookApi } from '@/api'
-import { useLocalSearchParams } from 'expo-router'
+import { useFocusEffect, useLocalSearchParams } from 'expo-router'
 import { ChapterItem, GetBookDetailsData } from '@/api/modules/book/type'
 import ChapterList from '@/components/chapter-list/chapter-list'
 import { CurrentReadChapterInfo } from '@/types'
-import { debounce, extractNonChineseChars, getAdjacentIndexes, LocalCache, splitTextByLine } from '@/utils'
-import { CURRENT_READ_CHAPTER_KEY, READER_GUIDE_AREA } from '@/constants'
+import {
+    debounce,
+    extractNonChineseChars,
+    getAdjacentIndexes,
+    getReadStorage,
+    LocalCache,
+    splitTextByLine,
+    updateReadStorage
+} from '@/utils'
+import { CURRENT_READ_CHAPTER_KEY, CURRENT_SOURCE, READER_GUIDE_AREA } from '@/constants'
 import { jcShowToast } from '@/components/jc-toast/jc-toast'
 import ReadContentWrap from './read-content-wrap'
 import { CharacterSizeMap, ReaderSetting } from './read.type'
@@ -201,6 +209,7 @@ interface useChapterSwitchParams {
         source: number
     ) => Promise<CacheChapterItem[]>
     setChapterContents: React.Dispatch<React.SetStateAction<CacheChapterItem[]>>
+    setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 }
 // 切换章节
 function useChapterSwitch({
@@ -211,10 +220,11 @@ function useChapterSwitch({
     setCurReadChapter,
     getNoChineseCharacterList,
     getCacheChapterContentsByIndexs,
-    setChapterContents
+    setChapterContents,
+    setCurrentPage
 }: useChapterSwitchParams) {
     // 上一章
-    const prevChapter = () => {
+    const prevChapter = (progress?: number) => {
         // 上一章的时候，判断是否是第一章节，如果是第一章节，则不进行任何操作
         if (curReadChapter?.cSN === 0) {
             jcShowToast({ text: '已经是第一章了', type: 'info' })
@@ -222,11 +232,14 @@ function useChapterSwitch({
         }
 
         const index = curReadChapter?.cSN || 0
-        processChapterSwitch(index - 1, index)
+        processChapterSwitch(index - 1, index, progress || 0)
     }
 
     // 下一章
-    const nextChapter = () => {
+    const nextChapter = (progress?: number) => {
+        // 每当切换到下一章节的时候，都应该将 currentPage 改为 0
+        setCurrentPage(0)
+
         // 下一章的时候，判断是否是最后一章节，如果是最后一章节，则不进行任何操作
         if (curReadChapter?.cSN === chapterList.length - 1) {
             jcShowToast({ text: '已经是最后一章了', type: 'info' })
@@ -235,11 +248,11 @@ function useChapterSwitch({
 
         // 切换到下一章节
         const index = curReadChapter?.cSN || 0
-        processChapterSwitch(index + 1, index)
+        processChapterSwitch(index + 1, index, progress || 0)
     }
 
     // 处理章节切换
-    const processChapterSwitch = async (newIndex: number, oldIndex: number) => {
+    const processChapterSwitch = async (newIndex: number, oldIndex: number, progress: number) => {
         // 根据当前章节index获取需要的缓存章节index
         const { prevIndex, nextIndex } = getAdjacentIndexes(newIndex, chapterList.length, cacheNum)
         const newIndexs = [...prevIndex, newIndex, ...nextIndex]
@@ -250,7 +263,7 @@ function useChapterSwitch({
         // 得到需要去请求获取的章节index
         const _chapterIndexList = newIndexs.filter(item => !cacheChapterIndexs.includes(item))
 
-        // 是否完整章节的切换
+        // 是否处理完成章节的切换
         let isProcessChapterSwitch = false
 
         // 如果缓存章节的内容中，存在当前章节，则直接使用
@@ -258,7 +271,7 @@ function useChapterSwitch({
 
         if (chapterItem && curReadChapter) {
             // 重置章节阅读进度
-            setCurChapterProgress(0)
+            setCurChapterProgress(progress)
             // 切换当前阅读章节
             setCurReadChapter({ ...curReadChapter, cSN: newIndex })
             // 获取新章节中非中文的字符
@@ -284,14 +297,17 @@ function useChapterSwitch({
             // 合并章节内容
             const newChapterContents = list.concat(result)
 
+            // * 如果当前章节内容存在与上一次缓存的章节内容中，则前面已经处理完成了，这里就不需要再次处理了
+            if (isProcessChapterSwitch) return
+
             setChapterContents(newChapterContents)
             setChapterContents(prev => {
                 const item = prev.find(item => item.chapterIndex === newIndex)
                 if (item) {
                     // 重置章节阅读进度
-                    setCurChapterProgress(0)
+                    setCurChapterProgress(progress)
                     // 切换当前阅读章节
-                    setCurReadChapter({ ...curReadChapter, cSN: newIndex })
+                    setCurReadChapter({ ...curReadChapter, cSN: newIndex, readProgress: progress })
                     // 获取新章节中非中文的字符
                     getNoChineseCharacterList(item.content)
                 }
@@ -304,16 +320,17 @@ function useChapterSwitch({
 }
 
 interface usePageSwitchParams {
-    nextChapter: () => void
-    prevChapter: () => void
+    nextChapter: (progress: number) => void
+    prevChapter: (progress: number) => void
+    currentPage: number
+    setCurrentPage: React.Dispatch<React.SetStateAction<number>>
 }
 // 切换上下页
-function usePageSwitch({ nextChapter, prevChapter }: usePageSwitchParams) {
+function usePageSwitch({ nextChapter, prevChapter, currentPage, setCurrentPage }: usePageSwitchParams) {
     // 切换章节时的动作
     //  - 比如一直是上一页的切换，则下一次激活的章节是上一章的最后一页，反之则是下一章的第一页
     const [switchAction, setSwitchAction] = useState<'prev' | 'next'>('next')
-    // 当前页
-    const [currentPage, setCurrentPage] = useState(0)
+
     // // 最大页数
     // const [maxPageIndex, setMaxPageIndex] = useState(0)
     // // 下一页
@@ -337,7 +354,7 @@ function usePageSwitch({ nextChapter, prevChapter }: usePageSwitchParams) {
 
     const nextPage = () => {
         if (currentPage >= maxPageIndexRef.current) {
-            nextChapter()
+            nextChapter(0)
             setSwitchAction('next')
             return
         }
@@ -347,7 +364,8 @@ function usePageSwitch({ nextChapter, prevChapter }: usePageSwitchParams) {
     // 上一页
     const prevPage = () => {
         if (currentPage <= 0) {
-            prevChapter()
+            // 通过点击上一页切换到的上一章，则阅读进度应为 100%
+            prevChapter(100)
             setSwitchAction('prev')
             return
         }
@@ -356,11 +374,10 @@ function usePageSwitch({ nextChapter, prevChapter }: usePageSwitchParams) {
 
     const calcPageDataCallback = (_maxPageIndex: number) => {
         setMaxPageIndex(_maxPageIndex)
-        //  如果是切换章节，则根据上一次的切换动作，来决定当前章节的起始页
+        //  这里额外处理一种情况，当用户通过上一页切换到上一章时，页面应该要单独处理，处理为上一章的最后一页
+        //  - 即本次分页数据处理完成的最大的index
         if (switchAction === 'prev') {
             setCurrentPage(_maxPageIndex)
-        } else {
-            setCurrentPage(0)
         }
     }
 
@@ -401,17 +418,17 @@ function useGuide() {
 }
 
 // 防抖处理保存当前章节信息
-function useDebouncedSave(key: string, value: CurrentReadChapterInfo | null, delay = 300) {
+function useDebouncedSave(value: CurrentReadChapterInfo | null, delay = 300) {
     const debouncedSave = useRef(
-        debounce((k: string, v: CurrentReadChapterInfo) => {
-            LocalCache.storeData(k, v)
+        debounce((v: CurrentReadChapterInfo) => {
+            updateReadStorage(v)
         }, delay)
     ).current
 
     useEffect(() => {
-        debouncedSave(key, value)
+        debouncedSave(value)
         return () => debouncedSave.cancel()
-    }, [key, value, debouncedSave])
+    }, [value, debouncedSave])
 }
 
 export default function ReadPage() {
@@ -421,6 +438,8 @@ export default function ReadPage() {
 
     // 是否开始正式正式渲染
     const [isRender, setIsRender] = useState(false)
+    // 当前页
+    const [currentPage, setCurrentPage] = useState(0)
 
     // 页面hooks
     const {
@@ -440,6 +459,11 @@ export default function ReadPage() {
         useCacheCharacterSize(readStyle)
     // 当前阅读章节
     const [curReadChapter, setCurReadChapter] = useState<CurrentReadChapterInfo | null>(null)
+    const curReadChapterRef = useRef(curReadChapter)
+    useEffect(() => {
+        curReadChapterRef.current = curReadChapter // 实时更新引用
+    }, [curReadChapter])
+
     // 切换阅读章节
     const { prevChapter, nextChapter, processChapterSwitch } = useChapterSwitch({
         curReadChapter,
@@ -449,42 +473,66 @@ export default function ReadPage() {
         setCurReadChapter,
         getNoChineseCharacterList,
         getCacheChapterContentsByIndexs,
-        setChapterContents
+        setChapterContents,
+        setCurrentPage
     })
     // 切换上下页
-    const { currentPage, setCurrentPage, nextPage, prevPage, calcPageDataCallback, maxPageIndexRef } = usePageSwitch({
+    const { nextPage, prevPage, calcPageDataCallback, maxPageIndexRef } = usePageSwitch({
         prevChapter,
-        nextChapter
+        nextChapter,
+        currentPage,
+        setCurrentPage
     })
     // 指引
     const { showGuide, closeGuide } = useGuide()
-    // 保存当前阅读章节
-    useDebouncedSave(CURRENT_READ_CHAPTER_KEY, curReadChapter)
 
     useEffect(() => {
         if (maxPageIndexRef.current === 0) return setCurChapterProgress(0)
         const progress = Math.round((currentPage / maxPageIndexRef.current) * 100 * 100) / 100
         // 四舍五入
         setCurChapterProgress(progress)
-        // 更新当前阅读章节的进度
+        // 更新当前章节的阅读进度
         setCurReadChapter(prev => {
             if (!prev) return prev
             return {
                 ...prev,
-                readProgress: progress
+                readProgress: currentPage
             }
         })
     }, [currentPage])
 
+    const params = useLocalSearchParams()
+
     async function init() {
+        const bookName = params.bookName as string
+        const author = params.author as string
+        const bookId = params.bookId as string
+        const source = await LocalCache.getData(CURRENT_SOURCE)
+
         // 1. 获取当前的阅读章节
-        //  - 在每次进入阅读页面之前，都会处理当前阅读章节，所以一般而言，肯定会有当前阅读章节数据
-        const currentReadChapter: CurrentReadChapterInfo = await LocalCache.getData(CURRENT_READ_CHAPTER_KEY)
+        let currentReadChapter = await getReadStorage({
+            bookName: params.bookName as string,
+            author: params.author as string
+        })
+
+        // 如果不存在，则添加一个初始的阅读记录
+        if (!currentReadChapter) {
+            const data = {
+                bID: params.bookId as string,
+                cSN: 0,
+                source,
+                readProgress: 0,
+                bookName,
+                author
+            }
+            currentReadChapter = data
+            updateReadStorage(data)
+        }
+
+        setCurrentPage(currentReadChapter.readProgress)
+
         if (!currentReadChapter) return
         setCurReadChapter(currentReadChapter)
-
-        const bookId = currentReadChapter.bID
-        const source = currentReadChapter.source
 
         // 2. 获取书籍详情
         const _chapters = await getBookDetails(bookId, source)
@@ -504,6 +552,12 @@ export default function ReadPage() {
 
     useEffect(() => {
         init()
+
+        return () => {
+            // 组件卸载时，保存阅读进度到本地
+            if (!curReadChapterRef.current) return
+            updateReadStorage(curReadChapterRef.current)
+        }
     }, [])
 
     // 当前章节名称
@@ -586,8 +640,9 @@ export default function ReadPage() {
                         nextChapter={nextChapter}
                         isVisible={isVisible}
                         showChapterList={showChapterList}
-                        curChapterProgress={curChapterProgress}
+                        curChapterProgress={0}
                     />
+                    {/* curChapterProgress={curChapterProgress} */}
                     {isVisible && (
                         <TouchableOpacity
                             onPress={() => setIsVisible(false)}
@@ -603,7 +658,10 @@ export default function ReadPage() {
                             setIsChapterListVisible(false)
                             // 章节不一致时才需要改变
                             if (chapterIndex !== curReadChapter?.cSN) {
-                                processChapterSwitch(chapterIndex, curReadChapter?.cSN!)
+                                // 切换章节时，重置当前页码
+                                setCurrentPage(0)
+
+                                processChapterSwitch(chapterIndex, curReadChapter?.cSN!, 0)
                             }
                         }}
                     />

@@ -1,6 +1,9 @@
 export const ACCESS_TOKEN = 'ACCESS_TOKEN'
 export const REFRESH_TOKEN = 'REFRESH_TOKEN'
 
+// 当前书源
+export const CURRENT_SOURCE = 'CURRENT_SOURCE'
+
 // 搜索历史key
 export const SEARCH_HISTORY = 'SEARCH_HISTORY'
 
@@ -16,7 +19,7 @@ export const MY_BOOKSHELF = 'MY_BOOKSHELF'
 // 书架布局key
 export const BOOKSHELF_LAYOUT = 'BOOKSHELF_LAYOUT'
 
-// 当前阅读章节
+// 当前阅读章节(即阅读进度)
 export const CURRENT_READ_CHAPTER_KEY = 'CURRENT_READ_CHAPTER'
 
 // 阅读器界面设置

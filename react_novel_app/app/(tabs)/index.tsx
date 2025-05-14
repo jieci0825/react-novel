@@ -17,7 +17,7 @@ import { BookshelfItem } from '@/types'
 import bookshelfStorage from '@/utils/bookshelf.storage'
 import ImgPlus from '@/components/img-plus/img-plus'
 import { RelativePathString, router, useNavigation } from 'expo-router'
-import { LocalCache } from '@/utils'
+import { getReadStorage, LocalCache, updateReadStorage } from '@/utils'
 import { CURRENT_READ_CHAPTER_KEY } from '@/constants'
 
 enum BookLayout {
@@ -246,16 +246,14 @@ function HomeContent(props: HomeContentProps) {
     }, [])
 
     const toRead = async (book: BookshelfItem) => {
-        await LocalCache.storeData(CURRENT_READ_CHAPTER_KEY, {
-            bID: book.bookId,
-            cSN: book.lastReadChapter,
-            source: book.source,
-            readProgress: book.lastReadChapterProgress,
-            bookName: book.bookName,
-            author: book.author
+        router.push({
+            pathname: '/read',
+            params: {
+                bookId: book.bookId,
+                bookName: book.bookName,
+                author: book.author
+            }
         })
-
-        router.push({ pathname: '/read' })
     }
 
     const layoutComp: Record<BookLayout, React.ReactNode> = {

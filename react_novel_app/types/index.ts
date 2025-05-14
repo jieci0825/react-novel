@@ -13,7 +13,7 @@ export interface CurrentReadChapterInfo {
     bID: number | string
     cSN: number // 章节列表索引
     source: number
-    readProgress: number
+    readProgress: number // 即分页之后的页码值
     author: string
     bookName: string
 }
