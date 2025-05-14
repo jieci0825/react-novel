@@ -103,6 +103,7 @@ export default function DetailsPage() {
             bookName,
             author,
             cover: details?.cover || '',
+            lastReadChapter: 1,
             totalChapterCount: details?.chapters.length || 0
         }
 
