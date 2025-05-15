@@ -21,9 +21,12 @@ export const readStyles = (theme: Theme) => {
         },
         portionMask: {
             position: 'fixed',
-            inset: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.6)',
-            zIndex: 1000,
+            left: 0,
+            top: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 1001,
             display: 'flex',
             flexDirection: 'row'
         },
