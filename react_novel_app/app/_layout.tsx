@@ -6,9 +6,12 @@ import JcToast from '@/components/jc-toast/jc-toast'
 import { useEffect } from 'react'
 import { LocalCache } from '@/utils'
 import { CURRENT_SOURCE } from '@/constants'
+import { runDB } from '@/db'
 
 export default function Layout() {
     async function init() {
+        await runDB()
+
         const s = await LocalCache.getData(CURRENT_SOURCE)
         if (!s) {
             await LocalCache.storeData(CURRENT_SOURCE, 1)
