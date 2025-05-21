@@ -23,6 +23,8 @@ import useReactiveState from '@/hooks/useReactiveState'
 import { useSQLiteContext } from 'expo-sqlite'
 import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite'
 import * as schema from '@/db/schema'
+// 可视化插件
+import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 
 enum BookLayout {
     Grid = 1,
@@ -372,6 +374,8 @@ export default function Index() {
     // 传递 schema，提供 schema 文件/文件中的所有表和关系初始化
     const drizzleDB = drizzle(db, { schema })
 
+    // useDrizzleStudio(db)
+
     useEffect(() => {
         const load = async () => {
             const data = await drizzleDB.query.tasks.findMany()
@@ -381,7 +385,7 @@ export default function Index() {
     }, [])
 
     const { data } = useLiveQuery(drizzleDB.select().from(schema.tasks))
-    console.log('data:', data)
+    console.log('data--11:', data)
 
     return (
         <>

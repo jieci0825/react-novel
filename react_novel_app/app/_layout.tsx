@@ -35,25 +35,26 @@ export default function Layout() {
     useDrizzleStudio(expoDb)
 
     // * 这些部分在你数据迁移的时候可能会很有用
-    // const db = drizzle(expoDb)
+    const db = drizzle(expoDb)
 
-    // const { success, error } = useMigrations(db, migrations)
+    const { success, error } = useMigrations(db, migrations)
 
-    // if (error) {
-    //     return (
-    //         <View>
-    //             <Text>Migration error: {error.message}</Text>
-    //         </View>
-    //     )
-    // }
+    if (error) {
+        return (
+            <View>
+                <Text>Migration error: {error.message}</Text>
+            </View>
+        )
+    }
 
-    // // 当成功之后，添加一些测试数据
-    // useEffect(() => {
-    //     if (success) {
-    //         // 迁移数据库完成之后，添加一些测试数据
-    //         addDummyData(db)
-    //     }
-    // }, [success])
+    // 当成功之后，添加一些测试数据
+    useEffect(() => {
+        console.log('success', success)
+        if (success) {
+            // 迁移数据库完成之后，添加一些测试数据
+            addDummyData(db)
+        }
+    }, [success])
 
     return (
         <GluestackUIProvider mode='light'>
