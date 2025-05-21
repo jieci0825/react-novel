@@ -1,9 +1,11 @@
 import { initializeDB } from './database'
 
-export async function runDB() {
+export * as booksBooksDB from './tables/books.table'
+
+export function runDB() {
     try {
         const dbName = 'novel.db'
-        const db = await initializeDB(dbName)
+        const db = initializeDB(dbName)
         console.log(`sqlite 初始化 ${dbName} 成功`)
         return db
     } catch (error) {

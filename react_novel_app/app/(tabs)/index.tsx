@@ -20,6 +20,9 @@ import { RelativePathString, router, useNavigation } from 'expo-router'
 import { getReadStorage, LocalCache, updateReadStorage } from '@/utils'
 import { CURRENT_READ_CHAPTER_KEY } from '@/constants'
 import useReactiveState from '@/hooks/useReactiveState'
+import { useSQLiteContext } from 'expo-sqlite'
+import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite'
+import * as schema from '@/db/schema'
 
 enum BookLayout {
     Grid = 1,
@@ -360,10 +363,25 @@ function HomeContent(props: HomeContentProps) {
 
 export default function Index() {
     const { theme } = useTheme()
-
     const styles = homeStyles(theme)
 
     const [bookLayout, setBookLayout] = useState<BookLayout>(BookLayout.List)
+
+    const db = useSQLiteContext()
+
+    // 传递 schema，提供 schema 文件/文件中的所有表和关系初始化
+    const drizzleDB = drizzle(db, { schema })
+
+    useEffect(() => {
+        const load = async () => {
+            const data = await drizzleDB.query.tasks.findMany()
+            // const data = drizzleDB.select().from(schema.tasks).toSQL()
+        }
+        load()
+    }, [])
+
+    const { data } = useLiveQuery(drizzleDB.select().from(schema.tasks))
+    console.log('data:', data)
 
     return (
         <>

@@ -8,7 +8,7 @@ export interface BookItemBase {
     book_name: string
     author: string
     cover: string
-    source: string
+    source: number
     is_bookshelf: number
     last_read_chapter: number
     total_chapter: number
@@ -17,10 +17,10 @@ export interface BookItemBase {
 }
 
 // 创建 books 表
-export async function createBooksTable(db: SQLite.SQLiteDatabase) {
+export function createBooksTable(db: SQLite.SQLiteDatabase) {
     _db = db
 
-    await _db.execAsync(`
+    _db.execSync(`
         PRAGMA journal_mode = WAL;
 
         CREATE TABLE IF NOT EXISTS books (
@@ -39,7 +39,7 @@ export async function createBooksTable(db: SQLite.SQLiteDatabase) {
     `)
 }
 
-type InsertBookParams = Omit<BookItemBase, 'id'> & {
+type InsertBookParams = Omit<BookItemBase, 'id' | 'last_read_time'> & {
     last_read_time?: number
 }
 // 插入数据
@@ -53,13 +53,13 @@ export async function insertBook(book: InsertBookParams) {
         cover = '',
         source = '',
         is_bookshelf = 0,
-        last_read_chapter = '',
+        last_read_chapter = 0,
         total_chapter = 0,
         last_read_chapter_page_index = 0,
         last_read_time
     } = book
 
-    await _db.runAsync(
+    _db.runSync(
         `INSERT INTO books (
           book_id, book_name, author, cover, source, is_bookshelf,
           last_read_chapter, total_chapter, last_read_chapter_page_index, last_read_time
