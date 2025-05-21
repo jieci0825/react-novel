@@ -378,13 +378,13 @@ export default function Index() {
 
     useEffect(() => {
         const load = async () => {
-            const data = await drizzleDB.query.tasks.findMany()
+            // const data = await drizzleDB.query.tasks.findMany()
             // const data = drizzleDB.select().from(schema.tasks).toSQL()
         }
         load()
     }, [])
 
-    const { data } = useLiveQuery(drizzleDB.select().from(schema.tasks))
+    const { data } = useLiveQuery(drizzleDB.select().from(schema.books))
     console.log('data--11:', data)
 
     return (
