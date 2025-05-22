@@ -195,7 +195,10 @@ function BookGridLayout(props: BookLayoutProps) {
                                     delayLongPress={500}
                                 >
                                     <View style={styles.bookCover}>
-                                        <ImgPlus src={book.cover} />
+                                        <ImgPlus
+                                            src={book.cover}
+                                            fit='fill'
+                                        />
                                     </View>
                                     <Text
                                         numberOfLines={1}
@@ -262,7 +265,10 @@ function BookListLayout(props: BookLayoutProps) {
                         delayLongPress={500}
                     >
                         <View style={styles.bookCover}>
-                            <ImgPlus src={book.cover} />
+                            <ImgPlus
+                                src={book.cover}
+                                fit='fill'
+                            />
                         </View>
                         <View style={styles.bookInfo}>
                             <Text style={styles.bookTitle}>{book.bookName}</Text>
