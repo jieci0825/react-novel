@@ -107,7 +107,8 @@ export const detailsFooterStyles = (theme: Theme) => {
             alignItems: 'center',
             gap: 10,
             borderTopWidth: 1,
-            borderTopColor: theme.borderColor
+            borderTopColor: theme.borderColor,
+            backgroundColor: theme.bgColor
         },
         detailsFooterBtn: {
             flex: 1,
