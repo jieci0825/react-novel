@@ -303,10 +303,7 @@ function useChapterSwitch({
     }
 
     // 下一章
-    const nextChapter = (progress?: number) => {
-        // 每当切换到下一章节的时候，都应该将 currentPage 改为 0
-        setCurrentPage(0)
-
+    const nextChapter = async (progress?: number) => {
         // 下一章的时候，判断是否是最后一章节，如果是最后一章节，则不进行任何操作
         if (curReadChapter?.cSN === chapterList.length - 1) {
             jcShowToast({ text: '已经是最后一章了', type: 'info' })
@@ -315,7 +312,11 @@ function useChapterSwitch({
 
         // 切换到下一章节
         const index = curReadChapter?.cSN || 0
-        processChapterSwitch(index + 1, index, progress || 0)
+        await processChapterSwitch(index + 1, index, progress || 0)
+
+        // tips: 等待章节切换完成后再更新当前阅读章节，可以避免切换时会先展示一下当前章节的第一页，然后才展现要切换到下一章节的内容
+        // 每当切换到下一章节的时候，都应该将 currentPage 改为 0
+        setCurrentPage(0)
     }
 
     // 处理章节切换
