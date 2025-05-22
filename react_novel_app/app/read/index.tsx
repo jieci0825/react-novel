@@ -1,11 +1,11 @@
 import { Theme, useTheme } from '@/hooks/useTheme'
 import { readStyles } from '@/styles/pages/read.styles'
-import { Button, PixelRatio, Text, TouchableOpacity, View } from 'react-native'
+import { PixelRatio, Text, TouchableOpacity, View } from 'react-native'
 import ReadHeader from './read-header'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReadFooter from './read-footer'
 import { bookApi } from '@/api'
-import { useFocusEffect, useLocalSearchParams } from 'expo-router'
+import { useLocalSearchParams } from 'expo-router'
 import { ChapterItem, GetBookDetailsData } from '@/api/modules/book/type'
 import ChapterList from '@/components/chapter-list/chapter-list'
 import { CurrentReadChapterInfo } from '@/types'
@@ -13,7 +13,6 @@ import {
     debounce,
     extractNonChineseChars,
     getAdjacentIndexes,
-    getReadStorage,
     LocalCache,
     splitTextByLine,
     updateReadStorage
@@ -23,10 +22,11 @@ import { jcShowToast } from '@/components/jc-toast/jc-toast'
 import ReadContentWrap from './read-content-wrap'
 import { ReaderSetting } from './read.type'
 import CalcTextSize from './calc-text-size'
-import { useSQLiteContext } from 'expo-sqlite'
-import { drizzle } from 'drizzle-orm/expo-sqlite'
+import { SQLiteDatabase, useSQLiteContext } from 'expo-sqlite'
+import { drizzle, ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite'
 import * as schema from '@/db/schema'
 import { and, eq } from 'drizzle-orm'
+import { DrizzleDB } from '@/db/db'
 
 // 缓存数量：即当前章节上下章节的缓存数量
 const cacheNum = 2
@@ -88,7 +88,7 @@ interface CacheChapterItem {
     chapterId: string | number
 }
 // 章节正文
-function useChapterContent() {
+function useChapterContent(drizzleDB: DrizzleDB, bookRecord: React.MutableRefObject<schema.Books | null>) {
     // 存储章节内容
     const [chapterContents, setChapterContents] = useState<CacheChapterItem[]>([])
 
@@ -117,7 +117,7 @@ function useChapterContent() {
         bookId: string | number,
         source: number
     ) {
-        // TODO 每次获取章节内容后，将内容进行缓存到本地，下次获取时先从本地获取，没有在筛选index去请求
+        // 每次获取章节内容后，将内容进行缓存到本地，下次获取时先从本地获取，没有在筛选index去请求
 
         const result = (
             await Promise.all(
@@ -138,6 +138,21 @@ function useChapterContent() {
                 chapterId: chapterList[allIndex[index]].chapterId
             }
         })
+
+        const chapterDataList = result.map(item => {
+            const obj: schema.AddChapters = {
+                chapter_name: item.chapterName,
+                content: item.content,
+                chapterIndex: item.chapterIndex,
+                // 即 books 表的主键 id
+                books_id: bookRecord.current?.id!
+            }
+
+            return obj
+        })
+
+        // 缓存章节内容到本地
+        await drizzleDB.insert(schema.chapters).values(chapterDataList)
 
         return result
     }
@@ -451,6 +466,9 @@ export default function ReadPage() {
     // 当前页
     const [currentPage, setCurrentPage] = useState(0)
 
+    // 当前books表中的记录
+    const bookRef = useRef<schema.Books | null>(null)
+
     // 页面hooks
     const {
         isVisible,
@@ -463,7 +481,7 @@ export default function ReadPage() {
     } = useUIState()
     const { bookDetails, chapterList, setChapterList, getBookDetails } = useBookData()
     const { chapterContents, setChapterContents, getCacheChapterContentsInit, getCacheChapterContentsByIndexs } =
-        useChapterContent()
+        useChapterContent(drizzleDB, bookRef)
     const { readStyle, setReadStyle } = useReaderSetting(theme)
     const { characterSizeMap, dynamicTextStyles, addData, noChineseCharacterList, getNoChineseCharacterList } =
         useCacheCharacterSize(readStyle)
@@ -555,6 +573,8 @@ export default function ReadPage() {
                 author
             }
         } else {
+            bookRef.current = result[0]
+
             const record = result[0]
             // 存在则根据进度赋值
             currentReadChapter = {

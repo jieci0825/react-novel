@@ -23,4 +23,6 @@ export const chapters = sqliteTable('chapters', {
 
 export type Books = typeof books.$inferSelect
 export type AddBooks = Omit<Books, 'id'>
+
 export type Chapters = typeof chapters.$inferSelect
+export type AddChapters = Omit<Chapters, 'id'>
