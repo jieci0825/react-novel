@@ -8,23 +8,20 @@ import { LocalCache } from '@/utils'
 import { CURRENT_SOURCE } from '@/constants'
 import { ActivityIndicator, Text, View } from 'react-native'
 import { openDatabaseSync, SQLiteProvider } from 'expo-sqlite'
-import { drizzle } from 'drizzle-orm/expo-sqlite'
 import migrations from '@/drizzle/migrations'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { addDummyData } from '@/db/add-dummy-data'
+import { initDB } from '@/db/db'
+import { drizzle } from 'drizzle-orm/expo-sqlite'
 // 可视化插件
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 
-export const DATABASE_NAME = 'novel.db'
+const DATABASE_NAME = 'novel.db'
 
 export default function Layout() {
-    const expoDb = openDatabaseSync(DATABASE_NAME)
-    // 终端按下 shift + m 进入，可视化工具，浏览器查看
-    useDrizzleStudio(expoDb)
+    const { db, DATABASE_NAME } = initDB()
 
     // * 这些部分在你数据迁移的时候可能会很有用
-    const db = drizzle(expoDb)
-
     const { success, error } = useMigrations(db, migrations)
 
     async function init() {
@@ -41,11 +38,7 @@ export default function Layout() {
 
     // 当成功之后，添加一些测试数据
     useEffect(() => {
-        // console.log('success', success)
-        // if (success && db) {
-        //     // 迁移数据库完成之后，添加一些测试数据
-        //     addDummyData(db)
-        // }
+        console.log('success', success)
     }, [success])
 
     if (error) {
@@ -60,6 +53,7 @@ export default function Layout() {
     return (
         <GluestackUIProvider mode='light'>
             <Suspense fallback={<ActivityIndicator size='large' />}>
+                {/* enableChangeListener 数据库更新更新UI */}
                 <SQLiteProvider
                     databaseName={DATABASE_NAME}
                     options={{ enableChangeListener: true }}
