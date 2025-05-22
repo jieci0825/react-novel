@@ -141,20 +141,35 @@ export default function DetailsPage() {
         const author = details.author || '[未知]'
         const cover = details.cover || ''
 
-        const data: schema.AddBooks = {
-            book_id: params.bid as string,
-            book_name: bookName,
-            author,
-            cover,
-            is_bookshelf: true,
-            total_chapter: details?.chapters.length || 0,
-            last_read_chapter_page_index: 0,
-            last_read_chapter_index: 0,
-            last_read_time: new Date()
-        }
+        // 检测书籍是否存在于书架中，如果存在则只更新 is_bookshelf 为 true
+        const result = await drizzleDB
+            .select()
+            .from(schema.books)
+            .where(and(eq(schema.books.book_name, bookName), eq(schema.books.author, author)))
 
-        // 插入数据到 books 表
-        await drizzleDB.insert(schema.books).values(data)
+        if (result.length) {
+            await drizzleDB
+                .update(schema.books)
+                .set({
+                    is_bookshelf: true
+                })
+                .where(eq(schema.books.id, result[0].id))
+        } else {
+            const data: schema.AddBooks = {
+                book_id: params.bid as string,
+                book_name: bookName,
+                author,
+                cover,
+                is_bookshelf: true,
+                total_chapter: details?.chapters.length || 0,
+                last_read_chapter_page_index: 0,
+                last_read_chapter_index: 0,
+                last_read_time: new Date()
+            }
+
+            // 插入数据到 books 表
+            await drizzleDB.insert(schema.books).values(data)
+        }
 
         setIsExistBookShelf(true)
     }
