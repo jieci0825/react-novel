@@ -25,6 +25,10 @@ import { CharacterSizeMap, ReaderSetting } from './read.type'
 import ReadContentFooter from './read-content-footer'
 import CalcTextSize from './calc-text-size'
 import bookshelfStorage from '@/utils/bookshelf.storage'
+import { useSQLiteContext } from 'expo-sqlite'
+import { drizzle } from 'drizzle-orm/expo-sqlite'
+import * as schema from '@/db/schema'
+import { and, eq } from 'drizzle-orm'
 
 // 缓存数量：即当前章节上下章节的缓存数量
 const cacheNum = 2
@@ -69,7 +73,11 @@ function useBookData() {
         })
         setChapterList(bookResp.data.chapters)
         setBookDetails(bookResp.data)
-        return bookResp.data.chapters
+
+        return {
+            details: bookResp.data,
+            chapters: bookResp.data.chapters
+        }
     }
 
     return { bookDetails, chapterList, setChapterList, getBookDetails }
@@ -437,6 +445,9 @@ export default function ReadPage() {
     const { theme } = useTheme()
     const styles = readStyles(theme)
 
+    const db = useSQLiteContext()
+    const drizzleDB = drizzle(db, { schema })
+
     // 是否开始正式正式渲染
     const [isRender, setIsRender] = useState(false)
     // 当前页
@@ -510,33 +521,58 @@ export default function ReadPage() {
         const bookId = params.bookId as string
         const source = await LocalCache.getData(CURRENT_SOURCE)
 
-        // 1. 获取当前的阅读章节
-        let currentReadChapter = await getReadStorage({
-            bookName: params.bookName as string,
-            author: params.author as string
-        })
+        const result = await drizzleDB
+            .select()
+            .from(schema.books)
+            .where(and(eq(schema.books.book_name, bookName), eq(schema.books.author, author)))
 
-        // 如果不存在，则添加一个初始的阅读记录
-        if (!currentReadChapter) {
-            const data = {
-                bID: params.bookId as string,
-                cSN: 0,
+        // 2. 获取书籍详情
+        const { chapters: _chapters, details } = await getBookDetails(bookId, source)
+
+        let currentReadChapter: CurrentReadChapterInfo = {} as CurrentReadChapterInfo
+
+        // 如果不存在，则添加一个记录
+        if (!result.length) {
+            const data: schema.AddBooks = {
+                book_id: bookId,
+                book_name: bookName,
+                author,
+                cover: details.cover,
+                is_bookshelf: true,
+                total_chapter: _chapters.length || 0,
+                last_read_chapter_page_index: 0,
+                last_read_chapter_index: 0,
+                last_read_time: new Date()
+            }
+
+            // 插入数据到 books 表
+            await drizzleDB.insert(schema.books).values(data)
+
+            currentReadChapter = {
+                bID: bookId,
                 source,
+                cSN: 0,
                 readProgress: 0,
                 bookName,
                 author
             }
-            currentReadChapter = data
-            updateReadStorage(data)
+        } else {
+            const record = result[0]
+            // 存在则根据进度赋值
+            currentReadChapter = {
+                bID: bookId,
+                source,
+                cSN: record.last_read_chapter_index,
+                readProgress: record.last_read_chapter_page_index,
+                bookName,
+                author
+            }
         }
 
-        setCurrentPage(currentReadChapter.readProgress)
-
         if (!currentReadChapter) return
-        setCurReadChapter(currentReadChapter)
 
-        // 2. 获取书籍详情
-        const _chapters = await getBookDetails(bookId, source)
+        setCurrentPage(currentReadChapter.readProgress)
+        setCurReadChapter(currentReadChapter)
 
         // 3. 获取初始化的缓存章节内容
         const _allChapterContents = await getCacheChapterContentsInit(currentReadChapter.cSN, _chapters, bookId, source)
@@ -557,13 +593,17 @@ export default function ReadPage() {
         return () => {
             // 组件卸载时，保存阅读进度到本地
             if (!curReadChapterRef.current) return
-            updateReadStorage(curReadChapterRef.current)
-            // 同时更新一下书架中记录的阅读进度，只需要更新阅读章节即可，主要用作渲染，不具备实际作用
-            const { updateBookshelfLastChapter, genKey } = bookshelfStorage
-            updateBookshelfLastChapter(
-                curReadChapterRef.current.cSN + 1,
-                genKey(curReadChapterRef.current.bookName, curReadChapterRef.current.author)
-            )
+            // 更新 books 表中的阅读进度
+            const update = async (cur: CurrentReadChapterInfo) => {
+                await drizzleDB
+                    .update(schema.books)
+                    .set({
+                        last_read_chapter_index: cur.cSN,
+                        last_read_chapter_page_index: cur.readProgress
+                    })
+                    .where(and(eq(schema.books.book_name, cur.bookName), eq(schema.books.author, cur.author)))
+            }
+            update(curReadChapterRef.current)
         }
     }, [])
 
