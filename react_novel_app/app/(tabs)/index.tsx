@@ -21,10 +21,9 @@ import { getReadStorage, LocalCache, updateReadStorage } from '@/utils'
 import { CURRENT_READ_CHAPTER_KEY } from '@/constants'
 import useReactiveState from '@/hooks/useReactiveState'
 import { useSQLiteContext } from 'expo-sqlite'
-import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite'
+import { drizzle } from 'drizzle-orm/expo-sqlite'
 import * as schema from '@/db/schema'
-// 可视化插件
-import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
+import { and, eq } from 'drizzle-orm'
 
 enum BookLayout {
     Grid = 1,
@@ -283,15 +282,26 @@ interface HomeContentProps {
 }
 function HomeContent(props: HomeContentProps) {
     const { theme } = useTheme()
-
     const styles = homeContentStyles(theme)
+
+    const db = useSQLiteContext()
+    const drizzleDB = drizzle(db, { schema })
 
     const [bookList, setBookList] = useState<RenderBookshelfItem[]>([])
 
     async function init() {
-        const resp = await bookshelfStorage.getBookshelfList()
-        const list = resp.map(item => {
-            return { ...item, isActive: false }
+        const result = await drizzleDB.select().from(schema.books).where(eq(schema.books.is_bookshelf, true))
+
+        const list = result.map(item => {
+            return {
+                bookId: item.book_id,
+                cover: item.cover!,
+                author: item.author,
+                bookName: item.book_name,
+                lastReadChapter: item.last_read_chapter_index + 1,
+                totalChapterCount: item.total_chapter,
+                isActive: false
+            }
         })
         setBookList(list)
     }
@@ -299,7 +309,6 @@ function HomeContent(props: HomeContentProps) {
     const navigation = useNavigation()
 
     useEffect(() => {
-        // TODO 解决从详情页返回不会重新获取导致章节进度没有更新的问题
         const unsubscribe = navigation.addListener('focus', () => {
             init()
         })
