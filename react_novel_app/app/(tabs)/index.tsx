@@ -23,7 +23,7 @@ import useReactiveState from '@/hooks/useReactiveState'
 import { useSQLiteContext } from 'expo-sqlite'
 import { drizzle } from 'drizzle-orm/expo-sqlite'
 import * as schema from '@/db/schema'
-import { and, eq } from 'drizzle-orm'
+import { and, desc, eq } from 'drizzle-orm'
 
 enum BookLayout {
     Grid = 1,
@@ -296,7 +296,11 @@ function HomeContent(props: HomeContentProps) {
     const [bookList, setBookList] = useState<RenderBookshelfItem[]>([])
 
     async function init() {
-        const result = await drizzleDB.select().from(schema.books).where(eq(schema.books.is_bookshelf, true))
+        const result = await drizzleDB
+            .select()
+            .from(schema.books)
+            .where(eq(schema.books.is_bookshelf, true))
+            .orderBy(desc(schema.books.last_read_time))
 
         const list = result.map(item => {
             return {
