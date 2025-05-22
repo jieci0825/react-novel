@@ -778,6 +778,11 @@ export default function ReadPage() {
                     />
                 </TouchableOpacity>
             )}
+            {!isRender && (
+                <View style={styles.container}>
+                    <Text>加载中...</Text>
+                </View>
+            )}
             {showGuide && (
                 <TouchableOpacity
                     activeOpacity={1}
