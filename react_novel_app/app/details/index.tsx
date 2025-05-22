@@ -90,8 +90,14 @@ export default function DetailsPage() {
     }
 
     const toRead = async (cSN?: number) => {
+        if (!details) {
+            // 没有详情记录则不做后续处理
+            // TODO 添加提示
+            return
+        }
+
         // 如果有 cSN 则表示打开书籍，需要定位到这个章节，且章节进度为更新为 0
-        if (cSN !== undefined && details) {
+        if (cSN !== undefined) {
             // 从 books 表中，找到当前书籍的记录
             const result = await drizzleDB
                 .select()
@@ -108,18 +114,14 @@ export default function DetailsPage() {
                     })
                     .where(eq(schema.books.id, result[0].id))
             }
-        } else {
-            // 没有详情记录则不做后续处理
-            // TODO 添加提示
-            return
         }
 
         router.push({
             pathname: '/read' as RelativePathString,
             params: {
                 bookId: params.bid,
-                bookName: details?.title,
-                author: details?.author
+                bookName: details.title,
+                author: details.author
             }
         })
     }
