@@ -663,7 +663,8 @@ export default function ReadPage() {
                     .update(schema.books)
                     .set({
                         last_read_chapter_index: cur.cSN,
-                        last_read_chapter_page_index: cur.readProgress
+                        last_read_chapter_page_index: cur.readProgress,
+                        last_read_time: new Date()
                     })
                     .where(and(eq(schema.books.book_name, cur.bookName), eq(schema.books.author, cur.author)))
             }
