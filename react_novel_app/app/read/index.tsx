@@ -18,13 +18,11 @@ import {
     splitTextByLine,
     updateReadStorage
 } from '@/utils'
-import { CURRENT_READ_CHAPTER_KEY, CURRENT_SOURCE, READER_GUIDE_AREA } from '@/constants'
+import { CURRENT_SOURCE, READER_GUIDE_AREA } from '@/constants'
 import { jcShowToast } from '@/components/jc-toast/jc-toast'
 import ReadContentWrap from './read-content-wrap'
-import { CharacterSizeMap, ReaderSetting } from './read.type'
-import ReadContentFooter from './read-content-footer'
+import { ReaderSetting } from './read.type'
 import CalcTextSize from './calc-text-size'
-import bookshelfStorage from '@/utils/bookshelf.storage'
 import { useSQLiteContext } from 'expo-sqlite'
 import { drizzle } from 'drizzle-orm/expo-sqlite'
 import * as schema from '@/db/schema'
