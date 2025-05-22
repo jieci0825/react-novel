@@ -110,6 +110,24 @@ function useChapterContent(drizzleDB: DrizzleDB, bookRecord: React.MutableRefObj
         return allChapterContents
     }
 
+    // 检测章节是否存在
+    async function checkChapterExist(chapterIndex: number) {
+        const result = await drizzleDB
+            .select()
+            .from(schema.chapters)
+            .where(
+                and(
+                    eq(schema.chapters.books_id, bookRecord.current?.id!),
+                    eq(schema.chapters.chapterIndex, chapterIndex)
+                )
+            )
+
+        return {
+            isExist: !!(result.length > 0),
+            row: result[0]
+        }
+    }
+
     // 根据章节索引获取章节内容
     async function getCacheChapterContentsByIndexs(
         allIndex: number[],
@@ -117,11 +135,29 @@ function useChapterContent(drizzleDB: DrizzleDB, bookRecord: React.MutableRefObj
         bookId: string | number,
         source: number
     ) {
+        const requestResultList = []
+
         // 每次获取章节内容后，将内容进行缓存到本地，下次获取时先从本地获取，没有在筛选index去请求
+        const needRequestIndex = []
+        for (const idx of allIndex) {
+            const { isExist, row } = await checkChapterExist(idx)
+
+            // 如果不存在才需要请求，加入请求队列
+            if (!isExist) {
+                needRequestIndex.push(idx)
+            } else {
+                requestResultList.push({
+                    chapterIndex: idx,
+                    content: row.content,
+                    chapterName: row.chapter_name,
+                    chapterId: chapterList[idx].chapterId
+                })
+            }
+        }
 
         const result = (
             await Promise.all(
-                allIndex.map(item => {
+                needRequestIndex.map(item => {
                     return bookApi.reqGetBookContent({
                         bookId: bookId as string,
                         _source: +source,
@@ -139,7 +175,9 @@ function useChapterContent(drizzleDB: DrizzleDB, bookRecord: React.MutableRefObj
             }
         })
 
-        const chapterDataList = result.map(item => {
+        requestResultList.push(...result)
+
+        const chapterDataList = requestResultList.map(item => {
             const obj: schema.AddChapters = {
                 chapter_name: item.chapterName,
                 content: item.content,
@@ -151,10 +189,17 @@ function useChapterContent(drizzleDB: DrizzleDB, bookRecord: React.MutableRefObj
             return obj
         })
 
-        // 缓存章节内容到本地
-        await drizzleDB.insert(schema.chapters).values(chapterDataList)
+        for (const item of chapterDataList) {
+            // 检测是否存在。只要 booksId 和 chapterIndex 相同，就不再插入
+            const { isExist } = await checkChapterExist(item.chapterIndex)
 
-        return result
+            // 不存在的才缓存章节内容到本地
+            if (!isExist) {
+                await drizzleDB.insert(schema.chapters).values(item)
+            }
+        }
+
+        return requestResultList
     }
 
     return { chapterContents, setChapterContents, getCacheChapterContentsInit, getCacheChapterContentsByIndexs }
