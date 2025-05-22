@@ -46,7 +46,7 @@ export const detailsBookInfoStyles = (theme: Theme) => {
             color: theme.textPrimaryColor
         },
         bookAuthor: {
-            fontSize: RFValue(16),
+            fontSize: RFValue(14),
             marginTop: 5,
             color: theme.textSecondaryColor
         },

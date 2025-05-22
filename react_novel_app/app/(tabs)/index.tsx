@@ -369,24 +369,6 @@ export default function Index() {
 
     const [bookLayout, setBookLayout] = useState<BookLayout>(BookLayout.List)
 
-    const db = useSQLiteContext()
-
-    // 传递 schema，提供 schema 文件/文件中的所有表和关系初始化
-    const drizzleDB = drizzle(db, { schema })
-
-    // useDrizzleStudio(db)
-
-    useEffect(() => {
-        const load = async () => {
-            // const data = await drizzleDB.query.tasks.findMany()
-            // const data = drizzleDB.select().from(schema.tasks).toSQL()
-        }
-        load()
-    }, [])
-
-    const { data } = useLiveQuery(drizzleDB.select().from(schema.books))
-    console.log('data--11:', data)
-
     return (
         <>
             <View style={styles.container}>

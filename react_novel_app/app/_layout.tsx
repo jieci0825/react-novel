@@ -18,6 +18,15 @@ import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
 export const DATABASE_NAME = 'novel.db'
 
 export default function Layout() {
+    const expoDb = openDatabaseSync(DATABASE_NAME)
+    // 终端按下 shift + m 进入，可视化工具，浏览器查看
+    useDrizzleStudio(expoDb)
+
+    // * 这些部分在你数据迁移的时候可能会很有用
+    const db = drizzle(expoDb)
+
+    const { success, error } = useMigrations(db, migrations)
+
     async function init() {
         const s = await LocalCache.getData(CURRENT_SOURCE)
         if (!s) {
@@ -30,31 +39,23 @@ export default function Layout() {
         init()
     }, [])
 
-    const expoDb = openDatabaseSync(DATABASE_NAME)
-    // 终端按下 shift + m 进入，可视化工具，浏览器查看
-    useDrizzleStudio(expoDb)
-
-    // * 这些部分在你数据迁移的时候可能会很有用
-    const db = drizzle(expoDb)
-
-    const { success, error } = useMigrations(db, migrations)
+    // 当成功之后，添加一些测试数据
+    useEffect(() => {
+        // console.log('success', success)
+        // if (success && db) {
+        //     // 迁移数据库完成之后，添加一些测试数据
+        //     addDummyData(db)
+        // }
+    }, [success])
 
     if (error) {
+        console.log('error', error.message)
         return (
             <View>
                 <Text>Migration error: {error.message}</Text>
             </View>
         )
     }
-
-    // 当成功之后，添加一些测试数据
-    useEffect(() => {
-        console.log('success', success)
-        if (success) {
-            // 迁移数据库完成之后，添加一些测试数据
-            addDummyData(db)
-        }
-    }, [success])
 
     return (
         <GluestackUIProvider mode='light'>
