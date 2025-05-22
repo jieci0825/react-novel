@@ -47,7 +47,13 @@ export default function DetailsPage() {
             const result = await drizzleDB
                 .select()
                 .from(schema.books)
-                .where(and(eq(schema.books.book_name, data.title), eq(schema.books.author, data.author)))
+                .where(
+                    and(
+                        eq(schema.books.book_name, data.title),
+                        eq(schema.books.author, data.author),
+                        eq(schema.books.is_bookshelf, true)
+                    )
+                )
 
             if (result.length > 0) {
                 setIsExistBookShelf(true)
@@ -103,6 +109,7 @@ export default function DetailsPage() {
                 .select()
                 .from(schema.books)
                 .where(and(eq(schema.books.book_name, details.title), eq(schema.books.author, details.author)))
+            // 如果有，更新 books 表中的记录
             if (result.length) {
                 await drizzleDB
                     .update(schema.books)

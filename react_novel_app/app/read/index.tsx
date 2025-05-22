@@ -600,7 +600,7 @@ export default function ReadPage() {
                 book_name: bookName,
                 author,
                 cover: details.cover,
-                is_bookshelf: true,
+                is_bookshelf: false,
                 total_chapter: _chapters.length || 0,
                 last_read_chapter_page_index: 0,
                 last_read_chapter_index: 0,
