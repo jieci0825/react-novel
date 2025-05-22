@@ -2,7 +2,7 @@ import PageHeader from '@/components/page-header/page-header'
 import { useTheme } from '@/hooks/useTheme'
 import { detailsStyles } from '@/styles/pages/details.style'
 import { RelativePathString, router, useLocalSearchParams } from 'expo-router'
-import { Text, TouchableOpacity, View } from 'react-native'
+import { Text, TouchableOpacity, View, ScrollView } from 'react-native'
 import AntDesign from '@expo/vector-icons/AntDesign'
 import { RFValue } from 'react-native-responsive-fontsize'
 import BookInfo from './book-info'
@@ -178,16 +178,18 @@ export default function DetailsPage() {
                     title='书籍详情'
                 />
                 <View style={styles.main}>
-                    {details && <BookInfo item={details} />}
-                    {details && (
-                        <BookChapter
-                            onMoreChapter={onMoreChapter}
-                            item={details}
-                            onChapterClick={index => {
-                                toRead(index)
-                            }}
-                        />
-                    )}
+                    <ScrollView style={styles.mainWrap}>
+                        {details && <BookInfo item={details} />}
+                        {details && (
+                            <BookChapter
+                                onMoreChapter={onMoreChapter}
+                                item={details}
+                                onChapterClick={index => {
+                                    toRead(index)
+                                }}
+                            />
+                        )}
+                    </ScrollView>
                 </View>
                 <DetailsFooter
                     toRead={() => toRead()}

@@ -16,9 +16,12 @@ export const detailsStyles = (theme: Theme) => {
         },
         main: {
             flex: 1,
-            overflowY: 'auto',
+            overflowY: 'scroll',
             overflowX: 'hidden',
-            padding: 20
+            paddingVertical: 20
+        },
+        mainWrap: {
+            paddingHorizontal: 20
         }
     })
 }
