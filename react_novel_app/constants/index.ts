@@ -1,6 +1,9 @@
 export const ACCESS_TOKEN = 'ACCESS_TOKEN'
 export const REFRESH_TOKEN = 'REFRESH_TOKEN'
 
+// 当前用户设置
+export const USER_SETTING = 'USER_SETTING'
+
 // 当前书源
 export const CURRENT_SOURCE = 'CURRENT_SOURCE'
 

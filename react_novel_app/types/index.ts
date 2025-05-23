@@ -15,3 +15,7 @@ export interface CurrentReadChapterInfo {
     author: string
     bookName: string
 }
+
+export interface UserSetting {
+    systemTheme: 'light' | 'dark'
+}

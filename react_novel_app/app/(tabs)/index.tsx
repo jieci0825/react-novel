@@ -10,13 +10,12 @@ import {
     homeHeaderStyles,
     homeStyles
 } from '@/styles/tabs/index.style'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RFValue } from 'react-native-responsive-fontsize'
 import PageHeader from '@/components/page-header/page-header'
 import { BookshelfItem } from '@/types'
 import ImgPlus from '@/components/img-plus/img-plus'
-import { RelativePathString, router, useNavigation } from 'expo-router'
-import { getReadStorage, LocalCache, updateReadStorage } from '@/utils'
+import { router, useNavigation } from 'expo-router'
 import useReactiveState from '@/hooks/useReactiveState'
 import { useSQLiteContext } from 'expo-sqlite'
 import { drizzle } from 'drizzle-orm/expo-sqlite'

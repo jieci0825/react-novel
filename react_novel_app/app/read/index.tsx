@@ -10,10 +10,10 @@ import { ChapterItem, GetBookDetailsData } from '@/api/modules/book/type'
 import ChapterList from '@/components/chapter-list/chapter-list'
 import { CurrentReadChapterInfo } from '@/types'
 import { extractNonChineseChars, getAdjacentIndexes, LocalCache, splitTextByLine } from '@/utils'
-import { CURRENT_SOURCE, READER_GUIDE_AREA } from '@/constants'
+import { CURRENT_SOURCE, READER_GUIDE_AREA, READER_SETTING } from '@/constants'
 import { jcShowToast } from '@/components/jc-toast/jc-toast'
 import ReadContentWrap from './read-content-wrap'
-import { ReaderSetting } from './read.type'
+import type { ReaderSetting } from './read.type'
 import CalcTextSize from './calc-text-size'
 import { useSQLiteContext } from 'expo-sqlite'
 import { drizzle } from 'drizzle-orm/expo-sqlite'
@@ -562,6 +562,11 @@ export default function ReadPage() {
         const author = params.author as string
         const bookId = params.bookId as string
         const source = await LocalCache.getData(CURRENT_SOURCE)
+
+        // 处理阅读器界面设置
+        const readerSetting: ReaderSetting = await LocalCache.getData(READER_SETTING)
+
+        setReadStyle(readerSetting)
 
         const result = await drizzleDB
             .select()
