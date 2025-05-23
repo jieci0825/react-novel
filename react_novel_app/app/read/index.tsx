@@ -208,7 +208,7 @@ function useChapterContent(drizzleDB: DrizzleDB, bookRecord: React.MutableRefObj
 // 阅读器界面设置
 function useReaderSetting(theme: Theme) {
     const [readStyle, setReadStyle] = useState<ReaderSetting>({
-        fontSize: 16, // 基础字体大小
+        fontSize: 18, // 基础字体大小
         lineHeight: 24, // 行高
         letterSpacing: 1, // 字间距
         paragraphSpacing: 14, // 段间距
@@ -501,7 +501,7 @@ function useDebouncedSave(value: CurrentReadChapterInfo | null, delay = 300) {
 
 export default function ReadPage() {
     // 主题样式
-    const { theme } = useTheme()
+    const { theme, toggleTheme } = useTheme()
     const styles = readStyles(theme)
 
     const db = useSQLiteContext()
@@ -760,6 +760,7 @@ export default function ReadPage() {
                         isVisible={isVisible}
                         showChapterList={showChapterList}
                         curChapterProgress={0}
+                        toggleDarkMode={toggleTheme}
                     />
                     <ChapterList
                         isVisible={isChapterListVisible}

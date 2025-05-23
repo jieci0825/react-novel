@@ -17,6 +17,7 @@ interface ReadFooterProps {
     prevChapter: () => void
     nextChapter: () => void
     curChapterProgress: number
+    toggleDarkMode: () => void
 }
 
 export default function ReadFooter(props: ReadFooterProps) {
@@ -76,7 +77,12 @@ export default function ReadFooter(props: ReadFooterProps) {
                         />
                         <Text style={styles.footerBottomBtnText}>目录</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.footerBottomBtn}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            props.toggleDarkMode()
+                        }}
+                        style={styles.footerBottomBtn}
+                    >
                         <Fontisto
                             name='night-clear'
                             size={RFValue(16)}

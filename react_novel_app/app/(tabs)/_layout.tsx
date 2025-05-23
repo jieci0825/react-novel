@@ -39,7 +39,8 @@ export default function TabLayout() {
                 tabBarButton: (props: any) => <TabBarButton {...props} />, // 自定义 tabbar 的按钮
                 headerShown: false, // 隐藏顶部导航栏
                 tabBarStyle: {
-                    height
+                    height,
+                    backgroundColor: theme.bgColor
                 },
                 tabBarLabelStyle: {
                     marginTop: mt,

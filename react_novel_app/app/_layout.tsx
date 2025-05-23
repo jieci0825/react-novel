@@ -1,4 +1,4 @@
-import { ThemeProvider } from '@/hooks/useTheme'
+import { ThemeProvider, useTheme } from '@/hooks/useTheme'
 import '@/global.css'
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider'
 import { Stack } from 'expo-router/stack'
@@ -6,19 +6,14 @@ import JcToast from '@/components/jc-toast/jc-toast'
 import { Suspense, useEffect } from 'react'
 import { LocalCache } from '@/utils'
 import { CURRENT_SOURCE } from '@/constants'
-import { ActivityIndicator, Text, View } from 'react-native'
-import { openDatabaseSync, SQLiteProvider } from 'expo-sqlite'
+import { ActivityIndicator, Platform, Text, View, StatusBar as RNStatusBar } from 'react-native'
+import { SQLiteProvider } from 'expo-sqlite'
 import migrations from '@/drizzle/migrations'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
-import { addDummyData } from '@/db/add-dummy-data'
 import { initDB } from '@/db/db'
-import { drizzle } from 'drizzle-orm/expo-sqlite'
-// 可视化插件
-import { useDrizzleStudio } from 'expo-drizzle-studio-plugin'
+import { StatusBar } from 'expo-status-bar'
 
-const DATABASE_NAME = 'novel.db'
-
-export default function Layout() {
+function InnerLayout() {
     const { db, DATABASE_NAME } = initDB()
 
     // * 这些部分在你数据迁移的时候可能会很有用
@@ -37,9 +32,7 @@ export default function Layout() {
     }, [])
 
     // 当成功之后，添加一些测试数据
-    useEffect(() => {
-        console.log('success', success)
-    }, [success])
+    useEffect(() => {}, [success])
 
     if (error) {
         console.log('error', error.message)
@@ -50,6 +43,10 @@ export default function Layout() {
         )
     }
 
+    const { theme, isDarkMode } = useTheme()
+
+    const statusBarHeight = Platform.OS === 'android' ? RNStatusBar.currentHeight ?? 0 : 0
+
     return (
         <GluestackUIProvider mode='light'>
             <Suspense fallback={<ActivityIndicator size='large' />}>
@@ -59,7 +56,11 @@ export default function Layout() {
                     options={{ enableChangeListener: true }}
                     useSuspense
                 >
-                    <ThemeProvider>
+                    <View style={{ flex: 1, paddingTop: statusBarHeight, backgroundColor: theme.bgColor }}>
+                        <StatusBar
+                            style={isDarkMode ? 'light' : 'dark'}
+                            translucent={true}
+                        />
                         <Stack>
                             <Stack.Screen
                                 name='(tabs)'
@@ -78,10 +79,18 @@ export default function Layout() {
                                 options={{ headerShown: false }}
                             />
                         </Stack>
-                        <JcToast />
-                    </ThemeProvider>
+                    </View>
+                    <JcToast />
                 </SQLiteProvider>
             </Suspense>
         </GluestackUIProvider>
+    )
+}
+
+export default function Layout() {
+    return (
+        <ThemeProvider>
+            <InnerLayout />
+        </ThemeProvider>
     )
 }
