@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native'
+import { ActivityIndicator, Text, View } from 'react-native'
 import { useTheme } from '@/hooks/useTheme'
 import { useEffect, useState } from 'react'
 import { bookStoreApi } from '@/api'
@@ -65,6 +65,8 @@ export default function SearchPage() {
     const [page, setPage] = useState(1)
     // 搜索关键词
     const [keyword, setKeyword] = useState<string>('')
+    // 是否显示加载效果
+    const [isLoading, setIsLoading] = useState(false)
 
     // 获取路由参数
     const params = useLocalSearchParams()
@@ -92,13 +94,17 @@ export default function SearchPage() {
         const k = v || keyword
         if (!k || !isMore) return
 
+        setIsLoading(true)
+
         // 每次搜索前需要添加历史记录、关闭历史记录面板、重置数据
         const h = await addHistoryKeyword(k)
         setHistorys(h)
         setShowHistoryPanel(false)
         reset()
 
-        fetchData({ keyword: k, _source: 1, page: 1 })
+        fetchData({ keyword: k, _source: 1, page: 1 }).then(() => {
+            setIsLoading(false)
+        })
     }
 
     // 获取数据
@@ -172,11 +178,22 @@ export default function SearchPage() {
                         onSelect={onSelect}
                     />
                 ) : (
-                    <SearchBookList
-                        list={searchResult}
-                        loadData={loadMore}
-                        isMore={isMore}
-                    />
+                    <>
+                        <SearchBookList
+                            list={searchResult}
+                            loadData={loadMore}
+                            isMore={isMore}
+                        />
+                    </>
+                )}
+                {/* 加载效果遮罩层 */}
+                {isLoading && (
+                    <View style={styles.mainLoadingWrap}>
+                        <ActivityIndicator
+                            size='large'
+                            color={theme.primaryColor}
+                        />
+                    </View>
                 )}
             </View>
         </View>

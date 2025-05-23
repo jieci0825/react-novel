@@ -1,6 +1,6 @@
 import { Theme, useTheme } from '@/hooks/useTheme'
 import { readStyles } from '@/styles/pages/read.styles'
-import { PixelRatio, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, PixelRatio, Text, TouchableOpacity, View } from 'react-native'
 import ReadHeader from './read-header'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReadFooter from './read-footer'
@@ -780,8 +780,21 @@ export default function ReadPage() {
                 </TouchableOpacity>
             )}
             {!isRender && (
-                <View style={styles.container}>
-                    <Text>加载中...</Text>
+                <View
+                    style={[
+                        styles.container,
+                        {
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            flex: 1,
+                            overflow: 'hidden'
+                        }
+                    ]}
+                >
+                    <ActivityIndicator
+                        size='large'
+                        color={theme.primaryColor}
+                    />
                 </View>
             )}
             {showGuide && (

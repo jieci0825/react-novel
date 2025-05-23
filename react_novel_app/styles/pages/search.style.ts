@@ -16,7 +16,18 @@ export const searchStyles = (theme: Theme) => {
         main: {
             width: '100%',
             flex: 1,
-            overflowY: 'auto'
+            overflowY: 'hidden',
+            position: 'relative'
+        },
+        mainLoadingWrap: {
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            left: 0,
+            top: 0,
+            alignItems: 'center',
+            paddingTop: adaptiveSize(100),
+            backgroundColor: theme.bgColor
         }
     })
 }
