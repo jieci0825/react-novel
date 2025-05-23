@@ -5,7 +5,7 @@ export type Theme = typeof LightTheme
 
 interface ThemeContextType {
     theme: Theme
-    toggleTheme: () => void
+    toggleTheme: (cb?: () => void) => void
     isDarkMode: boolean
 }
 
@@ -23,7 +23,9 @@ interface ThemeProviderProps {
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     const [isDarkMode, setIsDarkMode] = useState(false)
 
-    const toggleTheme = () => {
+    const toggleTheme = (cb?: () => void) => {
+        cb && cb()
+
         setIsDarkMode(!isDarkMode)
     }
 

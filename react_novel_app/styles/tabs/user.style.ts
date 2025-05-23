@@ -108,7 +108,7 @@ export const menuListStyles = (theme: Theme) => {
         },
         menuText: {
             fontSize: RFValue(14),
-            color: theme.secondaryColor,
+            color: theme.textPrimaryColor,
             flex: 1
         },
         menuAct: {

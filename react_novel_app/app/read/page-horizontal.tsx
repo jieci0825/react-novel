@@ -43,8 +43,7 @@ function NoneAnimation(props: NoneAnimationProps) {
                                 style={{
                                     ...props.textStyle,
                                     fontWeight: 'bold',
-                                    fontSize: (props.textStyle.fontSize as number) * 1.3,
-                                    color: theme.textPrimaryColor
+                                    fontSize: (props.textStyle.fontSize as number) * 1.3
                                 }}
                             >
                                 {item.content}

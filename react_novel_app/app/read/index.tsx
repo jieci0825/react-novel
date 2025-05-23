@@ -9,24 +9,18 @@ import { useLocalSearchParams } from 'expo-router'
 import { ChapterItem, GetBookDetailsData } from '@/api/modules/book/type'
 import ChapterList from '@/components/chapter-list/chapter-list'
 import { CurrentReadChapterInfo } from '@/types'
-import {
-    debounce,
-    extractNonChineseChars,
-    getAdjacentIndexes,
-    LocalCache,
-    splitTextByLine,
-    updateReadStorage
-} from '@/utils'
+import { extractNonChineseChars, getAdjacentIndexes, LocalCache, splitTextByLine } from '@/utils'
 import { CURRENT_SOURCE, READER_GUIDE_AREA } from '@/constants'
 import { jcShowToast } from '@/components/jc-toast/jc-toast'
 import ReadContentWrap from './read-content-wrap'
 import { ReaderSetting } from './read.type'
 import CalcTextSize from './calc-text-size'
-import { SQLiteDatabase, useSQLiteContext } from 'expo-sqlite'
-import { drizzle, ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite'
+import { useSQLiteContext } from 'expo-sqlite'
+import { drizzle } from 'drizzle-orm/expo-sqlite'
 import * as schema from '@/db/schema'
 import { and, eq } from 'drizzle-orm'
 import { DrizzleDB } from '@/db/db'
+import { DarkTheme } from '@/styles/variable'
 
 // 缓存数量：即当前章节上下章节的缓存数量
 const cacheNum = 2
@@ -206,7 +200,7 @@ function useChapterContent(drizzleDB: DrizzleDB, bookRecord: React.MutableRefObj
 }
 
 // 阅读器界面设置
-function useReaderSetting(theme: Theme) {
+function useReaderSetting(theme: Theme, isDarkMode: boolean) {
     const [readStyle, setReadStyle] = useState<ReaderSetting>({
         fontSize: 18, // 基础字体大小
         lineHeight: 24, // 行高
@@ -485,23 +479,9 @@ function useGuide() {
     return { showGuide, closeGuide }
 }
 
-// 防抖处理保存当前章节信息
-function useDebouncedSave(value: CurrentReadChapterInfo | null, delay = 300) {
-    const debouncedSave = useRef(
-        debounce((v: CurrentReadChapterInfo) => {
-            updateReadStorage(v)
-        }, delay)
-    ).current
-
-    useEffect(() => {
-        debouncedSave(value)
-        return () => debouncedSave.cancel()
-    }, [value, debouncedSave])
-}
-
 export default function ReadPage() {
     // 主题样式
-    const { theme, toggleTheme } = useTheme()
+    const { theme, toggleTheme, isDarkMode } = useTheme()
     const styles = readStyles(theme)
 
     const db = useSQLiteContext()
@@ -528,7 +508,7 @@ export default function ReadPage() {
     const { bookDetails, chapterList, setChapterList, getBookDetails } = useBookData()
     const { chapterContents, setChapterContents, getCacheChapterContentsInit, getCacheChapterContentsByIndexs } =
         useChapterContent(drizzleDB, bookRef)
-    const { readStyle, setReadStyle } = useReaderSetting(theme)
+    const { readStyle, setReadStyle } = useReaderSetting(theme, isDarkMode)
     const { characterSizeMap, dynamicTextStyles, addData, noChineseCharacterList, getNoChineseCharacterList } =
         useCacheCharacterSize(readStyle)
     // 当前阅读章节
@@ -701,8 +681,31 @@ export default function ReadPage() {
                 chapterName={curChapterName}
             />
         )
-        // TODO 依赖项，后期增加
     }, [currentPage, chapterContent, isVisible])
+
+    const toggleDarkMode = () => {
+        function cb() {
+            // 如果此时此处 isDarkMode 为 false，则表示要切换到深色主题
+            //  - 而深色主题拥有最高权重的主题，字体颜色和背景色只能使用内置的、
+            //  - 而为了避免 theme 因为直接切换深浅主题之后，theme 先改变，而 readStyle 还是原来初始值不会导致页面颜色不一致的问题，就在切换完成之前，手动更新相关颜色
+            //  - 且提前修改，这样可以解决，因为 theme 先更新，而 readStyle 后更新，导致页面切换主题色时，正文内容会闪烁一下才变化的问题
+            if (!isDarkMode) {
+                setReadStyle({
+                    ...readStyle,
+                    textColor: DarkTheme.textSecondaryColor,
+                    backgroundColor: DarkTheme.bgColor
+                })
+            } else {
+                // 切换到浅色系也要这样提前更新，但是因为浅色系的主题是允许被用户自定义的，所以取值需要从本地的记录中取值
+                setReadStyle({
+                    ...readStyle,
+                    textColor: 'red',
+                    backgroundColor: 'blue'
+                })
+            }
+        }
+        toggleTheme(cb)
+    }
 
     return (
         <>
@@ -760,7 +763,7 @@ export default function ReadPage() {
                         isVisible={isVisible}
                         showChapterList={showChapterList}
                         curChapterProgress={0}
-                        toggleDarkMode={toggleTheme}
+                        toggleDarkMode={toggleDarkMode}
                     />
                     <ChapterList
                         isVisible={isChapterListVisible}

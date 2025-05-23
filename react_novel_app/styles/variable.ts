@@ -27,11 +27,11 @@ export const DarkTheme = {
     primaryColor: '#F6F7F9',
     secondaryColor: '#bbbbbb',
     tertiaryColor: '#888888',
-    activeBgColor: '#333333',
+    activeBgColor: '#191B21',
     textPrimaryColor: '#F6F7F9',
     textSecondaryColor: '#bbbbbb',
     textTertiaryColor: '#666666',
-    borderColor: '#444444',
+    borderColor: '#5F656B',
     switch: {
         track: {
             trueColor: '#6B7280',
