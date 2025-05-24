@@ -18,6 +18,11 @@ export const LightTheme = {
             color: '#F9FAFB',
             activeColor: '#F9FAFB'
         }
+    },
+    progress: {
+        track: '#F4F4F5',
+        progress: '#181818',
+        thumb: '#181818'
     }
 }
 
@@ -41,5 +46,10 @@ export const DarkTheme = {
             color: '#F9FAFB',
             activeColor: '#F9FAFB'
         }
+    },
+    progress: {
+        track: '#16181D',
+        thumb: '#F6F7F9',
+        progress: '#F6F7F9'
     }
 }
