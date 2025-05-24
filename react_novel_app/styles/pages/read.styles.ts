@@ -246,3 +246,54 @@ export const pageHorizontalStyles = (theme: Theme) => {
         }
     })
 }
+
+export const readerSettingCompStyles = (theme: Theme) => {
+    return StyleSheet.create({
+        container: {
+            position: 'absolute',
+            zIndex: 2000,
+            width: '100%',
+            height: '100%',
+            left: 0,
+            top: 0,
+            backgroundColor: 'rgba(0,0,0,0)',
+            padding: adaptiveSize(10)
+        },
+        containerInner: {
+            position: 'absolute',
+            zIndex: 2001,
+            top: '50%',
+            right: 0,
+            left: 0,
+            bottom: 0,
+            backgroundColor: theme.bgColor,
+            padding: adaptiveSize(10)
+        }
+    })
+}
+
+export const readSettingBtnGroupStyles = (theme: Theme) => {
+    return StyleSheet.create({
+        container: {
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: adaptiveSize(6),
+            borderRadius: adaptiveSize(6),
+            backgroundColor: theme.bgSecondaryColor
+        },
+        btn: {
+            flex: 1,
+            borderRadius: adaptiveSize(6),
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: adaptiveSize(30)
+        },
+        btnText: {
+            fontSize: RFValue(14),
+            color: theme.textPrimaryColor
+        }
+    })
+}
