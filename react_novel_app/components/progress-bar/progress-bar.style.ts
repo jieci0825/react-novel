@@ -8,12 +8,12 @@ export const progressBarStyles = (theme: Theme) => {
             width: '100%'
         },
         track: {
-            width: '100%',
             borderRadius: 999,
             justifyContent: 'center'
         },
         progress: {
-            height: '100%'
+            height: '100%',
+            borderRadius: 999
         },
         thumb: {
             position: 'absolute',

@@ -12,16 +12,18 @@ type ProgressBarProps = {
     progressColor?: string
     thumbColor?: string
     thumbSize?: number
+    boundaryValue?: number
 }
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
     value,
     onChange,
-    height = 6,
+    height = 4,
     trackColor,
     progressColor,
     thumbColor,
-    thumbSize = 16
+    thumbSize = 16,
+    boundaryValue = 0
 }) => {
     const { theme } = useTheme()
 
@@ -45,9 +47,13 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
             onPanResponderGrant: () => {},
             onPanResponderMove: (_, gestureState) => {
                 if (containerWidth.current === 0) return
-                let newProgress = gestureState.moveX / containerWidth.current
+
+                const x = Math.min(Math.max(gestureState.dx, 0), containerWidth.current)
+
+                let newProgress = x / containerWidth.current
                 newProgress = Math.max(0, Math.min(1, newProgress))
                 progress.value = newProgress
+
                 if (onChange) runOnJS(onChange)(newProgress)
             }
         })
@@ -55,6 +61,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
     const handleLayout = (e: LayoutChangeEvent) => {
         containerWidth.current = e.nativeEvent.layout.width
+        console.log('layout', containerWidth.current, e.nativeEvent)
         progress.value = withTiming(value)
     }
 
