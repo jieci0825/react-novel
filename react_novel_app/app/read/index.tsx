@@ -8,12 +8,11 @@ import { bookApi } from '@/api'
 import { useLocalSearchParams } from 'expo-router'
 import { ChapterItem, GetBookDetailsData } from '@/api/modules/book/type'
 import ChapterList from '@/components/chapter-list/chapter-list'
-import { CurrentReadChapterInfo } from '@/types'
+import { CurrentReadChapterInfo, ReaderSetting } from '@/types'
 import { extractNonChineseChars, getAdjacentIndexes, LocalCache, splitTextByLine } from '@/utils'
 import { CURRENT_SOURCE, READER_GUIDE_AREA, READER_SETTING } from '@/constants'
 import { jcShowToast } from '@/components/jc-toast/jc-toast'
 import ReadContentWrap from './read-content-wrap'
-import type { ReaderSetting } from './read.type'
 import CalcTextSize from './calc-text-size'
 import { useSQLiteContext } from 'expo-sqlite'
 import { drizzle } from 'drizzle-orm/expo-sqlite'
@@ -21,6 +20,8 @@ import * as schema from '@/db/schema'
 import { and, eq } from 'drizzle-orm'
 import { DrizzleDB } from '@/db/db'
 import { DarkTheme } from '@/styles/variable'
+import ReaderSettingComp from './read-settting/read-setting'
+import { AnimationType } from './read.type'
 
 // 缓存数量：即当前章节上下章节的缓存数量
 const cacheNum = 2
@@ -491,6 +492,10 @@ export default function ReadPage() {
     const [isRender, setIsRender] = useState(false)
     // 当前页
     const [currentPage, setCurrentPage] = useState(0)
+    // 显示阅读器设置
+    const [showReaderSetting, setShowReaderSetting] = useState(false)
+    // 阅读动画
+    const [readAnimation, setReadAnimation] = useState<AnimationType>('none')
 
     // 当前books表中的记录
     const bookRef = useRef<schema.Books | null>(null)
@@ -712,6 +717,11 @@ export default function ReadPage() {
         toggleTheme(cb)
     }
 
+    const openReaderSetting = () => {
+        setIsVisible(false)
+        setShowReaderSetting(true)
+    }
+
     return (
         <>
             {/* 中文字符固定使用一来检测，中文字符的宽度都是一样的，无需重复计算 */}
@@ -769,6 +779,7 @@ export default function ReadPage() {
                         showChapterList={showChapterList}
                         curChapterProgress={0}
                         toggleDarkMode={toggleDarkMode}
+                        openReaderSetting={openReaderSetting}
                     />
                     <ChapterList
                         isVisible={isChapterListVisible}
@@ -786,6 +797,18 @@ export default function ReadPage() {
                             }
                         }}
                     />
+                    {/* 阅读器设置 */}
+                    {showReaderSetting && (
+                        <ReaderSettingComp
+                            settingData={readStyle}
+                            setReadStyle={setReadStyle}
+                            animation={readAnimation}
+                            setReadAnimation={setReadAnimation}
+                            close={() => {
+                                setShowReaderSetting(false)
+                            }}
+                        />
+                    )}
                 </TouchableOpacity>
             )}
             {!isRender && (
@@ -806,6 +829,7 @@ export default function ReadPage() {
                     />
                 </View>
             )}
+            {/* 阅读指南 */}
             {showGuide && (
                 <TouchableOpacity
                     activeOpacity={1}

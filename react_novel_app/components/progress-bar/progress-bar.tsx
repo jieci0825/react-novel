@@ -61,7 +61,6 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
     const handleLayout = (e: LayoutChangeEvent) => {
         containerWidth.current = e.nativeEvent.layout.width
-        console.log('layout', containerWidth.current, e.nativeEvent)
         progress.value = withTiming(value)
     }
 

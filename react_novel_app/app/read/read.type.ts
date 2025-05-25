@@ -1,3 +1,4 @@
+import { ReaderSetting } from '@/types'
 import { TextStyle } from 'react-native'
 
 export type CharacterSizeMap = React.MutableRefObject<
@@ -12,19 +13,6 @@ export type CharacterSizeMap = React.MutableRefObject<
 
 export type AnimationType = 'scroll' | 'page' | 'none' | 'simulation' | 'slide'
 
-export interface ReaderSetting {
-    fontSize: number // 字体大小
-    lineHeight: number // 行高
-    letterSpacing: number // 字间距
-    paragraphSpacing: number // 段间距
-    fontFamily: string // 字体
-    paddingHorizontal: number // 左右边距
-    paddingVertical: number // 上下边距
-    backgroundColor: string
-    textColor: string
-    indent: number // 缩进
-}
-
 export interface ReadContentBase {
     currentChapterName: string
     content: string
@@ -33,6 +21,14 @@ export interface ReadContentBase {
     readSetting: ReaderSetting
     dynamicTextStyles: TextStyle
     characterSizeMap: CharacterSizeMap
+}
+
+export interface ControllerItem {
+    label: string
+    field: string
+    min: number // 不具备实际限制意义，用于限制区间，来得出不同区间时，一个百分比处于这个区间的那个值
+    max: number // 不具备实际限制意义，用于限制区间，来得出不同区间时，一个百分比处于这个区间的那个值
+    current: number // 当前值，即一个处于最大值和最小值之间的值
 }
 
 export default {}

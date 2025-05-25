@@ -256,44 +256,121 @@ export const readerSettingCompStyles = (theme: Theme) => {
             height: '100%',
             left: 0,
             top: 0,
-            backgroundColor: 'rgba(0,0,0,0)',
+            backgroundColor: 'rgba(0,0,0,0.2)',
             padding: adaptiveSize(10)
         },
         containerInner: {
             position: 'absolute',
             zIndex: 2001,
-            top: '50%',
+            top: '40%',
             right: 0,
             left: 0,
             bottom: 0,
             backgroundColor: theme.bgColor,
-            padding: adaptiveSize(10)
-        }
-    })
-}
-
-export const readSettingBtnGroupStyles = (theme: Theme) => {
-    return StyleSheet.create({
-        container: {
-            width: '100%',
-            display: 'flex',
+            overflow: 'hidden',
+            borderTopColor: theme.borderColor,
+            borderTopWidth: 1
+        },
+        controlItem: {
+            paddingVertical: adaptiveSize(10),
+            borderBottomWidth: 1,
+            borderBottomColor: theme.borderColor
+        },
+        controlItemHead: {
             flexDirection: 'row',
             alignItems: 'center',
-            padding: adaptiveSize(6),
-            borderRadius: adaptiveSize(6),
-            backgroundColor: theme.bgSecondaryColor
+            gap: adaptiveSize(5)
         },
-        btn: {
-            flex: 1,
-            borderRadius: adaptiveSize(6),
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: adaptiveSize(30)
-        },
-        btnText: {
+        controlItemHeadText: {
             fontSize: RFValue(14),
             color: theme.textPrimaryColor
+        },
+        controlItemBody: {
+            marginTop: adaptiveSize(10),
+            gap: adaptiveSize(6)
+        },
+        controlItemBodyItem: {
+            flexDirection: 'row',
+            alignItems: 'center'
+        },
+        controlItemBodyItemText: {
+            fontSize: RFValue(12),
+            color: theme.textSecondaryColor
+        },
+        controlItemBodyItemOperation: {
+            marginLeft: 'auto',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: adaptiveSize(4)
+        },
+        controlItemBodyItemOperationBtn: {
+            width: adaptiveSize(25),
+            height: adaptiveSize(25),
+            borderRadius: adaptiveSize(4),
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderColor: theme.borderColor,
+            borderWidth: 1
+        },
+        controlItemBodyItemOperationValue: {
+            width: adaptiveSize(60),
+            height: adaptiveSize(25),
+            borderRadius: adaptiveSize(4),
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderColor: theme.borderColor,
+            borderWidth: 1,
+            textAlign: 'center',
+            lineHeight: adaptiveSize(25),
+            color: theme.textSecondaryColor
+        },
+        controlItemBtnsBody: {
+            marginTop: adaptiveSize(10),
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: adaptiveSize(10)
+        },
+        controlItemBtnsBodyBtn: {
+            width: adaptiveSize(60),
+            height: adaptiveSize(30),
+            borderRadius: adaptiveSize(4),
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderColor: theme.borderColor,
+            borderWidth: 1
+        },
+        controlItemBtnsBodyBtnText: {
+            fontSize: RFValue(12),
+            color: theme.textSecondaryColor
+        },
+        controlItemBgBody: {
+            gap: adaptiveSize(10),
+            marginTop: adaptiveSize(10),
+            paddingBottom: adaptiveSize(10)
+        },
+        controlItemBgItemBody: {
+            width: adaptiveSize(80),
+            borderRadius: adaptiveSize(4),
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: adaptiveSize(2),
+            borderColor: theme.borderColor,
+            borderWidth: 1,
+            marginRight: adaptiveSize(10),
+            paddingVertical: 5
+        },
+        controlItemBgItemBodyPreview: {
+            width: '50%',
+            height: adaptiveSize(20),
+            borderRadius: adaptiveSize(4),
+            borderColor: theme.borderColor,
+            borderWidth: 1,
+            backgroundColor: 'red'
+        },
+        controlItemBgItemBodyText: {
+            fontSize: RFValue(10),
+            color: theme.textSecondaryColor,
+            textAlign: 'center'
         }
     })
 }

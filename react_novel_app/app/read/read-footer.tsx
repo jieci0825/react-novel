@@ -3,13 +3,11 @@ import { readFooterStyles } from '@/styles/pages/read.styles'
 import { useEffect, useRef, useState } from 'react'
 import { Animated, Text, TouchableOpacity, View } from 'react-native'
 import { Slider, SliderThumb, SliderTrack, SliderFilledTrack } from '@/components/ui/slider'
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 import { adaptiveSize } from '@/utils'
 import Fontisto from '@expo/vector-icons/Fontisto'
 import Feather from '@expo/vector-icons/Feather'
-import Ionicons from '@expo/vector-icons/Ionicons'
 
 interface ReadFooterProps {
     isVisible: boolean
@@ -18,6 +16,7 @@ interface ReadFooterProps {
     nextChapter: () => void
     curChapterProgress: number
     toggleDarkMode: () => void
+    openReaderSetting: () => void
 }
 
 export default function ReadFooter(props: ReadFooterProps) {
@@ -45,12 +44,8 @@ export default function ReadFooter(props: ReadFooterProps) {
                     </TouchableOpacity>
                     <View style={styles.footerTopCenter}>
                         <Slider
-                            defaultValue={props.curChapterProgress}
-                            value={props.curChapterProgress}
+                            defaultValue={0}
                             size='sm'
-                            onChange={val => {
-                                console.log('change', val)
-                            }}
                             orientation='horizontal'
                             isDisabled={true}
                             isReversed={false}
@@ -90,10 +85,13 @@ export default function ReadFooter(props: ReadFooterProps) {
                         />
                         <Text style={styles.footerBottomBtnText}>夜间</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.footerBottomBtn}>
+                    <TouchableOpacity
+                        onPress={props.openReaderSetting}
+                        style={styles.footerBottomBtn}
+                    >
                         <Feather
                             name='layout'
-                            size={RFValue(18)}
+                            size={RFValue(16)}
                             color={theme.primaryColor}
                         />
                         <Text style={styles.footerBottomBtnText}>界面</Text>

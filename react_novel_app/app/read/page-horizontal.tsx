@@ -2,7 +2,7 @@ import { useTheme } from '@/hooks/useTheme'
 import { pageHorizontalStyles } from '@/styles/pages/read.styles'
 import { PageDataItem } from '@/utils'
 import { Text, TextStyle, View } from 'react-native'
-import { ReaderSetting } from './read.type'
+import { ReaderSetting } from '@/types'
 
 interface NoneAnimationProps {
     textStyle: TextStyle

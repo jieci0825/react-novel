@@ -12,7 +12,7 @@ import migrations from '@/drizzle/migrations'
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator'
 import { initDB } from '@/db/db'
 import { StatusBar } from 'expo-status-bar'
-import { UserSetting } from '@/types'
+import { ReaderSetting, UserSetting } from '@/types'
 
 // 初始化用户设置
 async function initUserSetting() {
@@ -31,7 +31,7 @@ async function initReaderSetting(theme: Theme) {
     // 存在则不在设置
     if (themeData) return
 
-    const data = {
+    const data: ReaderSetting = {
         fontSize: 18, // 基础字体大小
         lineHeight: 24, // 行高
         letterSpacing: 1, // 字间距
