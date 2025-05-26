@@ -78,6 +78,16 @@ export default function ReaderSettingComp({
                                             style={styles.controlItemBodyItem}
                                         >
                                             <Text style={styles.controlItemBodyItemText}>{item.label}</Text>
+                                            <Text
+                                                style={[
+                                                    styles.controlItemBodyItemText,
+                                                    {
+                                                        color: theme.textTertiaryColor,
+                                                        fontSize: RFValue(10),
+                                                        marginLeft: 5
+                                                    }
+                                                ]}
+                                            >{`（${item.min}~${item.max}）`}</Text>
                                             <View style={styles.controlItemBodyItemOperation}>
                                                 <TouchableOpacity
                                                     onPress={() => {
@@ -130,6 +140,16 @@ export default function ReaderSettingComp({
                                             style={styles.controlItemBodyItem}
                                         >
                                             <Text style={styles.controlItemBodyItemText}>{item.label}</Text>
+                                            <Text
+                                                style={[
+                                                    styles.controlItemBodyItemText,
+                                                    {
+                                                        color: theme.textTertiaryColor,
+                                                        fontSize: RFValue(10),
+                                                        marginLeft: 5
+                                                    }
+                                                ]}
+                                            >{`（${item.min}~${item.max}）`}</Text>
                                             <View style={styles.controlItemBodyItemOperation}>
                                                 <TouchableOpacity
                                                     onPress={() => {
