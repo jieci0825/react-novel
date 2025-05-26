@@ -9,7 +9,7 @@ import { useLocalSearchParams } from 'expo-router'
 import { ChapterItem, GetBookDetailsData } from '@/api/modules/book/type'
 import ChapterList from '@/components/chapter-list/chapter-list'
 import { CurrentReadChapterInfo, ReaderSetting } from '@/types'
-import { extractNonChineseChars, getAdjacentIndexes, LocalCache, splitTextByLine } from '@/utils'
+import { extractNonChineseChars, getAdjacentIndexes, isArray, LocalCache, splitTextByLine } from '@/utils'
 import { CURRENT_SOURCE, READER_GUIDE_AREA, READER_SETTING, USER_SETTING } from '@/constants'
 import { jcShowToast } from '@/components/jc-toast/jc-toast'
 import ReadContentWrap from './read-content-wrap'
@@ -19,7 +19,7 @@ import { drizzle } from 'drizzle-orm/expo-sqlite'
 import * as schema from '@/db/schema'
 import { and, eq } from 'drizzle-orm'
 import { DrizzleDB } from '@/db/db'
-import { DarkTheme } from '@/styles/variable'
+import { DarkTheme, LightTheme } from '@/styles/variable'
 import ReaderSettingComp from './read-settting/read-setting'
 import { AnimationType, ControllerItem } from './read.type'
 
@@ -210,15 +210,40 @@ function useReaderSetting(theme: Theme, isDarkMode: boolean) {
         fontFamily: 'Arial', // 字体
         paddingHorizontal: 16, // 左右边距
         paddingVertical: 10, // 上下边距
-        backgroundColor: theme.bgColor,
+        // backgroundColor: theme.bgColor,
+        backgroundColor: '',
         textColor: theme.textSecondaryColor,
         indent: 2
     })
 
-    const handleSetReadStyle = async (raw: ControllerItem, value: number) => {
-        const data = { ...readStyle, [raw.field]: value }
+    const handleSetReadStyle = async (
+        field: ControllerItem['field'] | ControllerItem['field'][],
+        value: number | string | Array<string | number>
+    ) => {
+        const fields = isArray(field) ? field : [field]
+        const values = isArray(value) ? value : [value]
+
+        const data: ReaderSetting = { ...readStyle }
+
+        for (let i = 0; i < fields.length; i++) {
+            const field = fields[i]
+            data[field as keyof ReaderSetting] = values[i] as never
+        }
+
         setReadStyle(data)
-        await LocalCache.storeData(READER_SETTING, data)
+
+        const readerSetting = await LocalCache.getData(READER_SETTING)
+        if (!isDarkMode) {
+            // 不是暗黑模式则正常更新
+            await LocalCache.storeData(READER_SETTING, data)
+        } else {
+            // 如果是暗黑模式，则当前 readStyle 中存储的 背景色和文字颜色 都不需要更新，要使用之前记录的背景色和文字颜色
+            await LocalCache.storeData(READER_SETTING, {
+                ...data,
+                backgroundColor: readerSetting?.backgroundColor || LightTheme.bgColor,
+                textColor: readerSetting?.textColor || LightTheme.textSecondaryColor
+            })
+        }
     }
 
     return { readStyle, setReadStyle, handleSetReadStyle }
@@ -576,19 +601,6 @@ export default function ReadPage() {
 
         // 处理阅读器界面设置
         const readerSetting: ReaderSetting = await LocalCache.getData(READER_SETTING)
-
-        console.log('isDarkMode', isDarkMode)
-
-        // 检测是否是出于暗黑模式
-        if (isDarkMode) {
-            // 如果是暗黑模式则采用暗黑模式主题。非暗黑模式则使用本地记录的主题
-            readerSetting.backgroundColor = DarkTheme.bgColor
-            readerSetting.textColor = DarkTheme.textSecondaryColor
-        } else {
-            readerSetting.backgroundColor = readerSetting.backgroundColor
-            readerSetting.textColor = readerSetting.textColor
-        }
-
         setReadStyle(readerSetting)
 
         const result = await drizzleDB
@@ -718,30 +730,9 @@ export default function ReadPage() {
             // 更改本地主题
             await LocalCache.storeData(USER_SETTING, {
                 ...userSetting,
-                systemTheme: isDarkMode ? 'dark' : 'light'
+                // 此时 isDarkMode 还没有更新完成，所以取值需要相反
+                systemTheme: !isDarkMode ? 'dark' : 'light'
             })
-
-            const readerSetting: ReaderSetting = await LocalCache.getData(READER_SETTING)
-            setReadStyle(readerSetting)
-
-            return
-
-            // 如果此时此处 isDarkMode 为 false，则表示要切换到深色主题
-            //  - 而深色主题拥有最高权重的主题，字体颜色和背景色只能使用内置的、
-            //  - 而为了避免 theme 因为直接切换深浅主题之后，theme 先改变，而 readStyle 还是原来初始值不会导致页面颜色不一致的问题，就在切换完成之前，手动更新相关颜色
-            //  - 且提前修改，这样可以解决，因为 theme 先更新，而 readStyle 后更新，导致页面切换主题色时，正文内容会闪烁一下才变化的问题
-            if (!isDarkMode) {
-                setReadStyle({
-                    ...readStyle,
-                    textColor: DarkTheme.textSecondaryColor,
-                    backgroundColor: DarkTheme.bgColor
-                })
-            } else {
-                // 切换到浅色系也要这样提前更新，但是因为浅色系的主题是允许被用户自定义的，所以取值需要从本地的记录中取值
-                //  - 因为 readStyle 的值可能被更改过了，所以需要从本地记录中取值。而本地本项目采用的是实时变化，所以可以放心取用
-                const readerSetting: ReaderSetting = await LocalCache.getData(READER_SETTING)
-                setReadStyle(readerSetting)
-            }
         }
         toggleTheme(cb)
     }

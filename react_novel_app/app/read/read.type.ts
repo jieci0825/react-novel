@@ -27,6 +27,7 @@ type ReaderSettingKeys = keyof ReaderSetting
 
 export interface ControllerItem {
     label: string
+    step: number
     field: ReaderSettingKeys
     min: number // 不具备实际限制意义，用于限制区间，来得出不同区间时，一个百分比处于这个区间的那个值
     max: number // 不具备实际限制意义，用于限制区间，来得出不同区间时，一个百分比处于这个区间的那个值

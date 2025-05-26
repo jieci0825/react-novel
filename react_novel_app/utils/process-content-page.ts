@@ -155,7 +155,6 @@ function createParseContext({
                 } else {
                     // 如果不是中文字符，则继续查找，直到找到下一个中文字符，然后根据这些字符来计算是否需要换行
                     const noChineseCharWidth = this.getNonChineseCharWidth(this.curCharIndx + 1)
-                    // console.log('noChineseCharWidth', noChineseCharWidth)
                     if (this.curLineWidth + charItem.width + noChineseCharWidth > containerSize.width) {
                         return true
                     }

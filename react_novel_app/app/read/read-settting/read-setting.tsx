@@ -11,7 +11,10 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import { adaptiveSize } from '@/utils'
 
 interface ReaderSettingCompProps {
-    handleSetReadStyle: (data: ControllerItem, value: number) => void
+    handleSetReadStyle: (
+        field: ControllerItem['field'] | ControllerItem['field'][],
+        value: number | string | Array<string | number>
+    ) => void
     settingData: ReaderSetting
     animation: AnimationType
     setReadAnimation: React.Dispatch<React.SetStateAction<AnimationType>>
@@ -28,21 +31,38 @@ export default function ReaderSettingComp({
     const styles = readerSettingCompStyles(theme)
 
     const [fontControllerList, setFontControllerList] = useState<ControllerItem[]>([
-        { label: '字号', field: 'fontSize', min: 12, max: 32, current: settingData.fontSize },
-        { label: '字距', field: 'letterSpacing', min: 0, max: 4, current: settingData.letterSpacing },
-        { label: '行高', field: 'lineHeight', min: 20, max: 40, current: settingData.lineHeight },
-        { label: '段距', field: 'paragraphSpacing', min: 10, max: 20, current: settingData.paragraphSpacing }
+        { label: '字号', field: 'fontSize', min: 12, max: 32, step: 1, current: settingData.fontSize },
+        { label: '字距', field: 'letterSpacing', min: 0, max: 4, step: 0.5, current: settingData.letterSpacing },
+        { label: '行高', field: 'lineHeight', min: 20, max: 40, step: 1, current: settingData.lineHeight },
+        { label: '段距', field: 'paragraphSpacing', min: 10, max: 20, step: 1, current: settingData.paragraphSpacing }
     ])
 
     const [marginControllerList, setMarginControllerList] = useState<ControllerItem[]>([
-        { label: '左右边距', field: 'paddingHorizontal', min: 0, max: 20, current: settingData.paddingHorizontal },
-        { label: '上下边距', field: 'paddingVertical', min: 0, max: 20, current: settingData.paddingVertical }
+        {
+            label: '左右边距',
+            field: 'paddingHorizontal',
+            min: 0,
+            max: 20,
+            step: 1,
+            current: settingData.paddingHorizontal
+        },
+        { label: '上下边距', field: 'paddingVertical', min: 0, max: 20, step: 1, current: settingData.paddingVertical }
     ])
 
     const onSetReadStyle = (raw: ControllerItem, value: number) => {
         if (value < raw.min || value > raw.max) return
-        handleSetReadStyle(raw, value)
+        handleSetReadStyle(raw.field, value)
     }
+
+    const bgColorList = [
+        { text: '象牙', bgColor: '#eeeadc', textColor: '#181716' },
+        { text: '黄河琉璃', bgColor: '#CCC0A6', textColor: '#211500' },
+        { text: '月白', bgColor: '#d4e5ef', textColor: '#151717' },
+        { text: '茶白', bgColor: '#f9f0e3', textColor: '#464646' },
+        { text: '竹皇', bgColor: '#b9dec9', textColor: '#000F00' },
+        { text: '鱼肚白', bgColor: '#C8D0D4', textColor: '#191919' },
+        { text: '暮山紫', bgColor: '#A4AAD8', textColor: '#1F2937' }
+    ]
 
     return (
         <>
@@ -91,7 +111,7 @@ export default function ReaderSettingComp({
                                             <View style={styles.controlItemBodyItemOperation}>
                                                 <TouchableOpacity
                                                     onPress={() => {
-                                                        onSetReadStyle(item, +settingData[item.field] - 1)
+                                                        onSetReadStyle(item, +settingData[item.field] - item.step)
                                                     }}
                                                     style={styles.controlItemBodyItemOperationBtn}
                                                 >
@@ -106,7 +126,7 @@ export default function ReaderSettingComp({
                                                 </Text>
                                                 <TouchableOpacity
                                                     onPress={() => {
-                                                        onSetReadStyle(item, +settingData[item.field] + 1)
+                                                        onSetReadStyle(item, +settingData[item.field] + item.step)
                                                     }}
                                                     style={styles.controlItemBodyItemOperationBtn}
                                                 >
@@ -153,7 +173,7 @@ export default function ReaderSettingComp({
                                             <View style={styles.controlItemBodyItemOperation}>
                                                 <TouchableOpacity
                                                     onPress={() => {
-                                                        onSetReadStyle(item, +settingData[item.field] - 1)
+                                                        onSetReadStyle(item, +settingData[item.field] - item.step)
                                                     }}
                                                     style={styles.controlItemBodyItemOperationBtn}
                                                 >
@@ -168,7 +188,7 @@ export default function ReaderSettingComp({
                                                 </Text>
                                                 <TouchableOpacity
                                                     onPress={() => {
-                                                        onSetReadStyle(item, +settingData[item.field] + 1)
+                                                        onSetReadStyle(item, +settingData[item.field] + item.step)
                                                     }}
                                                     style={styles.controlItemBodyItemOperationBtn}
                                                 >
@@ -272,30 +292,30 @@ export default function ReaderSettingComp({
                                 horizontal
                                 style={styles.controlItemBgBody}
                             >
-                                <TouchableOpacity style={[styles.controlItemBgItemBody]}>
-                                    <View style={styles.controlItemBgItemBodyPreview}></View>
-                                    <Text style={styles.controlItemBgItemBodyText}>天水碧</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={[styles.controlItemBgItemBody]}>
-                                    <View style={styles.controlItemBgItemBodyPreview}></View>
-                                    <Text style={styles.controlItemBgItemBodyText}>天水碧</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={[styles.controlItemBgItemBody]}>
-                                    <View style={styles.controlItemBgItemBodyPreview}></View>
-                                    <Text style={styles.controlItemBgItemBodyText}>天水碧</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={[styles.controlItemBgItemBody]}>
-                                    <View style={styles.controlItemBgItemBodyPreview}></View>
-                                    <Text style={styles.controlItemBgItemBodyText}>天水碧</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={[styles.controlItemBgItemBody]}>
-                                    <View style={styles.controlItemBgItemBodyPreview}></View>
-                                    <Text style={styles.controlItemBgItemBodyText}>天水碧</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={[styles.controlItemBgItemBody]}>
-                                    <View style={styles.controlItemBgItemBodyPreview}></View>
-                                    <Text style={styles.controlItemBgItemBodyText}>天水碧</Text>
-                                </TouchableOpacity>
+                                {bgColorList.map((item, index) => {
+                                    return (
+                                        <TouchableOpacity
+                                            onPress={e => {
+                                                handleSetReadStyle(
+                                                    ['backgroundColor', 'textColor'],
+                                                    [item.bgColor, item.textColor]
+                                                )
+                                            }}
+                                            key={index}
+                                            style={[styles.controlItemBgItemBody]}
+                                        >
+                                            <View
+                                                style={[
+                                                    styles.controlItemBgItemBodyPreview,
+                                                    {
+                                                        backgroundColor: item.bgColor
+                                                    }
+                                                ]}
+                                            ></View>
+                                            <Text style={styles.controlItemBgItemBodyText}>{item.text}</Text>
+                                        </TouchableOpacity>
+                                    )
+                                })}
                             </ScrollView>
                         </View>
                     </ScrollView>

@@ -27,9 +27,9 @@ async function initUserSetting() {
 
 // 初始化阅读器设置参数
 async function initReaderSetting(theme: Theme) {
-    const themeData = await LocalCache.getData(READER_SETTING)
+    const readerSetting = await LocalCache.getData(READER_SETTING)
     // 存在则不在设置
-    if (themeData) return
+    if (readerSetting) return
 
     const data: ReaderSetting = {
         fontSize: 18, // 基础字体大小

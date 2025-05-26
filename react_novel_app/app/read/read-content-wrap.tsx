@@ -93,6 +93,19 @@ export default function ReadContentWrap(props: ReadContentHorizontalProps) {
         }
     }
 
+    const [bgColor, setBgColor] = useState<string>(isDarkMode ? DarkTheme.bgColor : props.readSetting.backgroundColor)
+
+    useEffect(() => {
+        if (!isDarkMode) {
+            if (props.readSetting.backgroundColor !== bgColor) {
+                // 设置背景色
+                setBgColor(props.readSetting.backgroundColor)
+            }
+        } else {
+            setBgColor(DarkTheme.bgColor)
+        }
+    }, [props.readSetting, isDarkMode])
+
     return (
         <>
             <TouchableOpacity
@@ -107,7 +120,8 @@ export default function ReadContentWrap(props: ReadContentHorizontalProps) {
                             paddingHorizontal: props.readSetting.paddingHorizontal,
                             paddingVertical: props.readSetting.paddingVertical,
                             // 背景色需要特殊处理一下，如果是夜间模式，则背景颜色需要是内置的夜间模式背景色
-                            backgroundColor: isDarkMode ? DarkTheme.bgColor : props.readSetting.backgroundColor
+                            // backgroundColor: isDarkMode ? DarkTheme.bgColor : bgColor
+                            backgroundColor: bgColor
                         }
                     ]}
                 >
@@ -140,6 +154,7 @@ export default function ReadContentWrap(props: ReadContentHorizontalProps) {
                     chapterName={props.currentChapterName}
                     currentPage={props.currentPage + 1}
                     totalPage={pageData.length}
+                    readSetting={props.readSetting}
                 />
             </TouchableOpacity>
         </>

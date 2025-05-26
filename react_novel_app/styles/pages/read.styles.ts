@@ -349,7 +349,7 @@ export const readerSettingCompStyles = (theme: Theme) => {
             paddingBottom: adaptiveSize(10)
         },
         controlItemBgItemBody: {
-            width: adaptiveSize(80),
+            width: adaptiveSize(70),
             borderRadius: adaptiveSize(4),
             justifyContent: 'center',
             alignItems: 'center',

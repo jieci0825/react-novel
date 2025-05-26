@@ -36,7 +36,6 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
         const load = async () => {
             const userSetting: UserSetting = await LocalCache.getData(USER_SETTING)
             if (userSetting) {
-                console.log('userSetting', userSetting)
                 setIsDarkMode(!!(userSetting.systemTheme === 'dark'))
             }
         }
