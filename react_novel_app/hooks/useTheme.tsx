@@ -1,5 +1,8 @@
+import { USER_SETTING } from '@/constants'
 import { LightTheme, DarkTheme } from '@/styles/variable'
-import React, { createContext, useContext, useState } from 'react'
+import { UserSetting } from '@/types'
+import { LocalCache } from '@/utils'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 
 export type Theme = typeof LightTheme
 
@@ -28,6 +31,17 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
         setIsDarkMode(!isDarkMode)
     }
+
+    useEffect(() => {
+        const load = async () => {
+            const userSetting: UserSetting = await LocalCache.getData(USER_SETTING)
+            if (userSetting) {
+                console.log('userSetting', userSetting)
+                setIsDarkMode(!!(userSetting.systemTheme === 'dark'))
+            }
+        }
+        load()
+    }, [])
 
     const theme: Theme = isDarkMode ? DarkTheme : LightTheme
 

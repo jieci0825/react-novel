@@ -577,11 +577,16 @@ export default function ReadPage() {
         // 处理阅读器界面设置
         const readerSetting: ReaderSetting = await LocalCache.getData(READER_SETTING)
 
+        console.log('isDarkMode', isDarkMode)
+
         // 检测是否是出于暗黑模式
         if (isDarkMode) {
             // 如果是暗黑模式则采用暗黑模式主题。非暗黑模式则使用本地记录的主题
             readerSetting.backgroundColor = DarkTheme.bgColor
             readerSetting.textColor = DarkTheme.textSecondaryColor
+        } else {
+            readerSetting.backgroundColor = readerSetting.backgroundColor
+            readerSetting.textColor = readerSetting.textColor
         }
 
         setReadStyle(readerSetting)
@@ -716,6 +721,11 @@ export default function ReadPage() {
                 systemTheme: isDarkMode ? 'dark' : 'light'
             })
 
+            const readerSetting: ReaderSetting = await LocalCache.getData(READER_SETTING)
+            setReadStyle(readerSetting)
+
+            return
+
             // 如果此时此处 isDarkMode 为 false，则表示要切换到深色主题
             //  - 而深色主题拥有最高权重的主题，字体颜色和背景色只能使用内置的、
             //  - 而为了避免 theme 因为直接切换深浅主题之后，theme 先改变，而 readStyle 还是原来初始值不会导致页面颜色不一致的问题，就在切换完成之前，手动更新相关颜色
@@ -745,6 +755,7 @@ export default function ReadPage() {
         <>
             {/* 中文字符固定使用一来检测，中文字符的宽度都是一样的，无需重复计算 */}
             <CalcTextSize
+                key={`chinese-${JSON.stringify(dynamicTextStyles)}`}
                 text='一'
                 textStyle={dynamicTextStyles}
                 onSizeInfo={({ width, height }) => {
@@ -755,7 +766,7 @@ export default function ReadPage() {
             {noChineseCharacterList.map((item, index) => {
                 return (
                     <CalcTextSize
-                        key={index}
+                        key={index + `chinese-${JSON.stringify(dynamicTextStyles)}`}
                         text={item}
                         textStyle={dynamicTextStyles}
                         onSizeInfo={({ width, height }) => {

@@ -10,6 +10,7 @@ import { GestureResponderEvent } from 'react-native'
 import { jcShowToast } from '@/components/jc-toast/jc-toast'
 import { LocalCache } from '@/utils'
 import { READER_GUIDE_AREA } from '@/constants'
+import { DarkTheme } from '@/styles/variable'
 
 // 根据缓存的字符 size，来计算当前章节的分页数据
 function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentHorizontalProps) {
@@ -61,7 +62,7 @@ interface ReadContentHorizontalProps extends ReadContentBase {
 }
 
 export default function ReadContentWrap(props: ReadContentHorizontalProps) {
-    const { theme } = useTheme()
+    const { theme, isDarkMode } = useTheme()
     const styles = readContentWrapStyles(theme)
     const screenWidth = useWindowDimensions().width
 
@@ -105,7 +106,8 @@ export default function ReadContentWrap(props: ReadContentHorizontalProps) {
                         {
                             paddingHorizontal: props.readSetting.paddingHorizontal,
                             paddingVertical: props.readSetting.paddingVertical,
-                            backgroundColor: props.readSetting.backgroundColor
+                            // 背景色需要特殊处理一下，如果是夜间模式，则背景颜色需要是内置的夜间模式背景色
+                            backgroundColor: isDarkMode ? DarkTheme.bgColor : props.readSetting.backgroundColor
                         }
                     ]}
                 >
@@ -121,7 +123,10 @@ export default function ReadContentWrap(props: ReadContentHorizontalProps) {
                                 <PageHorizontal
                                     pageList={pageData}
                                     currentPage={props.currentPage}
-                                    textStyle={props.dynamicTextStyles}
+                                    textStyle={{
+                                        ...props.dynamicTextStyles,
+                                        color: isDarkMode ? DarkTheme.textSecondaryColor : props.dynamicTextStyles.color
+                                    }}
                                     paragraphIndent={paragraphIndent}
                                     animation={props.animation as Exclude<AnimationType, 'scroll'>}
                                     readerSetting={props.readSetting}
