@@ -11,14 +11,14 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import { adaptiveSize } from '@/utils'
 
 interface ReaderSettingCompProps {
-    setReadStyle: React.Dispatch<React.SetStateAction<ReaderSetting>>
+    handleSetReadStyle: (data: ControllerItem, value: number) => void
     settingData: ReaderSetting
     animation: AnimationType
     setReadAnimation: React.Dispatch<React.SetStateAction<AnimationType>>
     close: () => void
 }
 export default function ReaderSettingComp({
-    setReadStyle,
+    handleSetReadStyle,
     settingData,
     animation,
     setReadAnimation,
@@ -38,6 +38,11 @@ export default function ReaderSettingComp({
         { label: '左右边距', field: 'paddingHorizontal', min: 0, max: 20, current: settingData.paddingHorizontal },
         { label: '上下边距', field: 'paddingVertical', min: 0, max: 20, current: settingData.paddingVertical }
     ])
+
+    const onSetReadStyle = (raw: ControllerItem, value: number) => {
+        if (value < raw.min || value > raw.max) return
+        handleSetReadStyle(raw, value)
+    }
 
     return (
         <>
@@ -74,7 +79,12 @@ export default function ReaderSettingComp({
                                         >
                                             <Text style={styles.controlItemBodyItemText}>{item.label}</Text>
                                             <View style={styles.controlItemBodyItemOperation}>
-                                                <TouchableOpacity style={styles.controlItemBodyItemOperationBtn}>
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        onSetReadStyle(item, +settingData[item.field] - 1)
+                                                    }}
+                                                    style={styles.controlItemBodyItemOperationBtn}
+                                                >
                                                     <Feather
                                                         name='minus'
                                                         size={RFValue(16)}
@@ -82,9 +92,14 @@ export default function ReaderSettingComp({
                                                     />
                                                 </TouchableOpacity>
                                                 <Text style={[styles.controlItemBodyItemOperationValue]}>
-                                                    {item.current}
+                                                    {settingData[item.field]}
                                                 </Text>
-                                                <TouchableOpacity style={styles.controlItemBodyItemOperationBtn}>
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        onSetReadStyle(item, +settingData[item.field] + 1)
+                                                    }}
+                                                    style={styles.controlItemBodyItemOperationBtn}
+                                                >
                                                     <Feather
                                                         name='plus'
                                                         size={RFValue(16)}
@@ -116,7 +131,12 @@ export default function ReaderSettingComp({
                                         >
                                             <Text style={styles.controlItemBodyItemText}>{item.label}</Text>
                                             <View style={styles.controlItemBodyItemOperation}>
-                                                <TouchableOpacity style={styles.controlItemBodyItemOperationBtn}>
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        onSetReadStyle(item, +settingData[item.field] - 1)
+                                                    }}
+                                                    style={styles.controlItemBodyItemOperationBtn}
+                                                >
                                                     <Feather
                                                         name='minus'
                                                         size={RFValue(16)}
@@ -124,9 +144,14 @@ export default function ReaderSettingComp({
                                                     />
                                                 </TouchableOpacity>
                                                 <Text style={[styles.controlItemBodyItemOperationValue]}>
-                                                    {item.current}
+                                                    {settingData[item.field]}
                                                 </Text>
-                                                <TouchableOpacity style={styles.controlItemBodyItemOperationBtn}>
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        onSetReadStyle(item, +settingData[item.field] + 1)
+                                                    }}
+                                                    style={styles.controlItemBodyItemOperationBtn}
+                                                >
                                                     <Feather
                                                         name='plus'
                                                         size={RFValue(16)}

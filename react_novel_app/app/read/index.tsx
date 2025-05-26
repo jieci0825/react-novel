@@ -21,7 +21,7 @@ import { and, eq } from 'drizzle-orm'
 import { DrizzleDB } from '@/db/db'
 import { DarkTheme } from '@/styles/variable'
 import ReaderSettingComp from './read-settting/read-setting'
-import { AnimationType } from './read.type'
+import { AnimationType, ControllerItem } from './read.type'
 
 // 缓存数量：即当前章节上下章节的缓存数量
 const cacheNum = 2
@@ -215,7 +215,13 @@ function useReaderSetting(theme: Theme, isDarkMode: boolean) {
         indent: 2
     })
 
-    return { readStyle, setReadStyle }
+    const handleSetReadStyle = async (raw: ControllerItem, value: number) => {
+        const data = { ...readStyle, [raw.field]: value }
+        setReadStyle(data)
+        await LocalCache.storeData(READER_SETTING, data)
+    }
+
+    return { readStyle, setReadStyle, handleSetReadStyle }
 }
 
 // 缓存字符的size
@@ -513,7 +519,7 @@ export default function ReadPage() {
     const { bookDetails, chapterList, setChapterList, getBookDetails } = useBookData()
     const { chapterContents, setChapterContents, getCacheChapterContentsInit, getCacheChapterContentsByIndexs } =
         useChapterContent(drizzleDB, bookRef)
-    const { readStyle, setReadStyle } = useReaderSetting(theme, isDarkMode)
+    const { readStyle, setReadStyle, handleSetReadStyle } = useReaderSetting(theme, isDarkMode)
     const { characterSizeMap, dynamicTextStyles, addData, noChineseCharacterList, getNoChineseCharacterList } =
         useCacheCharacterSize(readStyle)
     // 当前阅读章节
@@ -691,7 +697,7 @@ export default function ReadPage() {
                 chapterName={curChapterName}
             />
         )
-    }, [currentPage, chapterContent, isVisible])
+    }, [currentPage, chapterContent, isVisible, dynamicTextStyles])
 
     const toggleDarkMode = () => {
         function cb() {
@@ -801,7 +807,7 @@ export default function ReadPage() {
                     {showReaderSetting && (
                         <ReaderSettingComp
                             settingData={readStyle}
-                            setReadStyle={setReadStyle}
+                            handleSetReadStyle={handleSetReadStyle}
                             animation={readAnimation}
                             setReadAnimation={setReadAnimation}
                             close={() => {
