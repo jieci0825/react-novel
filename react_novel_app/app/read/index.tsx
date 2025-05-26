@@ -10,7 +10,7 @@ import { ChapterItem, GetBookDetailsData } from '@/api/modules/book/type'
 import ChapterList from '@/components/chapter-list/chapter-list'
 import { CurrentReadChapterInfo, ReaderSetting } from '@/types'
 import { extractNonChineseChars, getAdjacentIndexes, LocalCache, splitTextByLine } from '@/utils'
-import { CURRENT_SOURCE, READER_GUIDE_AREA, READER_SETTING } from '@/constants'
+import { CURRENT_SOURCE, READER_GUIDE_AREA, READER_SETTING, USER_SETTING } from '@/constants'
 import { jcShowToast } from '@/components/jc-toast/jc-toast'
 import ReadContentWrap from './read-content-wrap'
 import CalcTextSize from './calc-text-size'
@@ -577,6 +577,13 @@ export default function ReadPage() {
         // 处理阅读器界面设置
         const readerSetting: ReaderSetting = await LocalCache.getData(READER_SETTING)
 
+        // 检测是否是出于暗黑模式
+        if (isDarkMode) {
+            // 如果是暗黑模式则采用暗黑模式主题。非暗黑模式则使用本地记录的主题
+            readerSetting.backgroundColor = DarkTheme.bgColor
+            readerSetting.textColor = DarkTheme.textSecondaryColor
+        }
+
         setReadStyle(readerSetting)
 
         const result = await drizzleDB
@@ -700,7 +707,15 @@ export default function ReadPage() {
     }, [currentPage, chapterContent, isVisible, dynamicTextStyles])
 
     const toggleDarkMode = () => {
-        function cb() {
+        async function cb() {
+            const userSetting = await LocalCache.getData(USER_SETTING)
+
+            // 更改本地主题
+            await LocalCache.storeData(USER_SETTING, {
+                ...userSetting,
+                systemTheme: isDarkMode ? 'dark' : 'light'
+            })
+
             // 如果此时此处 isDarkMode 为 false，则表示要切换到深色主题
             //  - 而深色主题拥有最高权重的主题，字体颜色和背景色只能使用内置的、
             //  - 而为了避免 theme 因为直接切换深浅主题之后，theme 先改变，而 readStyle 还是原来初始值不会导致页面颜色不一致的问题，就在切换完成之前，手动更新相关颜色
@@ -713,11 +728,9 @@ export default function ReadPage() {
                 })
             } else {
                 // 切换到浅色系也要这样提前更新，但是因为浅色系的主题是允许被用户自定义的，所以取值需要从本地的记录中取值
-                setReadStyle({
-                    ...readStyle,
-                    textColor: 'red',
-                    backgroundColor: 'blue'
-                })
+                //  - 因为 readStyle 的值可能被更改过了，所以需要从本地记录中取值。而本地本项目采用的是实时变化，所以可以放心取用
+                const readerSetting: ReaderSetting = await LocalCache.getData(READER_SETTING)
+                setReadStyle(readerSetting)
             }
         }
         toggleTheme(cb)
