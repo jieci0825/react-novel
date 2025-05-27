@@ -33,7 +33,7 @@ export default function ReaderSettingComp({
     const [fontControllerList, setFontControllerList] = useState<ControllerItem[]>([
         { label: '字号', field: 'fontSize', min: 12, max: 32, step: 1, current: settingData.fontSize },
         { label: '字距', field: 'letterSpacing', min: 0, max: 4, step: 0.5, current: settingData.letterSpacing },
-        { label: '行高', field: 'lineHeight', min: 20, max: 40, step: 1, current: settingData.lineHeight },
+        { label: '行高', field: 'lineHeight', min: 20, max: 60, step: 1, current: settingData.lineHeight },
         { label: '段距', field: 'paragraphSpacing', min: 10, max: 20, step: 1, current: settingData.paragraphSpacing }
     ])
 

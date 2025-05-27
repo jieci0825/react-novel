@@ -133,6 +133,18 @@ export const readFooterStyles = (theme: Theme) => {
         footerTopCenter: {
             flex: 1
         },
+        footerProgressWrap: {
+            width: '100%',
+            height: adaptiveSize(8),
+            borderRadius: 999,
+            overflow: 'hidden',
+            backgroundColor: theme.progress.track
+        },
+        footerProgressBar: {
+            height: adaptiveSize(8),
+            backgroundColor: theme.progress.progress,
+            borderRadius: 999
+        },
         footerBottom: {
             flex: 1,
             display: 'flex',

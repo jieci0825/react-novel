@@ -836,7 +836,7 @@ export default function ReadPage() {
                         nextChapter={nextChapter}
                         isVisible={isVisible}
                         showChapterList={showChapterList}
-                        curChapterProgress={0}
+                        curChapterProgress={curChapterProgress}
                         toggleDarkMode={toggleDarkMode}
                         openReaderSetting={openReaderSetting}
                     />

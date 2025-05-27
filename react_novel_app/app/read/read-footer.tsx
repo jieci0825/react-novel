@@ -43,18 +43,16 @@ export default function ReadFooter(props: ReadFooterProps) {
                         <Text style={styles.footerTopText}>上一章</Text>
                     </TouchableOpacity>
                     <View style={styles.footerTopCenter}>
-                        <Slider
-                            defaultValue={0}
-                            size='sm'
-                            orientation='horizontal'
-                            isDisabled={true}
-                            isReversed={false}
-                        >
-                            <SliderTrack>
-                                <SliderFilledTrack />
-                            </SliderTrack>
-                            <SliderThumb />
-                        </Slider>
+                        <View style={styles.footerProgressWrap}>
+                            <View
+                                style={[
+                                    styles.footerProgressBar,
+                                    {
+                                        width: `${props.curChapterProgress}%`
+                                    }
+                                ]}
+                            ></View>
+                        </View>
                     </View>
                     <TouchableOpacity onPress={props.nextChapter}>
                         <Text style={styles.footerTopText}>下一章</Text>
