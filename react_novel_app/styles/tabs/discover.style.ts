@@ -152,7 +152,6 @@ export const discoverFAQStyles = (theme: Theme) => {
             padding: adaptiveSize(10),
             borderRadius: adaptiveSize(4),
             backgroundColor: theme.bgSecondaryColor,
-            maxHeight: adaptiveSize(200),
             display: 'flex',
             gap: adaptiveSize(10)
         },
