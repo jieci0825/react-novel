@@ -13,6 +13,7 @@ interface ReadHeaderProps {
     isVisible: boolean
     bookName: string
     chapterName: string
+    toggleSwitchSource: () => void
 }
 
 export default function ReadHeader(props: ReadHeaderProps) {
@@ -60,16 +61,18 @@ export default function ReadHeader(props: ReadHeaderProps) {
                     <Text style={styles.chapterName}>{props.chapterName}</Text>
                 </View>
                 <View style={styles.readHeaderRight}>
-                    <FontAwesome
+                    {/* <FontAwesome
                         name='refresh'
                         size={RFValue(20)}
                         color={theme.primaryColor}
-                    />
-                    <FontAwesome5
-                        name='random'
-                        size={RFValue(20)}
-                        color={theme.primaryColor}
-                    />
+                    /> */}
+                    <TouchableOpacity onPress={props.toggleSwitchSource}>
+                        <FontAwesome5
+                            name='random'
+                            size={RFValue(20)}
+                            color={theme.primaryColor}
+                        />
+                    </TouchableOpacity>
                 </View>
             </Animated.View>
         </>

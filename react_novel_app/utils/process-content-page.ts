@@ -68,7 +68,7 @@ function createParseContext({
         paragraphSpacing,
         // 初始高度，预留标题高度。标题高度为 行高 + 2倍段落间距
         // curPageHeight: 0,
-        curPageHeight: lineHeight * 1.3 + paragraphSpacing * 2,
+        curPageHeight: lineHeight * 1.3 + paragraphSpacing,
         curLineWidth: 0,
         curPageNum: 1,
         curPageData: [],

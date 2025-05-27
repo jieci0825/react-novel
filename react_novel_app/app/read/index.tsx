@@ -780,17 +780,21 @@ export default function ReadPage() {
         )
     }, [readStyle])
 
+    const toggleSwitchSource = () => {
+        console.log('toggleSwitchSource')
+    }
+
     return (
         <>
             {memoizedCalcTextSize}
             {/* 中文字符固定使用一来检测，中文字符的宽度都是一样的，无需重复计算 */}
-            {/* <CalcTextSize
+            <CalcTextSize
                 text='一'
                 textStyle={dynamicTextStyles}
                 onSizeInfo={({ width, height }) => {
                     addData('chinese', { width, height })
                 }}
-            /> */}
+            />
             {/* 其他字符动态计算 */}
             {noChineseCharacterList.map((item, index) => {
                 return (
@@ -799,7 +803,6 @@ export default function ReadPage() {
                         text={item}
                         textStyle={dynamicTextStyles}
                         onSizeInfo={({ width, height }) => {
-                            // 检测当前 key 是否存在
                             if (characterSizeMap.current.has(item)) return
                             addData(item, { width, height })
                         }}
@@ -815,6 +818,7 @@ export default function ReadPage() {
                 >
                     {bookDetails && (
                         <ReadHeader
+                            toggleSwitchSource={toggleSwitchSource}
                             chapterName={curChapterName}
                             bookName={bookDetails.title}
                             isVisible={isVisible}
