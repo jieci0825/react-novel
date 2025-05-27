@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Animated, FlatList, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { chapterListStyles } from './chapter-list.style'
+import { adaptiveSize } from '@/utils'
 
 interface ChapterListProps {
     isVisible: boolean
@@ -14,6 +15,8 @@ interface ChapterListProps {
     clickChapter?: (csn: number) => void
     activeIndex?: number
 }
+
+const itemHeight = 40
 
 export default function ChapterList(props: ChapterListProps) {
     const { theme } = useTheme()
@@ -56,7 +59,13 @@ export default function ChapterList(props: ChapterListProps) {
     const renderItem = ({ item, index }: { item: ChapterItem; index: number }) => {
         return (
             <TouchableOpacity
-                style={[styles.chapterItem, index === props.activeIndex && styles.chapterItemActive]}
+                style={[
+                    styles.chapterItem,
+                    {
+                        height: itemHeight
+                    },
+                    index === props.activeIndex && styles.chapterItemActive
+                ]}
                 onPress={() => props.clickChapter && props.clickChapter(index)}
             >
                 <Text style={styles.chapterItemText}>{item.chapterName}</Text>
@@ -97,12 +106,17 @@ export default function ChapterList(props: ChapterListProps) {
                     />
                 </TouchableOpacity>
             </View>
+            {/* 必须等待数组，否则 initialScrollIndex 无法正常工作 */}
             <View style={styles.content}>
-                <FlatList
-                    data={filterChapterList}
-                    keyExtractor={item => item.chapterId as string}
-                    renderItem={renderItem}
-                />
+                {!!filterChapterList.length && (
+                    <FlatList
+                        data={filterChapterList}
+                        keyExtractor={item => item.chapterId as string}
+                        renderItem={renderItem}
+                        getItemLayout={(data, index) => ({ length: itemHeight, offset: itemHeight * index, index })}
+                        initialScrollIndex={props.activeIndex || 0}
+                    />
+                )}
             </View>
         </Animated.View>
     )

@@ -34,11 +34,11 @@ export const chapterListStyles = (theme: Theme) => {
             flex: 1
         },
         chapterItem: {
-            padding: 10,
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
-            alignItems: 'center'
+            alignItems: 'center',
+            paddingHorizontal: 10
         },
         chapterItemText: {
             fontSize: RFValue(14),
