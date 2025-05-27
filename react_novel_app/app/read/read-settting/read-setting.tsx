@@ -58,7 +58,7 @@ export default function ReaderSettingComp({
         { text: '象牙', bgColor: '#eeeadc', textColor: '#181716' },
         { text: '黄河琉璃', bgColor: '#CCC0A6', textColor: '#211500' },
         { text: '月白', bgColor: '#d4e5ef', textColor: '#151717' },
-        { text: '茶白', bgColor: '#f9f0e3', textColor: '#464646' },
+        { text: '茶白', bgColor: '#DED9C3', textColor: '#171200' },
         { text: '竹皇', bgColor: '#b9dec9', textColor: '#000F00' },
         { text: '鱼肚白', bgColor: '#C8D0D4', textColor: '#191919' },
         { text: '暮山紫', bgColor: '#A4AAD8', textColor: '#1F2937' }

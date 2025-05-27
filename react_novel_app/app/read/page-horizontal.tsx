@@ -40,10 +40,12 @@ function NoneAnimation(props: NoneAnimationProps) {
                             key={index}
                         >
                             <Text
+                                numberOfLines={1}
+                                ellipsizeMode='tail'
                                 style={{
                                     ...props.textStyle,
                                     fontWeight: 'bold',
-                                    fontSize: (props.textStyle.fontSize as number) * 1.3
+                                    fontSize: (props.textStyle.fontSize as number) * 1.1
                                 }}
                             >
                                 {item.content}

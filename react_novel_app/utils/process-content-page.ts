@@ -54,7 +54,8 @@ function createParseContext({
     paragraphIndent,
     paragraphSpacing,
     lineHeight,
-    containerSize
+    containerSize,
+    titleCount
 }: GetCharItemListParams): PageDataContext {
     const context: PageDataContext = {
         _s: JSON.parse(JSON.stringify(charItemList)), // 源数据
@@ -67,7 +68,7 @@ function createParseContext({
         paragraphSpacing,
         // 初始高度，预留标题高度。标题高度为 行高 + 2倍段落间距
         // curPageHeight: 0,
-        curPageHeight: lineHeight + paragraphSpacing * 2,
+        curPageHeight: lineHeight * 1.3 + paragraphSpacing * 2,
         curLineWidth: 0,
         curPageNum: 1,
         curPageData: [],
@@ -244,7 +245,8 @@ export default function processContentPage(params: ProcessContentPageParams) {
         paragraphIndent,
         lineHeight,
         paragraphSpacing,
-        containerSize
+        containerSize,
+        titleCount: 0
     })
 
     // 给第一页的段落数据中，初始化一个标题
@@ -319,6 +321,7 @@ interface GetCharItemListParams {
     lineHeight: number
     paragraphSpacing: number
     containerSize: { width: number; height: number }
+    titleCount: number
 }
 
 function getCharItemList(contents: string[], chineseWidth: number, characterSizeMap: CharacterSizeMap) {
