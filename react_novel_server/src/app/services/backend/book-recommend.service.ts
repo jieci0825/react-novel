@@ -10,7 +10,6 @@ export async function addMainBookRecommendService(data: AddBookRecommendParams) 
         book_id: data.bookId,
         book_cover: data.bookCover,
         book_author: data.bookAuthor,
-        book_source: data._source,
         order: data.order
     }
 

@@ -27,11 +27,6 @@ const BookRecommendModel = db.define('book_recommend', {
         allowNull: false,
         comment: '书籍id'
     },
-    book_source: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        comment: '书籍来源'
-    },
     recommend_type: {
         // 推荐类型：post-帖子，post-comment-帖子评论，main-站主推荐
         type: DataTypes.ENUM('post', 'post-comment', 'main'),
