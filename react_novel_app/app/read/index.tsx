@@ -519,6 +519,8 @@ export default function ReadPage() {
     const db = useSQLiteContext()
     const drizzleDB = drizzle(db, { schema })
 
+    const [count, setCount] = useState(0)
+
     // 是否开始正式正式渲染
     const [isRender, setIsRender] = useState(false)
     // 当前页
@@ -590,6 +592,10 @@ export default function ReadPage() {
             }
         })
     }, [currentPage])
+
+    useEffect(() => {
+        setCount(count + 1)
+    }, [readStyle])
 
     const params = useLocalSearchParams()
 
@@ -706,6 +712,7 @@ export default function ReadPage() {
     const memoizedReadContentWrap = useMemo(() => {
         return (
             <ReadContentWrap
+                count={count}
                 currentChapterName={curChapterName}
                 handleCenter={() => setIsVisible(!isVisible)}
                 nextPage={nextPage}
@@ -721,7 +728,7 @@ export default function ReadPage() {
                 chapterName={curChapterName}
             />
         )
-    }, [currentPage, chapterContent, isVisible, dynamicTextStyles])
+    }, [currentPage, chapterContent, isVisible, dynamicTextStyles, count])
 
     const toggleDarkMode = () => {
         async function cb() {
@@ -742,22 +749,53 @@ export default function ReadPage() {
         setShowReaderSetting(true)
     }
 
+    const memoizedCalcTextSize = useMemo(() => {
+        // 重新计算字符尺寸，清空之前的数据
+        characterSizeMap.current.clear()
+
+        return (
+            <>
+                <CalcTextSize
+                    text='一'
+                    textStyle={dynamicTextStyles}
+                    onSizeInfo={({ width, height }) => {
+                        addData('chinese', { width, height })
+                    }}
+                />
+                {noChineseCharacterList.map((item, index) => {
+                    return (
+                        <CalcTextSize
+                            key={index}
+                            text={item}
+                            textStyle={dynamicTextStyles}
+                            onSizeInfo={({ width, height }) => {
+                                // 检测当前 key 是否存在
+                                if (characterSizeMap.current.has(item)) return
+                                addData(item, { width, height })
+                            }}
+                        />
+                    )
+                })}
+            </>
+        )
+    }, [readStyle])
+
     return (
         <>
+            {memoizedCalcTextSize}
             {/* 中文字符固定使用一来检测，中文字符的宽度都是一样的，无需重复计算 */}
-            <CalcTextSize
-                key={`chinese-${JSON.stringify(dynamicTextStyles)}`}
+            {/* <CalcTextSize
                 text='一'
                 textStyle={dynamicTextStyles}
                 onSizeInfo={({ width, height }) => {
                     addData('chinese', { width, height })
                 }}
-            />
+            /> */}
             {/* 其他字符动态计算 */}
             {noChineseCharacterList.map((item, index) => {
                 return (
                     <CalcTextSize
-                        key={index + `chinese-${JSON.stringify(dynamicTextStyles)}`}
+                        key={index}
                         text={item}
                         textStyle={dynamicTextStyles}
                         onSizeInfo={({ width, height }) => {

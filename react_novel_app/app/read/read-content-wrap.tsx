@@ -59,6 +59,7 @@ interface ReadContentHorizontalProps extends ReadContentBase {
     // 重新计算分页后的回调
     calcPageDataCallback: (maxPageIndex: number) => void
     chapterName: string
+    count: number // 用于触发重新计算，利用这个值改变的时候，重新计算长文本分页
 }
 
 export default function ReadContentWrap(props: ReadContentHorizontalProps) {
@@ -76,7 +77,7 @@ export default function ReadContentWrap(props: ReadContentHorizontalProps) {
     useEffect(() => {
         startCalc(containerSize)
         // props.content 这里来监听 props.content 字符串的内容变化。如果是 props.contents 则因为每次都是新对象，导致会不停的触发计算
-    }, [containerSize, props.content])
+    }, [containerSize, props.content, props.count])
 
     const containerClick = (e: GestureResponderEvent) => {
         const x = e.nativeEvent.pageX

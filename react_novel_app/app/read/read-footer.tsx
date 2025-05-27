@@ -96,14 +96,14 @@ export default function ReadFooter(props: ReadFooterProps) {
                         />
                         <Text style={styles.footerBottomBtnText}>界面</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.footerBottomBtn}>
+                    {/* <TouchableOpacity style={styles.footerBottomBtn}>
                         <Feather
                             name='settings'
                             size={RFValue(16)}
                             color={theme.primaryColor}
                         />
                         <Text style={styles.footerBottomBtnText}>设置</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </Animated.View>
         </>
