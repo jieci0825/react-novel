@@ -259,10 +259,12 @@ function MainRecommend() {
         })
     }, [])
 
-    const toDetails = (item: BookRecommendItem) => {
+    const toSearch = (item: BookRecommendItem) => {
         router.push({
-            pathname: '/details',
-            params: { bid: item.bookId, source: item.bookSource }
+            pathname: '/search',
+            params: {
+                bookName: item.bookName
+            }
         })
     }
 
@@ -280,7 +282,7 @@ function MainRecommend() {
                                 return (
                                     <TouchableOpacity
                                         key={item.id}
-                                        onPress={() => toDetails(item)}
+                                        onPress={() => toSearch(item)}
                                     >
                                         <View style={styles.recommendItem}>
                                             <ImgPlus
