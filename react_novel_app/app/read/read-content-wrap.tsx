@@ -1,5 +1,5 @@
 import { FlatList, PixelRatio, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native'
-import { AnimationType, CharacterSizeMap, ReadContentBase } from './read.type'
+import { AnimationType, ChapterDataItem, CharacterSizeMap, ReadContentBase } from './read.type'
 import { forwardRef, memo, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import { readContentWrapStyles } from '@/styles/pages/read.styles'
@@ -11,11 +11,12 @@ import { jcShowToast } from '@/components/jc-toast/jc-toast'
 import { LocalCache } from '@/utils'
 import { READER_GUIDE_AREA } from '@/constants'
 import { DarkTheme } from '@/styles/variable'
+import { CacheChapterItem } from '.'
 
 // 根据缓存的字符 size，来计算当前章节的分页数据
 function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentHorizontalProps) {
     // 分页数据
-    const [pageData, setPageData] = useState<Array<PageDataItem[]>>([])
+    const [pageData, setPageData] = useState<PageDataItem[][]>([])
 
     // 中文字符宽度
     const chineseWidth = characterSizeMap.current.get('chinese')?.width || 0
@@ -46,6 +47,8 @@ function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentHoriz
         props.calcPageDataCallback(result.length - 1)
 
         setPageData(result)
+
+        return result
     }
 
     return { startCalc, paragraphIndent, pageData }
@@ -136,6 +139,7 @@ export default function ReadContentWrap(props: ReadContentHorizontalProps) {
                         {!!containerSize.width && (
                             <>
                                 <PageHorizontal
+                                    containerClick={containerClick}
                                     pageList={pageData}
                                     currentPage={props.currentPage}
                                     textStyle={{

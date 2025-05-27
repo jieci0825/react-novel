@@ -1,4 +1,5 @@
 import { ReaderSetting } from '@/types'
+import { PageDataItem } from '@/utils'
 import { TextStyle } from 'react-native'
 
 export type CharacterSizeMap = React.MutableRefObject<
@@ -32,6 +33,11 @@ export interface ControllerItem {
     min: number // 不具备实际限制意义，用于限制区间，来得出不同区间时，一个百分比处于这个区间的那个值
     max: number // 不具备实际限制意义，用于限制区间，来得出不同区间时，一个百分比处于这个区间的那个值
     current: number // 当前值，即一个处于最大值和最小值之间的值
+}
+
+export interface ChapterDataItem {
+    chapterIndex: number
+    pageList: PageDataItem[][]
 }
 
 export default {}

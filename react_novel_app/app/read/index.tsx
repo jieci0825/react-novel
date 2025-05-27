@@ -76,7 +76,7 @@ function useBookData() {
     return { bookDetails, chapterList, setChapterList, getBookDetails }
 }
 
-interface CacheChapterItem {
+export interface CacheChapterItem {
     chapterIndex: number
     content: string
     chapterName: string
@@ -528,7 +528,7 @@ export default function ReadPage() {
     // 显示阅读器设置
     const [showReaderSetting, setShowReaderSetting] = useState(false)
     // 阅读动画
-    const [readAnimation, setReadAnimation] = useState<AnimationType>('none')
+    const [readAnimation, setReadAnimation] = useState<AnimationType>('slide')
 
     // 当前books表中的记录
     const bookRef = useRef<schema.Books | null>(null)
@@ -717,7 +717,7 @@ export default function ReadPage() {
                 handleCenter={() => setIsVisible(!isVisible)}
                 nextPage={nextPage}
                 prevPage={prevPage}
-                animation='none'
+                animation={readAnimation}
                 content={chapterContent}
                 contents={splitTextByLine(chapterContent)}
                 readSetting={readStyle}
@@ -728,7 +728,7 @@ export default function ReadPage() {
                 chapterName={curChapterName}
             />
         )
-    }, [currentPage, chapterContent, isVisible, dynamicTextStyles, count])
+    }, [currentPage, chapterContent, isVisible, dynamicTextStyles, count, readAnimation])
 
     const toggleDarkMode = () => {
         async function cb() {
