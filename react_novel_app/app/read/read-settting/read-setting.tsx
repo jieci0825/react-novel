@@ -251,7 +251,7 @@ export default function ReaderSettingComp({
                                         滑动
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity
+                                {/* <TouchableOpacity
                                     style={[
                                         styles.controlItemBtnsBodyBtn,
                                         animation === 'scroll' && { backgroundColor: theme.primaryColor }
@@ -268,7 +268,7 @@ export default function ReaderSettingComp({
                                     >
                                         滚动
                                     </Text>
-                                </TouchableOpacity>
+                                </TouchableOpacity> */}
                             </View>
                         </View>
                         {/* 背景 */}

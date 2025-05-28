@@ -12,6 +12,7 @@ import { LocalCache } from '@/utils'
 import { READER_GUIDE_AREA } from '@/constants'
 import { DarkTheme } from '@/styles/variable'
 import { CacheChapterItem } from '.'
+import PageVertical from './page-vertical'
 
 // 根据缓存的字符 size，来计算当前章节的分页数据
 function usePageData(characterSizeMap: CharacterSizeMap, props: ReadContentHorizontalProps) {
@@ -83,6 +84,8 @@ export default function ReadContentWrap(props: ReadContentHorizontalProps) {
     }, [containerSize, props.content, props.count])
 
     const containerClick = (e: GestureResponderEvent) => {
+        if (props.animation === 'scroll') return
+
         const x = e.nativeEvent.pageX
         const leftRange = screenWidth / portion
         const rightRange = (screenWidth / portion) * 2
@@ -138,19 +141,39 @@ export default function ReadContentWrap(props: ReadContentHorizontalProps) {
                         {/* 根据阅读进度计算展示第几页 */}
                         {!!containerSize.width && (
                             <>
-                                <PageHorizontal
-                                    containerClick={containerClick}
-                                    pageList={pageData}
-                                    currentPage={props.currentPage}
-                                    textStyle={{
-                                        ...props.dynamicTextStyles,
-                                        color: isDarkMode ? DarkTheme.textSecondaryColor : props.dynamicTextStyles.color
-                                    }}
-                                    paragraphIndent={paragraphIndent}
-                                    animation={props.animation as Exclude<AnimationType, 'scroll'>}
-                                    readerSetting={props.readSetting}
-                                    containerSize={containerSize}
-                                />
+                                {props.animation === 'scroll' ? (
+                                    <PageVertical
+                                        containerClick={containerClick}
+                                        pageList={pageData}
+                                        currentPage={props.currentPage}
+                                        textStyle={{
+                                            ...props.dynamicTextStyles,
+                                            color: isDarkMode
+                                                ? DarkTheme.textSecondaryColor
+                                                : props.dynamicTextStyles.color
+                                        }}
+                                        paragraphIndent={paragraphIndent}
+                                        animation={props.animation}
+                                        readerSetting={props.readSetting}
+                                        containerSize={containerSize}
+                                    />
+                                ) : (
+                                    <PageHorizontal
+                                        containerClick={containerClick}
+                                        pageList={pageData}
+                                        currentPage={props.currentPage}
+                                        textStyle={{
+                                            ...props.dynamicTextStyles,
+                                            color: isDarkMode
+                                                ? DarkTheme.textSecondaryColor
+                                                : props.dynamicTextStyles.color
+                                        }}
+                                        paragraphIndent={paragraphIndent}
+                                        animation={props.animation as Exclude<AnimationType, 'scroll'>}
+                                        readerSetting={props.readSetting}
+                                        containerSize={containerSize}
+                                    />
+                                )}
                             </>
                         )}
                     </View>
